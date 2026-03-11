@@ -1,0 +1,79 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__logo">
+      <a routerLink="/">
+        <img src="assets/logo/logo_dany1st.webp" alt="Dany1st" />
+      </a>
+    </div>
+
+    <div class="auth-card__header">
+      <span class="section-label">Espace Client</span>
+      <h1 class="auth-card__title">INSCRIPTION</h1>
+      <div class="gold-divider"></div>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="submit()">
+      <div class="auth-form__row">
+        <div class="auth-form__field">
+          <label>Prénom <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.firstName" name="firstName" placeholder="Prénom" required />
+        </div>
+        <div class="auth-form__field">
+          <label>Nom <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="form.lastName" name="lastName" placeholder="Nom" required />
+        </div>
+      </div>
+
+      <div class="auth-form__field">
+        <label>Email <span class="req">*</span></label>
+        <input type="email" [(ngModel)]="form.email" name="email" placeholder="votre@email.com" required />
+      </div>
+
+      <div class="auth-form__field">
+        <label>Mot de passe <span class="req">*</span></label>
+        <input type="password" [(ngModel)]="form.password" name="password" placeholder="Min. 8 caractères" required />
+      </div>
+
+      <div class="auth-form__field">
+        <label>Téléphone</label>
+        <input type="tel" [(ngModel)]="form.phone" name="phone" placeholder="06 XX XX XX XX" />
+      </div>
+
+      <div class="auth-form__row">
+        <div class="auth-form__field">
+          <label>Date de naissance</label>
+          <input type="date" [(ngModel)]="form.birthDate" name="birthDate" />
+        </div>
+        <div class="auth-form__field">
+          <label>Code parrainage</label>
+          <input
+            type="text"
+            [(ngModel)]="form.referralCode"
+            name="referralCode"
+            placeholder="Ex: A1B2C3D4"
+            maxlength="8"
+            style="text-transform: uppercase"
+          />
+        </div>
+      </div>
+
+      @if (error()) {
+        <p class="auth-form__error">{{ error() }}</p>
+      }
+
+      <button type="submit" class="auth-form__submit" [class.loading]="loading()">
+        @if (loading()) {
+          <span class="auth-form__spinner"></span>
+        } @else {
+          <span>Créer mon compte</span>
+          <span class="auth-form__arrow">→</span>
+        }
+      </button>
+    </form>
+
+    <p class="auth-card__switch">
+      Déjà un compte ?
+      <a routerLink="/login">Se connecter</a>
+    </p>
+  </div>
+</section>

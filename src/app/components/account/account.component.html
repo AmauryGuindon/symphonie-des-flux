@@ -1,0 +1,155 @@
+<section class="account section">
+  <div class="container">
+    @if (user(); as u) {
+
+    <!-- Header -->
+    <div class="account__header reveal">
+      <div class="account__header-left">
+        <span class="section-label">Espace Client</span>
+        <h1 class="account__name">{{ u.firstName }} {{ u.lastName }}</h1>
+        <div class="account__tier-badge" [style.--tier-color]="getTierColor(u.loyaltyTier)">
+          <span class="account__tier-dot"></span>
+          <span>{{ tierConfig[u.loyaltyTier].label }}</span>
+        </div>
+      </div>
+      <div class="account__header-actions">
+        @if (saveSuccess()) {
+          <span class="account__saved">✓ Sauvegardé</span>
+        }
+        <button class="account__logout" (click)="logout()">Déconnexion</button>
+      </div>
+    </div>
+
+    <div class="gold-divider reveal"></div>
+
+    <!-- Stats fidélité -->
+    <div class="account__stats reveal">
+      <div class="account__stat">
+        <span class="account__stat-value" [style.color]="getTierColor(u.loyaltyTier)">{{ u.loyaltyPoints }}</span>
+        <span class="account__stat-label">Points fidélité</span>
+      </div>
+      <div class="account__stat">
+        <span class="account__stat-value">{{ u.visitCount }}</span>
+        <span class="account__stat-label">Visites totales</span>
+      </div>
+      <div class="account__stat">
+        <span class="account__stat-value">{{ u.referralCount }}</span>
+        <span class="account__stat-label">Parrainages</span>
+      </div>
+      @if (u.lastVisitAt) {
+        <div class="account__stat">
+          <span class="account__stat-value">{{ u.lastVisitAt | date:'dd/MM/yy' }}</span>
+          <span class="account__stat-label">Dernière visite</span>
+        </div>
+      }
+    </div>
+
+    <!-- Progression palier -->
+    <div class="account__tier-progress reveal">
+      <div class="account__tier-bar-wrap">
+        <div class="account__tier-bar" [style.width.%]="tierProgress()" [style.background]="getTierColor(u.loyaltyTier)"></div>
+      </div>
+      <p class="account__tier-hint">{{ nextTierLabel() }}</p>
+    </div>
+
+    <div class="account__grid">
+
+      <!-- Profil -->
+      <div class="account__card reveal">
+        <div class="account__card-header">
+          <h3>Mon Profil</h3>
+          @if (!editMode()) {
+            <button class="account__card-edit" (click)="startEdit()">Modifier</button>
+          }
+        </div>
+
+        @if (!editMode()) {
+          <dl class="account__info">
+            <dt>Email</dt><dd>{{ u.email }}</dd>
+            <dt>Téléphone</dt><dd>{{ u.phone || '—' }}</dd>
+            <dt>Style favori</dt><dd>{{ u.favoriteStyle || '—' }}</dd>
+            <dt>Préférences</dt><dd>{{ u.preferences || '—' }}</dd>
+            <dt>Anniversaire</dt><dd>{{ u.birthDate ? (u.birthDate | date:'dd/MM/yyyy') : '—' }}</dd>
+          </dl>
+        } @else {
+          <div class="account__edit-form">
+            <div class="account__edit-row">
+              <div class="account__field">
+                <label>Prénom</label>
+                <input [(ngModel)]="editFirstName" name="fn" />
+              </div>
+              <div class="account__field">
+                <label>Nom</label>
+                <input [(ngModel)]="editLastName" name="ln" />
+              </div>
+            </div>
+            <div class="account__field">
+              <label>Téléphone</label>
+              <input [(ngModel)]="editPhone" name="ph" placeholder="06 XX XX XX XX" />
+            </div>
+            <div class="account__field">
+              <label>Style favori</label>
+              <input [(ngModel)]="editFavoriteStyle" name="fs" placeholder="Ex: Dégradé propre, tempes rasées" />
+            </div>
+            <div class="account__field">
+              <label>Préférences / Notes</label>
+              <textarea [(ngModel)]="editPreferences" name="pref" rows="3" placeholder="Ex: Pas trop court sur le dessus…"></textarea>
+            </div>
+            <div class="account__edit-actions">
+              <button class="account__btn-save" (click)="saveEdit()" [disabled]="saveLoading()">
+                {{ saveLoading() ? '…' : 'Sauvegarder' }}
+              </button>
+              <button class="account__btn-cancel" (click)="editMode.set(false)">Annuler</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Parrainage -->
+      <div class="account__card reveal">
+        <div class="account__card-header">
+          <h3>Mon Code Parrainage</h3>
+        </div>
+        <p class="account__card-desc">
+          Partage ce code à tes amis. Tu gagnes <strong>20 pts</strong> à chaque inscription via ton code.
+        </p>
+        <div class="account__referral">
+          <span class="account__referral-code">{{ u.referralCode }}</span>
+          <button class="account__referral-copy" (click)="copyReferralCode()">
+            {{ codeCopied() ? '✓ Copié !' : 'Copier' }}
+          </button>
+        </div>
+        <p class="account__card-sub">{{ u.referralCount }} ami(s) parrainé(s)</p>
+      </div>
+
+      <!-- Bonus anniversaire -->
+      <div class="account__card reveal">
+        <div class="account__card-header">
+          <h3>Bonus Anniversaire</h3>
+        </div>
+        <p class="account__card-desc">
+          Réclame <strong>15 pts bonus</strong> dans les 7 jours autour de ton anniversaire.
+        </p>
+        @if (birthdaySuccess()) {
+          <p class="account__birthday-success">🎂 +15 pts ajoutés à ton compte !</p>
+        } @else {
+          @if (birthdayError()) {
+            <p class="account__birthday-error">{{ birthdayError() }}</p>
+          }
+          <button
+            class="account__btn-birthday"
+            (click)="claimBirthdayBonus()"
+            [disabled]="birthdayLoading()"
+          >
+            {{ birthdayLoading() ? '…' : 'Réclamer mon bonus' }}
+          </button>
+        }
+      </div>
+
+    </div>
+
+    } @else {
+      <div class="account__loading">Chargement…</div>
+    }
+  </div>
+</section>
