@@ -1,0 +1,46 @@
+<section class="services section" id="services">
+  <div class="container">
+    <div class="services__header">
+      <span class="section-label reveal">Services</span>
+      <h2 class="section-title reveal reveal-delay-1">NOS<br><em class="services__title-em">PRESTATIONS</em></h2>
+      <p class="services__intro reveal reveal-delay-2">
+        Chaque service est pensé pour sublimer ton style.<br>
+        Qualité premium, attention aux détails, résultat garanti.
+      </p>
+    </div>
+
+    <div class="services__grid">
+      @for (service of services; track $index) {
+        <div class="service-card reveal" [class]="'reveal-delay-' + (($index % 3) + 1)">
+          @if (service.tag) {
+            <span class="service-card__tag">{{ service.tag }}</span>
+          }
+          <div class="service-card__icon">{{ service.icon }}</div>
+          <h3 class="service-card__name">{{ service.name }}</h3>
+          <p class="service-card__desc">{{ service.description }}</p>
+          <div class="service-card__bottom">
+            <span class="service-card__price">Sur devis</span>
+            <a
+              href="https://dany1stbarber.setmore.com/"
+              target="_blank"
+              rel="noopener"
+              class="service-card__cta"
+            >Réserver →</a>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="services__booking reveal">
+      <p>Tous les tarifs disponibles sur la plateforme de réservation</p>
+      <a
+        href="https://dany1stbarber.setmore.com/"
+        target="_blank"
+        rel="noopener"
+        class="services__booking-btn"
+      >
+        Voir les tarifs & Réserver
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,228 @@
+.booking {
+  position: relative;
+  padding: 8rem 0;
+  overflow: hidden;
+  background: var(--black-mid);
+
+  &__bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &__bg-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 60px,
+        rgba(201, 164, 74, 0.02) 60px,
+        rgba(201, 164, 74, 0.02) 61px
+      );
+  }
+
+  &__bg-glow {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(201, 164, 74, 0.06) 0%, transparent 70%);
+  }
+
+  &__inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+      gap: 4rem;
+    }
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 7vw, 6.5rem);
+    line-height: 1;
+    color: var(--white);
+    letter-spacing: 0.03em;
+    margin: 1rem 0 1.5rem;
+
+    &-gold {
+      color: var(--gold);
+      font-style: normal;
+    }
+  }
+
+  &__text {
+    font-size: 0.92rem;
+    color: var(--white-muted);
+    line-height: 1.9;
+    max-width: 440px;
+  }
+
+  &__cta-group {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transition: all var(--transition);
+
+    svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.3s ease;
+    }
+
+    &--primary {
+      padding: 1rem 2.5rem;
+      background: var(--gold);
+      color: var(--black);
+
+      &:hover {
+        background: var(--gold-light);
+        transform: translateY(-2px);
+
+        svg {
+          transform: translateX(4px);
+        }
+      }
+    }
+
+    &--ghost {
+      color: var(--white-muted);
+      border-bottom: 1px solid var(--gold-border);
+      padding-bottom: 2px;
+
+      &:hover {
+        color: var(--gold);
+        border-color: var(--gold);
+      }
+    }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--gold-border);
+  }
+
+  &__info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    strong {
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: var(--white-muted);
+    }
+  }
+
+  &__info-icon {
+    color: var(--gold);
+    font-size: 1rem;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  &__decorative {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3rem;
+
+    @media (max-width: 900px) {
+      display: none;
+    }
+  }
+
+  &__deco-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  &__deco-word {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: 0.2em;
+    color: rgba(201, 164, 74, 0.08);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  &__deco-divider {
+    width: 2px;
+    height: 30px;
+    background: var(--gold-border);
+  }
+
+  &__deco-circle {
+    width: 220px;
+    height: 220px;
+    border: 1px solid var(--gold-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: rotateSlow 20s linear infinite;
+
+    svg {
+      width: 170px;
+      height: 170px;
+
+      text {
+        fill: var(--gold);
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,224 @@
+.footer {
+  background: #050505;
+  position: relative;
+  padding-bottom: 0;
+
+  &__top-line {
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-border), var(--gold), var(--gold-border), transparent);
+  }
+
+  &__main {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 4rem;
+    padding: 5rem 0 4rem;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+    }
+  }
+
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__logo-link {
+    display: inline-flex;
+    text-decoration: none;
+  }
+
+  &__logo-img {
+    height: 60px;
+    width: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1.5px solid var(--gold);
+    box-shadow:
+      0 0 0 4px rgba(201, 164, 74, 0.1),
+      0 0 18px rgba(201, 164, 74, 0.2);
+    display: block;
+    transition: box-shadow 0.4s ease;
+
+    &:hover {
+      box-shadow:
+        0 0 0 4px rgba(201, 164, 74, 0.22),
+        0 0 28px rgba(201, 164, 74, 0.45);
+    }
+  }
+
+  &__tagline {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--white-muted);
+    line-height: 1.6;
+  }
+
+  &__social {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  &__social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--white-muted);
+    text-decoration: none;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    transition: color 0.3s ease, transform 0.2s ease;
+    width: fit-content;
+
+    svg {
+      width: 15px;
+      height: 15px;
+      flex-shrink: 0;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+
+    &:hover {
+      color: var(--gold);
+      transform: translateX(3px);
+
+      svg {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__nav-title {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  &__nav ul,
+  &__contact ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+
+    a {
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: var(--white-muted);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color 0.3s ease;
+
+      &:hover {
+        color: var(--gold);
+      }
+    }
+  }
+
+  &__contact ul {
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+  }
+
+  &__contact-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: rgba(245, 240, 232, 0.3);
+    text-transform: uppercase;
+  }
+
+  &__contact li span:not(.footer__contact-label),
+  &__contact li a {
+    font-size: 0.82rem;
+    color: var(--white-muted);
+    text-decoration: none;
+    line-height: 1.4;
+
+    &:hover {
+      color: var(--gold);
+    }
+  }
+
+  &__cta-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    p {
+      font-size: 0.82rem;
+      color: var(--white-muted);
+      line-height: 1.7;
+    }
+  }
+
+  &__book-btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: center;
+    transition: background 0.3s ease, color 0.3s ease;
+
+    &:hover {
+      background: var(--gold);
+      color: var(--black);
+    }
+  }
+
+  &__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(201, 164, 74, 0.1);
+  }
+
+  &__copy {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: rgba(245, 240, 232, 0.2);
+  }
+
+  &__back-top {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--gold-border);
+    background: transparent;
+    color: var(--gold);
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease, border-color 0.3s ease;
+
+    &:hover {
+      background: var(--gold-muted);
+      border-color: var(--gold);
+    }
+  }
+}

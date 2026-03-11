@@ -1,0 +1,42 @@
+<nav class="navbar" [class.scrolled]="scrolled" [class.menu-open]="menuOpen">
+  <div class="navbar__inner">
+    <a class="navbar__logo" routerLink="/">
+      <img src="assets/logo/logo_dany1st.webp" alt="Dany1st Barber" class="navbar__logo-img" />
+    </a>
+
+    <ul class="navbar__links">
+      <li><a routerLink="/services" routerLinkActive="active">Services</a></li>
+      <li><a routerLink="/gallery" routerLinkActive="active">Galerie</a></li>
+      <li><a routerLink="/about" routerLinkActive="active">À Propos</a></li>
+      <li>
+        <a href="https://dany1stbarber.setmore.com/" target="_blank" rel="noopener" class="navbar__cta">
+          Réserver
+        </a>
+      </li>
+    </ul>
+
+    <button class="navbar__burger" (click)="toggleMenu()" [class.active]="menuOpen" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <!-- Mobile overlay menu -->
+  <div class="navbar__mobile" [class.open]="menuOpen">
+    <ul>
+      <li><a routerLink="/services" routerLinkActive="active" (click)="closeMenu()">Services</a></li>
+      <li><a routerLink="/gallery" routerLinkActive="active" (click)="closeMenu()">Galerie</a></li>
+      <li><a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">À Propos</a></li>
+      <li>
+        <a href="https://dany1stbarber.setmore.com/" target="_blank" rel="noopener" (click)="closeMenu()">
+          Réserver
+        </a>
+      </li>
+    </ul>
+    <div class="navbar__mobile-footer">
+      <span>Tournan-en-Brie</span>
+      <a href="https://www.instagram.com/danyy1st" target="_blank" rel="noopener">&#64;danyy1st</a>
+    </div>
+  </div>
+</nav>

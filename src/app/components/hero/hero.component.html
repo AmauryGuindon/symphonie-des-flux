@@ -1,0 +1,52 @@
+<section class="hero" id="hero" #heroSection>
+  <canvas #particleCanvas class="hero__canvas"></canvas>
+
+  <!-- Diagonal grid overlay -->
+  <div class="hero__grid"></div>
+
+  <!-- Side decorative line -->
+  <div class="hero__side-line hero__side-line--left"></div>
+  <div class="hero__side-line hero__side-line--right"></div>
+
+  <div class="hero__content">
+    <div class="hero__eyebrow">
+      <span class="hero__eyebrow-line"></span>
+      <span class="hero__eyebrow-text">BARBER SHOP · EST. 2020</span>
+      <span class="hero__eyebrow-line"></span>
+    </div>
+
+    <h1 class="hero__title">
+      @for (char of titleChars; track $index) {
+      <span class="hero__title-char">{{ char }}</span>
+      }
+      <span class="hero__title-spade">♠</span>
+    </h1>
+
+    <p class="hero__subtitle">
+      L'ART DU STYLE
+      <span class="hero__subtitle-sep">·</span>
+      <span class="hero__location">
+        <svg class="hero__pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+        </svg>
+        TOURNAN-EN-BRIE
+      </span>
+    </p>
+
+    <div class="hero__cta">
+      <a href="https://dany1stbarber.setmore.com/" target="_blank" rel="noopener" class="hero__btn">
+        <span class="hero__btn-text">Prendre Rendez-vous</span>
+        <span class="hero__btn-arrow">→</span>
+      </a>
+      <a class="hero__btn-ghost" routerLink="/services">
+        Découvrir
+      </a>
+    </div>
+  </div>
+
+
+
+  <!-- Bottom accent -->
+  <div class="hero__bottom-accent"></div>
+</section>
