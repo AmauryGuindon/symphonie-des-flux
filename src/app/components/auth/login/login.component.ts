@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -17,7 +17,11 @@ export class LoginComponent {
   loading = signal(false);
   error = signal('');
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   submit() {
     if (!this.email || !this.password) {
@@ -27,8 +31,13 @@ export class LoginComponent {
     this.loading.set(true);
     this.error.set('');
 
+    const redirect = this.route.snapshot.queryParamMap.get('redirect');
+
     this.auth.login(this.email, this.password).subscribe({
-      next: () => this.router.navigate(['/account']),
+      next: () => {
+        const dest = redirect ?? (this.auth.isAdmin() ? '/admin' : '/account');
+        this.router.navigateByUrl(dest);
+      },
       error: (err) => {
         this.error.set(err.error?.message ?? 'Email ou mot de passe incorrect.');
         this.loading.set(false);

@@ -1,0 +1,146 @@
+@use '../admin-shared' as *;
+
+.clients {
+  padding: 2rem 2.5rem;
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__title { @include page-title; }
+
+  &__count {
+    font-size: .8rem;
+    color: rgba(255,255,255,.3);
+  }
+
+  &__search-wrap {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: rgba(255,255,255,.3);
+  }
+
+  &__search {
+    width: 100%;
+    background: #161616;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: .75rem 1rem .75rem 2.75rem;
+    color: #fff;
+    font-size: .875rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .2s;
+
+    &::placeholder { color: rgba(255,255,255,.25); }
+    &:focus { border-color: rgba(201,164,74,.4); }
+  }
+
+  &__loading, &__empty { @include loading; }
+
+  &__table-wrap {
+    @include card;
+    padding: 0;
+    overflow: hidden;
+    overflow-x: auto;
+  }
+
+  &__table {
+    @include table;
+  }
+
+  &__name {
+    font-weight: 600;
+    color: #fff !important;
+    white-space: nowrap;
+  }
+
+  &__email {
+    color: rgba(255,255,255,.5) !important;
+    font-size: .8rem !important;
+  }
+
+  &__tier {
+    display: inline-block;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    border: 1px solid;
+    font-size: .7rem;
+    font-weight: 600;
+  }
+
+  &__pts {
+    font-weight: 600;
+    color: #C9A44A !important;
+  }
+
+  &__btn-detail {
+    @include btn-ghost;
+    text-decoration: none;
+    font-size: .75rem;
+    padding: .3rem .75rem;
+    white-space: nowrap;
+  }
+
+  // ── Pagination ─────────────────────────────────────────────────────────────
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  &__page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 .5rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 6px;
+    color: rgba(255,255,255,.55);
+    font-size: .8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+    font-family: inherit;
+
+    &:hover:not(:disabled) {
+      background: rgba(255,255,255,.1);
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+
+    &--active {
+      background: rgba(201,164,74,.15);
+      border-color: rgba(201,164,74,.4);
+      color: #C9A44A;
+      font-weight: 700;
+    }
+
+    &--nav { font-size: .9rem; }
+  }
+
+  &__page-info {
+    margin-left: .5rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,.3);
+  }
+}

@@ -58,6 +58,10 @@ export class User {
   @Prop({ default: 0 })
   referralCount: number;
 
+  /** Dates des parrainages ayant généré un bonus (max 3 par période de 60 jours) */
+  @Prop({ type: [Date], default: [] })
+  referralDates: Date[];
+
   // --- Dernière visite ---
   @Prop()
   lastVisitAt?: Date;

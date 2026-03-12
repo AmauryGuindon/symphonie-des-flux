@@ -1,0 +1,105 @@
+// Mixins & variables partagées entre tous les composants admin
+
+@mixin card {
+  background: #161616;
+  border: 1px solid rgba(201,164,74,.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+@mixin page-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: .02em;
+  margin: 0;
+}
+
+@mixin loading {
+  text-align: center;
+  padding: 4rem;
+  color: rgba(255,255,255,.3);
+  font-size: .9rem;
+}
+
+@mixin badge($bg, $color) {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .6rem;
+  border-radius: 20px;
+  background: $bg;
+  color: $color;
+  font-size: .7rem;
+  font-weight: 600;
+}
+
+@mixin btn-primary {
+  background: #C9A44A;
+  color: #000;
+  border: none;
+  padding: .5rem 1rem;
+  border-radius: 6px;
+  font-size: .8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s;
+  &:hover { opacity: .85; }
+  &:disabled { opacity: .4; cursor: not-allowed; }
+}
+
+@mixin btn-ghost {
+  background: none;
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.5);
+  padding: .4rem .875rem;
+  border-radius: 6px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .2s;
+  &:hover {
+    border-color: rgba(255,255,255,.4);
+    color: rgba(255,255,255,.8);
+  }
+}
+
+@mixin btn-danger {
+  background: none;
+  border: 1px solid rgba(231,76,60,.3);
+  color: rgba(231,76,60,.7);
+  padding: .4rem .875rem;
+  border-radius: 6px;
+  font-size: .8rem;
+  cursor: pointer;
+  transition: all .2s;
+  &:hover {
+    background: rgba(231,76,60,.1);
+    border-color: #e74c3c;
+    color: #e74c3c;
+  }
+}
+
+@mixin table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    font-size: .7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.35);
+    padding: .75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+
+  td {
+    padding: .875rem 1rem;
+    font-size: .85rem;
+    color: rgba(255,255,255,.75);
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+
+  tr:hover td { background: rgba(255,255,255,.02); }
+}

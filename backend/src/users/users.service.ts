@@ -36,10 +36,24 @@ export class UsersService {
       });
       if (referrer) {
         referredBy = referrer._id.toString();
-        // Bonus points pour le parrain
-        await this.userModel.findByIdAndUpdate(referrer._id, {
-          $inc: { loyaltyPoints: LOYALTY_REFERRAL_BONUS, referralCount: 1 },
-        });
+
+        // Limite : 3 parrainages avec bonus par période de 60 jours
+        const twoMonthsAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
+        const recentBonuses = (referrer.referralDates ?? []).filter(
+          (d) => d >= twoMonthsAgo,
+        ).length;
+
+        if (recentBonuses < 3) {
+          await this.userModel.findByIdAndUpdate(referrer._id, {
+            $inc: { loyaltyPoints: LOYALTY_REFERRAL_BONUS, referralCount: 1 },
+            $push: { referralDates: new Date() },
+          });
+        } else {
+          // Parrainage comptabilisé mais sans bonus
+          await this.userModel.findByIdAndUpdate(referrer._id, {
+            $inc: { referralCount: 1 },
+          });
+        }
       }
     }
 
@@ -87,11 +101,11 @@ export class UsersService {
 
   // --- Fidélité ---
 
-  async recordVisit(userId: string): Promise<UserDocument> {
+  async recordVisit(userId: string, points: number = LOYALTY_POINTS_PER_VISIT): Promise<UserDocument> {
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $inc: { loyaltyPoints: LOYALTY_POINTS_PER_VISIT, visitCount: 1 },
+        $inc: { loyaltyPoints: points, visitCount: 1 },
         lastVisitAt: new Date(),
       },
       { new: true },

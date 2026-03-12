@@ -17,3 +17,7 @@ Thumbs.db
 *.log
 npm-debug.log*
 node_modules
+
+# Variables d'environnement (identifiants sensibles)
+.env
+backend/.env

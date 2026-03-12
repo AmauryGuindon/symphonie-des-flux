@@ -2,7 +2,8 @@ export type Role = 'client' | 'admin';
 export type LoyaltyTier = 'bronze' | 'silver' | 'gold' | 'platinum';
 
 export interface User {
-  id: string;
+  _id?: string;
+  id?: string;
   firstName: string;
   lastName: string;
   email: string;

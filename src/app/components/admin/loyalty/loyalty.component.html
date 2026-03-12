@@ -1,0 +1,142 @@
+<div class="loyalty">
+  <div class="loyalty__header">
+    <h1 class="loyalty__title">Programme Fidélité</h1>
+  </div>
+
+  @if (loading()) {
+    <div class="loyalty__loading">Chargement…</div>
+  } @else {
+    @if (stats(); as s) {
+
+      <!-- Répartition paliers -->
+      <div class="loyalty__row">
+        <div class="loyalty__card loyalty__card--tiers">
+          <h3 class="loyalty__card-title">Répartition des paliers</h3>
+          <div class="loyalty__tier-grid">
+            @for (tier of tiers; track tier) {
+              <div class="loyalty__tier-bloc" [style.--tc]="tierColors[tier]">
+                <span class="loyalty__tier-value">{{ s.tiers[tier] }}</span>
+                <span class="loyalty__tier-label">{{ tierLabels[tier] }}</span>
+                <div class="loyalty__tier-bar-wrap">
+                  <div class="loyalty__tier-bar" [style.width.%]="tierPercent(tier)"></div>
+                </div>
+                <span class="loyalty__tier-pct">{{ tierPercent(tier) }}%</span>
+              </div>
+            }
+          </div>
+          <p class="loyalty__total">{{ tierTotal() }} clients au total</p>
+        </div>
+
+        <!-- Anniversaires disponibles -->
+        <div class="loyalty__card">
+          <h3 class="loyalty__card-title">🎂 Bonus anniversaire disponibles</h3>
+          @if (s.birthdayAvailable.length === 0) {
+            <p class="loyalty__empty-text">Aucun bonus disponible en ce moment.</p>
+          } @else {
+            <div class="loyalty__birthday-list">
+              @for (c of s.birthdayAvailable; track c._id) {
+                <div class="loyalty__birthday-item">
+                  <span class="loyalty__birthday-name">{{ c.firstName }} {{ c.lastName }}</span>
+                  <span class="loyalty__birthday-date">{{ c.birthDate | date:'dd/MM' }}</span>
+                  <a [routerLink]="['/admin/clients', c._id]" class="loyalty__btn-view">Voir</a>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Top clients -->
+      <div class="loyalty__card loyalty__card--full">
+        <h3 class="loyalty__card-title">Top 10 clients les plus fidèles</h3>
+        <table class="loyalty__table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Client</th>
+              <th>Palier</th>
+              <th>Visites</th>
+              <th>Points</th>
+              <th>Dernière visite</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of s.topClients; track c._id; let i = $index) {
+              <tr [class.loyalty__row--podium]="i < 3">
+                <td class="loyalty__rank">
+                  @if (i === 0) { 🥇 }
+                  @else if (i === 1) { 🥈 }
+                  @else if (i === 2) { 🥉 }
+                  @else { {{ i + 1 }} }
+                </td>
+                <td class="loyalty__client-name">{{ c.firstName }} {{ c.lastName }}</td>
+                <td>
+                  <span class="loyalty__tier-badge" [style.color]="tierColors[c.loyaltyTier]" [style.border-color]="tierColors[c.loyaltyTier] + '40'">
+                    {{ tierLabels[c.loyaltyTier] }}
+                  </span>
+                </td>
+                <td class="loyalty__visits">{{ c.visitCount }}</td>
+                <td class="loyalty__points">{{ c.loyaltyPoints }} pts</td>
+                <td>{{ c.lastVisitAt ? (c.lastVisitAt | date:'dd/MM/yyyy') : '—' }}</td>
+                <td><a [routerLink]="['/admin/clients', c._id]" class="loyalty__btn-view">Voir</a></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    }
+  }
+
+  <!-- Configuration des prestations -->
+  <div class="loyalty__card loyalty__card--full loyalty__services">
+    <div class="loyalty__services-header">
+      <h3 class="loyalty__card-title" style="margin:0">Configuration des prestations</h3>
+      @if (saveSuccess()) {
+        <span class="loyalty__save-success">✓ {{ saveSuccess() }}</span>
+      }
+    </div>
+    <p class="loyalty__services-desc">Définissez le nombre de points fidélité attribués pour chaque prestation.</p>
+
+    @if (services().length === 0) {
+      <p class="loyalty__empty-text">Chargement des prestations…</p>
+    } @else {
+      <table class="loyalty__table loyalty__services-table">
+        <thead>
+          <tr>
+            <th>Prestation</th>
+            <th>Prix par défaut</th>
+            <th>Points attribués</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (svc of services(); track svc._id) {
+            <tr>
+              <td class="loyalty__svc-name">{{ svc.name }}</td>
+              <td class="loyalty__svc-price">{{ svc.price }} €</td>
+              <td class="loyalty__svc-pts">
+                @if (editingId() === svc._id) {
+                  <input class="loyalty__pts-input" type="number" [(ngModel)]="editPoints" min="0" step="1" />
+                } @else {
+                  <span class="loyalty__pts-value">{{ svc.loyaltyPoints }} pts</span>
+                }
+              </td>
+              <td class="loyalty__svc-actions">
+                @if (editingId() === svc._id) {
+                  <button class="loyalty__btn-save" (click)="saveEdit(svc)" [disabled]="saveLoading()">
+                    {{ saveLoading() ? '…' : 'Sauvegarder' }}
+                  </button>
+                  <button class="loyalty__btn-cancel" (click)="cancelEdit()">Annuler</button>
+                } @else {
+                  <button class="loyalty__btn-edit" (click)="startEdit(svc)">Modifier</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
