@@ -8,6 +8,7 @@ import { Visit, VisitSchema } from '../visits/schemas/visit.schema';
 import { ServiceConfig, ServiceConfigSchema } from '../services/schemas/service-config.schema';
 import { Appointment, AppointmentSchema } from '../appointments/schemas/appointment.schema';
 import { AppointmentsModule } from '../appointments/appointments.module';
+import { ScheduleModule } from '../schedule/schedule.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { AppointmentsModule } from '../appointments/appointments.module';
     ]),
     UsersModule,
     AppointmentsModule,
+    ScheduleModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

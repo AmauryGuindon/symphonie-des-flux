@@ -1,6 +1,24 @@
+import { IsString, IsNotEmpty, IsOptional, IsIn } from 'class-validator';
+
 export class CreateAppointmentDto {
+  @IsString()
+  @IsNotEmpty()
   serviceType: string;
-  date: string;   // YYYY-MM-DD
-  time: string;   // HH:mm
+
+  @IsString()
+  @IsNotEmpty()
+  date: string;
+
+  @IsString()
+  @IsNotEmpty()
+  time: string;
+
+  @IsString()
+  @IsOptional()
   notes?: string;
+
+  @IsString()
+  @IsIn(['especes', 'virement', 'en_ligne'])
+  @IsOptional()
+  paymentMethod?: string;
 }

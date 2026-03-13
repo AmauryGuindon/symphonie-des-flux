@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { AppointmentService, TimeSlot } from '../../services/appointment.service';
+import { AppointmentService, TimeSlot, BusinessConfig } from '../../services/appointment.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -20,6 +20,15 @@ export class AppointmentBookingComponent implements OnInit {
   services = signal<{ _id: string; name: string; price: number }[]>([]);
   selectedService = '';
 
+  // Schedule config (dynamic from API)
+  private scheduleConfig: BusinessConfig = {
+    openDays: [1, 2, 3, 4, 5, 6],
+    openTime: '09:00',
+    closeTime: '19:00',
+    slotDuration: 60,
+    closedDates: [],
+  };
+
   // Calendar
   today = new Date();
   currentMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
@@ -35,6 +44,7 @@ export class AppointmentBookingComponent implements OnInit {
 
   // Booking
   notes = '';
+  paymentMethod = '';
   bookLoading = signal(false);
   bookError = signal('');
   bookSuccess = signal(false);
@@ -42,6 +52,15 @@ export class AppointmentBookingComponent implements OnInit {
   // My appointments
   myAppointments = signal<any[]>([]);
   myTab = signal<'book' | 'mine'>('book');
+
+  switchTab(tab: 'book' | 'mine') {
+    this.myTab.set(tab);
+    setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.revealed)').forEach(el => {
+        el.classList.add('revealed');
+      });
+    }, 50);
+  }
 
   constructor(
     private appointmentService: AppointmentService,
@@ -55,6 +74,9 @@ export class AppointmentBookingComponent implements OnInit {
         this.services.set(s);
         if (s.length) this.selectedService = s[0].name;
       },
+    });
+    this.appointmentService.getPublicSchedule().subscribe({
+      next: cfg => { this.scheduleConfig = cfg; },
     });
     if (this.auth.isAuthenticated()) {
       this.loadMyAppointments();
@@ -101,8 +123,11 @@ export class AppointmentBookingComponent implements OnInit {
     return d <= today;
   }
 
-  isSunday(d: Date): boolean {
-    return d.getDay() === 0;
+  isClosedDay(d: Date): boolean {
+    const weekday = d.getDay();
+    const ds = this.toDateString(d);
+    return !this.scheduleConfig.openDays.includes(weekday) ||
+           this.scheduleConfig.closedDates.includes(ds);
   }
 
   toDateString(d: Date): string {
@@ -110,7 +135,7 @@ export class AppointmentBookingComponent implements OnInit {
   }
 
   selectDate(d: Date | null) {
-    if (!d || this.isPast(d) || this.isSunday(d)) return;
+    if (!d || this.isPast(d) || this.isClosedDay(d)) return;
     const ds = this.toDateString(d);
     this.selectedDate.set(ds);
     this.selectedTime.set(null);
@@ -138,7 +163,7 @@ export class AppointmentBookingComponent implements OnInit {
     }
     const date = this.selectedDate();
     const time = this.selectedTime();
-    if (!date || !time || !this.selectedService) return;
+    if (!date || !time || !this.selectedService || !this.paymentMethod) return;
 
     this.bookLoading.set(true);
     this.bookError.set('');
@@ -147,6 +172,7 @@ export class AppointmentBookingComponent implements OnInit {
       date,
       time,
       notes: this.notes || undefined,
+      paymentMethod: this.paymentMethod,
     }).subscribe({
       next: () => {
         this.bookLoading.set(false);
@@ -154,6 +180,7 @@ export class AppointmentBookingComponent implements OnInit {
         this.loadSlots(date);
         this.loadMyAppointments();
         this.notes = '';
+        this.paymentMethod = '';
         this.selectedTime.set(null);
       },
       error: (e) => {

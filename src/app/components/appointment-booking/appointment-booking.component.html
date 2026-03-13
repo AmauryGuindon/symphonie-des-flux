@@ -7,37 +7,27 @@
       <div class="gold-divider"></div>
     </div>
 
-    @if (!isAuth()) {
-      <div class="appt__login-cta reveal">
-        <div class="appt__login-icon">◈</div>
-        <p>Connecte-toi pour réserver ton créneau en quelques secondes.</p>
-        <div class="appt__login-actions">
-          <a routerLink="/login" [queryParams]="{redirect: '/appointment'}" class="appt__btn appt__btn--primary">Se connecter</a>
-          <a routerLink="/register" class="appt__btn appt__btn--ghost">Créer un compte</a>
-        </div>
-      </div>
-    }
-
+    <!-- Tabs (uniquement connecté) -->
     @if (isAuth()) {
       <div class="appt__tabs reveal">
-        <button class="appt__tab" [class.active]="myTab() === 'book'" (click)="myTab.set('book')">
+        <button class="appt__tab" [class.active]="myTab() === 'book'" (click)="switchTab('book')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           Réserver
         </button>
-        <button class="appt__tab" [class.active]="myTab() === 'mine'" (click)="myTab.set('mine')">
+        <button class="appt__tab" [class.active]="myTab() === 'mine'" (click)="switchTab('mine')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
           Mes RDV
         </button>
       </div>
     }
 
+    <!-- Vue réservation (toujours visible) -->
     @if (myTab() === 'book') {
       <div class="appt__layout reveal">
 
-        <!-- Left: service picker + calendar + slots -->
+        <!-- Gauche : prestation + calendrier + créneaux -->
         <div class="appt__left">
 
-          <!-- Service selector -->
           <div class="appt__card">
             <h3 class="appt__card-title">
               <span class="appt__step">1</span>
@@ -57,7 +47,6 @@
             </div>
           </div>
 
-          <!-- Calendar -->
           <div class="appt__card">
             <h3 class="appt__card-title">
               <span class="appt__step">2</span>
@@ -72,7 +61,6 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
               </button>
             </div>
-
             <div class="appt__cal-grid">
               @for (day of ['Lu','Ma','Me','Je','Ve','Sa','Di']; track day) {
                 <div class="appt__cal-head">{{ day }}</div>
@@ -84,29 +72,27 @@
                   <div
                     class="appt__cal-cell"
                     [class.appt__cal-cell--past]="isPast(d)"
-                    [class.appt__cal-cell--closed]="isSunday(d)"
+                    [class.appt__cal-cell--closed]="isClosedDay(d)"
                     [class.appt__cal-cell--selected]="selectedDate() === toDateString(d)"
-                    [class.appt__cal-cell--selectable]="!isPast(d) && !isSunday(d)"
+                    [class.appt__cal-cell--selectable]="!isPast(d) && !isClosedDay(d)"
                     (click)="selectDate(d)"
                   >{{ d.getDate() }}</div>
                 }
               }
             </div>
-            <p class="appt__cal-legend">Fermé le dimanche · Réservation à partir du lendemain</p>
+            <p class="appt__cal-legend">Réservation à partir du lendemain</p>
           </div>
 
-          <!-- Time slots -->
           @if (selectedDate()) {
             <div class="appt__card">
               <h3 class="appt__card-title">
                 <span class="appt__step">3</span>
-                Choisissez un créneau — {{ formatDate(selectedDate()!) }}
+                Créneaux disponibles — {{ formatDate(selectedDate()!) }}
               </h3>
-
               @if (slotsLoading()) {
                 <div class="appt__slots-loading">
                   <span class="appt__spinner"></span>
-                  Chargement des créneaux…
+                  Chargement…
                 </div>
               } @else if (closed()) {
                 <p class="appt__closed">Fermé ce jour-là.</p>
@@ -127,7 +113,7 @@
           }
         </div>
 
-        <!-- Right: summary + confirm -->
+        <!-- Droite : récapitulatif -->
         <div class="appt__right">
           <div class="appt__card appt__summary-card">
 
@@ -163,37 +149,87 @@
                 </div>
               </div>
 
-              <div class="appt__notes-field">
-                <label class="appt__notes-label">Notes <span>(optionnel)</span></label>
-                <textarea
-                  class="appt__textarea"
-                  [(ngModel)]="notes"
-                  rows="3"
-                  placeholder="Ex: coupe dégradée, pas trop court sur le dessus…"
-                ></textarea>
-              </div>
+              @if (isAuth()) {
+                <!-- Connecté : formulaire complet -->
+                <div class="appt__payment-field">
+                  <label class="appt__notes-label">Moyen de paiement</label>
+                  <div class="appt__payment-options">
+                    <button
+                      class="appt__pay-opt"
+                      [class.appt__pay-opt--selected]="paymentMethod === 'especes'"
+                      (click)="paymentMethod = 'especes'"
+                      type="button"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/><path d="M2 10h2M20 10h2M2 14h2M20 14h2"/></svg>
+                      Espèces
+                    </button>
+                    <button
+                      class="appt__pay-opt"
+                      [class.appt__pay-opt--selected]="paymentMethod === 'virement'"
+                      (click)="paymentMethod = 'virement'"
+                      type="button"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+                      Virement
+                    </button>
+                    <button
+                      class="appt__pay-opt"
+                      [class.appt__pay-opt--selected]="paymentMethod === 'en_ligne'"
+                      (click)="paymentMethod = 'en_ligne'"
+                      type="button"
+                    >
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      En ligne
+                    </button>
+                  </div>
+                </div>
 
-              @if (bookError()) {
-                <div class="appt__error-box">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                  {{ bookError() }}
+                <div class="appt__notes-field">
+                  <label class="appt__notes-label">Notes <span>(optionnel)</span></label>
+                  <textarea
+                    class="appt__textarea"
+                    [(ngModel)]="notes"
+                    rows="3"
+                    placeholder="Ex: coupe dégradée, pas trop court…"
+                  ></textarea>
+                </div>
+
+                @if (bookError()) {
+                  <div class="appt__error-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {{ bookError() }}
+                  </div>
+                }
+
+                <button
+                  class="appt__btn appt__btn--primary appt__btn--full"
+                  (click)="book()"
+                  [disabled]="bookLoading() || !selectedDate() || !selectedTime() || !selectedService || !paymentMethod"
+                >
+                  @if (bookLoading()) {
+                    <span class="appt__btn-spinner"></span> Réservation en cours…
+                  } @else {
+                    Confirmer le rendez-vous
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  }
+                </button>
+                <p class="appt__summary-note">Confirmation par email après réservation</p>
+
+              } @else {
+                <!-- Non connecté : invite à se connecter -->
+                <div class="appt__auth-wall">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <p>Connecte-toi pour finaliser ta réservation</p>
+                  <a
+                    routerLink="/login"
+                    [queryParams]="{redirect: '/appointment'}"
+                    class="appt__btn appt__btn--primary appt__btn--full"
+                  >Se connecter</a>
+                  <a routerLink="/register" class="appt__auth-register">
+                    Pas encore de compte ? <strong>Créer un compte</strong>
+                  </a>
                 </div>
               }
-
-              <button
-                class="appt__btn appt__btn--primary appt__btn--full"
-                (click)="book()"
-                [disabled]="bookLoading() || !selectedDate() || !selectedTime() || !selectedService"
-              >
-                @if (bookLoading()) {
-                  <span class="appt__btn-spinner"></span> Réservation en cours…
-                } @else {
-                  Confirmer le rendez-vous
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                }
-              </button>
-
-              <p class="appt__summary-note">Confirmation par email après réservation</p>
             }
           </div>
         </div>
@@ -201,7 +237,7 @@
       </div>
     }
 
-    <!-- My appointments tab -->
+    <!-- Onglet Mes RDV -->
     @if (myTab() === 'mine' && isAuth()) {
       <div class="appt__mine reveal">
         @if (myAppointments().length === 0) {

@@ -15,6 +15,7 @@ import { AdminClientDetailComponent } from './components/admin/client-detail/cli
 import { AdminLoyaltyComponent } from './components/admin/loyalty/loyalty.component';
 import { AdminReferralsComponent } from './components/admin/referrals/referrals.component';
 import { AdminAppointmentsComponent } from './components/admin/appointments/appointments.component';
+import { AdminScheduleComponent } from './components/admin/schedule/schedule.component';
 import { authGuard, adminGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -39,6 +40,7 @@ export const routes: Routes = [
       { path: 'loyalty', component: AdminLoyaltyComponent },
       { path: 'referrals', component: AdminReferralsComponent },
       { path: 'appointments', component: AdminAppointmentsComponent },
+      { path: 'schedule', component: AdminScheduleComponent },
     ],
   },
   { path: '**', redirectTo: '' },

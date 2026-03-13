@@ -1,7 +1,7 @@
 @use '../admin-shared' as *;
 
 .loyalty {
-  padding: 2rem 2.5rem;
+  @include page-padding;
 
   &__header { margin-bottom: 2rem; }
   &__title  { @include page-title; }

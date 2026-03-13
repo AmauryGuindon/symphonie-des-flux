@@ -1,7 +1,7 @@
 @use '../admin-shared' as *;
 
 .dash {
-  padding: 2rem 2.5rem;
+  @include page-padding;
 
   &__header {
     display: flex;
@@ -41,6 +41,7 @@
 
     @media (max-width: 1400px) { grid-template-columns: repeat(3, 1fr); }
     @media (max-width: 800px)  { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 480px)  { grid-template-columns: 1fr 1fr; }
   }
 
   &__kpi {

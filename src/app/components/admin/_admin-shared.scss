@@ -1,5 +1,12 @@
 // Mixins & variables partagées entre tous les composants admin
 
+@mixin page-padding {
+  padding: 2rem 2.5rem;
+  @media (max-width: 768px) {
+    padding: 1.25rem 1rem;
+  }
+}
+
 @mixin card {
   background: #161616;
   border: 1px solid rgba(201,164,74,.1);
@@ -83,6 +90,12 @@
   width: 100%;
   border-collapse: collapse;
 
+  @media (max-width: 768px) {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   th {
     font-size: .7rem;
     font-weight: 600;
@@ -92,13 +105,15 @@
     padding: .75rem 1rem;
     text-align: left;
     border-bottom: 1px solid rgba(255,255,255,.06);
+    white-space: nowrap;
   }
 
   td {
-    padding: .875rem 1rem;
-    font-size: .85rem;
+    padding: .75rem .875rem;
+    font-size: .82rem;
     color: rgba(255,255,255,.75);
     border-bottom: 1px solid rgba(255,255,255,.04);
+    white-space: nowrap;
   }
 
   tr:hover td { background: rgba(255,255,255,.02); }

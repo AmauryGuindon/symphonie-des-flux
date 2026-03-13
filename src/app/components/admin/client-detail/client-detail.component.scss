@@ -1,7 +1,7 @@
 @use '../admin-shared' as *;
 
 .cd {
-  padding: 2rem 2.5rem;
+  @include page-padding;
 
   &__back { margin-bottom: 1.5rem; }
 

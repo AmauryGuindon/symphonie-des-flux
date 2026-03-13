@@ -13,6 +13,8 @@ import { AdjustPointsDto } from './dto/adjust-points.dto';
 import { RecordVisitDto } from './dto/record-visit.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
 import { UpdateAppointmentDto } from '../appointments/dto/update-appointment.dto';
+import { ScheduleService } from '../schedule/schedule.service';
+import { UpdateBusinessConfigDto } from '../schedule/dto/update-business-config.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,6 +23,7 @@ export class AdminController {
   constructor(
     private adminService: AdminService,
     private appointmentsService: AppointmentsService,
+    private scheduleService: ScheduleService,
   ) {}
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
@@ -108,5 +111,17 @@ export class AdminController {
   @Delete('appointments/:id')
   deleteAppointment(@Param('id') id: string) {
     return this.appointmentsService.deleteAppointment(id);
+  }
+
+  // ── Horaires ──────────────────────────────────────────────────────────────
+
+  @Get('schedule')
+  getSchedule() {
+    return this.scheduleService.getConfig();
+  }
+
+  @Patch('schedule')
+  updateSchedule(@Body() dto: UpdateBusinessConfigDto) {
+    return this.scheduleService.updateConfig(dto);
   }
 }

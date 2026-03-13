@@ -10,12 +10,14 @@ import { UsersService } from '../users/users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
+import { ScheduleService } from '../schedule/schedule.service';
 
 @Controller('appointments')
 export class AppointmentsController {
   constructor(
     private appointmentsService: AppointmentsService,
     private usersService: UsersService,
+    private scheduleService: ScheduleService,
     @InjectModel(ServiceConfig.name) private serviceConfigModel: Model<ServiceConfigDocument>,
   ) {}
 
@@ -23,6 +25,12 @@ export class AppointmentsController {
   @Get('services')
   getServices() {
     return this.serviceConfigModel.find().sort({ name: 1 });
+  }
+
+  // Public: business schedule config
+  @Get('schedule')
+  getSchedule() {
+    return this.scheduleService.getConfig();
   }
 
   // Public: available slots for a date

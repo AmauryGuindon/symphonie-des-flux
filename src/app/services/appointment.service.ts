@@ -4,6 +4,14 @@ import { HttpClient } from '@angular/common/http';
 export interface TimeSlot { time: string; available: boolean; }
 export interface SlotsResponse { date: string; slots: TimeSlot[]; closed: boolean; }
 
+export interface BusinessConfig {
+  openDays: number[];
+  openTime: string;
+  closeTime: string;
+  slotDuration: number;
+  closedDates: string[];
+}
+
 export interface Appointment {
   _id: string;
   clientId: string;
@@ -14,6 +22,7 @@ export interface Appointment {
   time: string;
   status: 'pending' | 'confirmed' | 'cancelled';
   notes?: string;
+  paymentMethod?: string;
   createdAt: string;
 }
 
@@ -31,7 +40,7 @@ export class AppointmentService {
     return this.http.get<SlotsResponse>(`${API}/appointments/slots?date=${date}`);
   }
 
-  bookAppointment(dto: { serviceType: string; date: string; time: string; notes?: string }) {
+  bookAppointment(dto: { serviceType: string; date: string; time: string; notes?: string; paymentMethod?: string }) {
     return this.http.post<Appointment>(`${API}/appointments`, dto);
   }
 
@@ -41,6 +50,10 @@ export class AppointmentService {
 
   cancelAppointment(id: string) {
     return this.http.patch<Appointment>(`${API}/appointments/${id}/cancel`, {});
+  }
+
+  getPublicSchedule() {
+    return this.http.get<BusinessConfig>(`${API}/appointments/schedule`);
   }
 
   // Admin
@@ -59,5 +72,13 @@ export class AppointmentService {
 
   deleteAdminAppointment(id: string) {
     return this.http.delete(`${API}/admin/appointments/${id}`);
+  }
+
+  getAdminSchedule() {
+    return this.http.get<BusinessConfig>(`${API}/admin/schedule`);
+  }
+
+  updateAdminSchedule(dto: Partial<BusinessConfig>) {
+    return this.http.patch<BusinessConfig>(`${API}/admin/schedule`, dto);
   }
 }

@@ -5,6 +5,7 @@ import { AppointmentsService } from './appointments.service';
 import { Appointment, AppointmentSchema } from './schemas/appointment.schema';
 import { ServiceConfig, ServiceConfigSchema } from '../services/schemas/service-config.schema';
 import { UsersModule } from '../users/users.module';
+import { ScheduleModule } from '../schedule/schedule.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UsersModule } from '../users/users.module';
       { name: ServiceConfig.name, schema: ServiceConfigSchema },
     ]),
     UsersModule,
+    ScheduleModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],

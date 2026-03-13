@@ -19,12 +19,16 @@ export class AdminAppointmentsComponent implements OnInit {
 
   viewMode = signal<ViewMode>('week');
   statusFilter = signal<StatusFilter>('all');
+  sortDir = signal<'asc' | 'desc'>('asc');
+  dateFrom = signal('');
+  dateTo = signal('');
 
   // Week navigation
   weekStart = signal(this.getWeekStart(new Date()));
 
   // For rescheduling
   editingId = signal<string | null>(null);
+  private editingAppointment: Appointment | null = null;
   editDate = '';
   editTime = '';
   editStatus = 'pending';
@@ -53,10 +57,33 @@ export class AdminAppointmentsComponent implements OnInit {
 
   filteredAppointments = computed(() => {
     const f = this.statusFilter();
-    return f === 'all'
-      ? this.appointments()
-      : this.appointments().filter(a => a.status === f);
+    const from = this.dateFrom();
+    const to = this.dateTo();
+    const dir = this.sortDir();
+
+    let list = this.appointments().filter(a => {
+      if (f !== 'all' && a.status !== f) return false;
+      if (from && a.date < from) return false;
+      if (to && a.date > to) return false;
+      return true;
+    });
+
+    list = [...list].sort((a, b) => {
+      const cmp = a.date.localeCompare(b.date) || a.time.localeCompare(b.time);
+      return dir === 'asc' ? cmp : -cmp;
+    });
+
+    return list;
   });
+
+  toggleSort() {
+    this.sortDir.set(this.sortDir() === 'asc' ? 'desc' : 'asc');
+  }
+
+  clearDateFilter() {
+    this.dateFrom.set('');
+    this.dateTo.set('');
+  }
 
   constructor(private appointmentService: AppointmentService) {}
 
@@ -133,16 +160,28 @@ export class AdminAppointmentsComponent implements OnInit {
     }[s] ?? '';
   }
 
+  paymentLabel(m?: string): string {
+    return { especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne' }[m ?? ''] ?? '—';
+  }
+
   // ── Edit ──────────────────────────────────────────────────────────────────
 
   startEdit(a: Appointment) {
+    this.editingAppointment = a;
     this.editingId.set(a._id);
     this.editDate = a.date;
     this.editTime = a.time;
     this.editStatus = a.status;
   }
 
-  cancelEdit() { this.editingId.set(null); }
+  cancelEdit() {
+    this.editingId.set(null);
+    this.editingAppointment = null;
+  }
+
+  saveEditById() {
+    if (this.editingAppointment) this.saveEdit(this.editingAppointment);
+  }
 
   saveEdit(a: Appointment) {
     this.saveLoading.set(true);
@@ -156,6 +195,7 @@ export class AdminAppointmentsComponent implements OnInit {
           list.map(x => (x._id === updated._id ? updated : x))
         );
         this.editingId.set(null);
+        this.editingAppointment = null;
         this.saveLoading.set(false);
       },
       error: () => this.saveLoading.set(false),

@@ -5,22 +5,7 @@ import * as nodemailer from 'nodemailer';
 import { Appointment, AppointmentDocument } from './schemas/appointment.schema';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
-
-// Working hours: Mon–Sat 9h–19h, 60-min slots
-const WORK_START = 9;
-const WORK_END   = 19;
-const SLOT_MIN   = 60;
-const CLOSED_WEEKDAY = 0; // Sunday = 0
-
-function generateSlots(): string[] {
-  const slots: string[] = [];
-  for (let h = WORK_START; h < WORK_END; h++) {
-    for (let m = 0; m < 60; m += SLOT_MIN) {
-      slots.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
-    }
-  }
-  return slots;
-}
+import { ScheduleService } from '../schedule/schedule.service';
 
 @Injectable()
 export class AppointmentsService {
@@ -28,6 +13,7 @@ export class AppointmentsService {
 
   constructor(
     @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
+    private scheduleService: ScheduleService,
   ) {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
@@ -43,11 +29,16 @@ export class AppointmentsService {
   // ── Slots disponibles ──────────────────────────────────────────────────────
 
   async getAvailableSlots(date: string) {
-    const d = new Date(date);
-    // Close on Sunday
-    if (d.getUTCDay() === CLOSED_WEEKDAY) return { date, slots: [], closed: true };
+    const cfg = await this.scheduleService.getConfig();
+    const d = new Date(date + 'T00:00:00');
+    const weekday = d.getDay();
 
-    const allSlots = generateSlots();
+    // Closed if weekday not in openDays or date is an exceptional closure
+    if (!cfg.openDays.includes(weekday) || cfg.closedDates.includes(date)) {
+      return { date, slots: [], closed: true };
+    }
+
+    const allSlots = this.scheduleService.generateSlots(cfg);
     const booked = await this.appointmentModel
       .find({ date, status: { $ne: 'cancelled' } })
       .select('time');
