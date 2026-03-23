@@ -13,6 +13,9 @@ export class ServiceConfig {
 
   @Prop({ required: true, min: 0 })
   loyaltyPoints: number;
+
+  @Prop({ default: true })
+  active: boolean;
 }
 
 export const ServiceConfigSchema = SchemaFactory.createForClass(ServiceConfig);

@@ -36,6 +36,12 @@ export class AdminService implements OnModuleInit {
         { upsert: true },
       );
     }
+
+    // Migration : backfiller active: true sur les services déjà seedés
+    await this.serviceConfigModel.updateMany(
+      { active: { $exists: false } },
+      { $set: { active: true } },
+    );
   }
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
