@@ -41,11 +41,21 @@ export class AuthService {
   }
 
   logout(): void {
+    this.clearSession();
+    this.router.navigate(['/']);
+  }
+
+  /** Appel interne : session expirée côté serveur → rediriger vers /login */
+  expireSession(): void {
+    this.clearSession();
+    this.router.navigate(['/login']);
+  }
+
+  private clearSession(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
     this._token.set(null);
     this._user.set(null);
-    this.router.navigate(['/']);
   }
 
   getToken(): string | null {

@@ -13,9 +13,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      // Ne pas logout sur un 401 de la route de login elle-même
-      if (err.status === 401 && !req.url.includes('/auth/login')) {
-        auth.logout();
+      // Expirer la session seulement si l'utilisateur était authentifié
+      // (ignore les 401 sur les routes d'auth elles-mêmes : login, forgot-password…)
+      if (err.status === 401 && token) {
+        auth.expireSession();
       }
       return throwError(() => err);
     }),
