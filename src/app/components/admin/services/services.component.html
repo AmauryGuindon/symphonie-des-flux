@@ -1,0 +1,107 @@
+<div class="svc">
+
+  <div class="svc__header">
+    <div>
+      <h1 class="svc__title">Prestations</h1>
+    </div>
+    <div class="svc__header-actions">
+      @if (saved()) { <span class="svc__saved">Enregistré ✓</span> }
+      <button class="svc__btn-add" (click)="openAdd()">+ Ajouter une prestation</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="svc__loading">Chargement...</div>
+  } @else {
+
+    <!-- Prestations actives -->
+    <div class="svc__card">
+      <div class="svc__card-title">Prestations actives</div>
+      <table class="svc__table">
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th class="svc__col-center">Prix</th>
+            <th class="svc__col-center">Points fidélité</th>
+            <th class="svc__col-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of active(); track s._id) {
+            <tr>
+              <td>{{ s.name }}</td>
+              <td class="svc__col-center svc__price">{{ s.price }} €</td>
+              <td class="svc__col-center svc__pts">{{ s.loyaltyPoints }} pts</td>
+              <td class="svc__col-right">
+                <div class="svc__actions">
+                  <button class="svc__btn-edit" (click)="openEdit(s)">Modifier</button>
+                  <button class="svc__btn-deactivate" (click)="toggle(s)">Désactiver</button>
+                </div>
+              </td>
+            </tr>
+          }
+          @if (!active().length) {
+            <tr><td colspan="4" class="svc__empty">Aucune prestation active.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Prestations désactivées -->
+    @if (inactive().length) {
+      <div class="svc__card svc__card--inactive">
+        <button class="svc__inactive-toggle" (click)="showInactive.set(!showInactive())">
+          <span class="svc__card-title">Prestations désactivées ({{ inactive().length }})</span>
+          <span>{{ showInactive() ? '▴ Masquer' : '▾ Afficher' }}</span>
+        </button>
+
+        @if (showInactive()) {
+          <ul class="svc__inactive-list">
+            @for (s of inactive(); track s._id) {
+              <li class="svc__inactive-item">
+                <span class="svc__inactive-name">{{ s.name }}</span>
+                <span class="svc__inactive-price">{{ s.price }} €</span>
+                <button class="svc__btn-reactivate" (click)="toggle(s)">Réactiver</button>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    }
+
+  }
+
+  <!-- Modal -->
+  @if (showModal()) {
+    <div class="svc__modal-overlay" (click)="showModal.set(false)">
+      <div class="svc__modal" (click)="$event.stopPropagation()">
+        <div class="svc__modal-title">{{ editingId() ? 'Modifier la prestation' : 'Nouvelle prestation' }}</div>
+
+        @if (!editingId()) {
+          <label class="svc__label">
+            Nom de la prestation
+            <input type="text" class="svc__input" [(ngModel)]="form.name" placeholder="ex : Coupe enfant" />
+          </label>
+        }
+
+        <label class="svc__label">
+          Prix (€)
+          <input type="number" class="svc__input" [(ngModel)]="form.price" min="0" step="0.5" />
+        </label>
+
+        <label class="svc__label">
+          Points fidélité
+          <input type="number" class="svc__input" [(ngModel)]="form.loyaltyPoints" min="0" />
+        </label>
+
+        <div class="svc__modal-actions">
+          <button class="svc__btn-save" (click)="save()" [disabled]="saving()">
+            {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <button class="svc__btn-cancel" (click)="showModal.set(false)">Annuler</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
