@@ -1,0 +1,197 @@
+<div class="acct">
+
+  <!-- En-tête -->
+  <div class="acct__header">
+    <div>
+      <h1 class="acct__title">Comptabilité</h1>
+      <p class="acct__subtitle">Revenus &amp; exports — {{ periodLabel() }}</p>
+    </div>
+    <div class="acct__header-actions no-print">
+      <button class="acct__btn-csv" (click)="exportCsv()">⬇ CSV</button>
+      <button class="acct__btn-pdf" (click)="printPdf()">⬇ PDF</button>
+    </div>
+  </div>
+
+  <!-- Filtre période -->
+  <div class="acct__filters no-print">
+    <div class="acct__period-toggle">
+      <button [class.active]="period() === 'month'" (click)="setPeriod('month')">Mois</button>
+      <button [class.active]="period() === 'quarter'" (click)="setPeriod('quarter')">Trimestre</button>
+      <button [class.active]="period() === 'year'" (click)="setPeriod('year')">Année</button>
+    </div>
+
+    @if (period() === 'month') {
+      <input type="month" class="acct__date-input" [value]="selectedDate()"
+        (change)="selectedDate.set($any($event.target).value); load()" />
+    }
+    @if (period() === 'quarter') {
+      <select class="acct__date-input" [value]="selectedDate()"
+        (change)="selectedDate.set($any($event.target).value); load()">
+        @for (q of quarterOptions(); track q) {
+          <option [value]="q">{{ q.replace('Q','T') }}</option>
+        }
+      </select>
+    }
+    @if (period() === 'year') {
+      <select class="acct__date-input" [value]="selectedDate()"
+        (change)="selectedDate.set($any($event.target).value); load()">
+        @for (y of yearOptions; track y) {
+          <option [value]="y">{{ y }}</option>
+        }
+      </select>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="acct__loading">Chargement...</div>
+  } @else if (data()) {
+
+    <!-- KPIs -->
+    <div class="acct__kpis">
+      <div class="acct__kpi">
+        <span class="acct__kpi-label">{{ period() === 'month' ? 'Ce mois' : period() === 'quarter' ? 'Ce trimestre' : 'Cette année' }}</span>
+        <span class="acct__kpi-value">{{ data()!.kpis.revenue | number:'1.0-0' }} €</span>
+        <span class="acct__kpi-sub">{{ data()!.kpis.visits }} visite{{ data()!.kpis.visits > 1 ? 's' : '' }}</span>
+      </div>
+      <div class="acct__kpi">
+        <span class="acct__kpi-label">Trimestre en cours</span>
+        <span class="acct__kpi-value">{{ data()!.kpis.quarter | number:'1.0-0' }} €</span>
+      </div>
+      <div class="acct__kpi">
+        <span class="acct__kpi-label">Année en cours</span>
+        <span class="acct__kpi-value">{{ data()!.kpis.year | number:'1.0-0' }} €</span>
+      </div>
+      <div class="acct__kpi">
+        <span class="acct__kpi-label">Nb visites</span>
+        <span class="acct__kpi-value">{{ data()!.kpis.visits }}</span>
+      </div>
+    </div>
+
+    <!-- Breakdowns -->
+    <div class="acct__breakdowns">
+
+      <!-- Par prestation -->
+      <div class="acct__card">
+        <div class="acct__card-title">Revenus par prestation</div>
+        @for (s of data()!.byService; track s._id) {
+          <div class="acct__service-row">
+            <div class="acct__service-info">
+              <span class="acct__service-name">{{ s._id }}</span>
+              <span class="acct__service-amount">{{ s.total | number:'1.0-0' }} €</span>
+            </div>
+            <div class="acct__bar-track">
+              <div class="acct__bar-fill" [style.width]="barWidth(s.total)"></div>
+            </div>
+          </div>
+        }
+        @if (!data()!.byService.length) {
+          <p class="acct__empty">Aucune visite sur cette période.</p>
+        }
+      </div>
+
+      <!-- Par paiement -->
+      <div class="acct__card">
+        <div class="acct__card-title">Par mode de paiement</div>
+        @for (p of data()!.byPayment; track p._id) {
+          <div class="acct__payment-row">
+            <div class="acct__payment-dot"></div>
+            <span class="acct__payment-label">{{ paymentLabel(p._id) }}</span>
+            <span class="acct__payment-amount">{{ p.total | number:'1.0-0' }} €</span>
+            <span class="acct__payment-pct">{{ totalPayments() > 0 ? ((p.total / totalPayments()) * 100 | number:'1.0-0') : 0 }}%</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Historique visites -->
+    <div class="acct__card acct__visits-card">
+      <div class="acct__visits-header">
+        <div class="acct__card-title">Historique des visites</div>
+        <button class="acct__btn-add no-print" (click)="openAddModal()">+ Ajouter une visite</button>
+      </div>
+
+      <table class="acct__table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Prestation</th>
+            <th>Paiement</th>
+            <th class="acct__col-amount">Montant</th>
+            <th class="no-print"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (v of data()!.visits; track v._id) {
+            <tr>
+              <td>{{ formatDate(v) }}</td>
+              <td>{{ v.clientName ?? (v.clientId === 'walk-in' ? 'Client anonyme' : v.clientId) }}</td>
+              <td>{{ v.serviceType }}</td>
+              <td><span class="acct__badge">{{ paymentLabel(v.paymentMethod ?? 'especes') }}</span></td>
+              <td class="acct__col-amount acct__amount">{{ v.price }} €</td>
+              <td class="no-print">
+                <button class="acct__btn-delete" (click)="deleteVisit(v._id)">Supprimer</button>
+              </td>
+            </tr>
+          }
+          @if (!data()!.visits.length) {
+            <tr><td colspan="6" class="acct__empty">Aucune visite.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  }
+
+  <!-- Modal ajout visite -->
+  @if (showAddModal()) {
+    <div class="acct__modal-overlay no-print" (click)="showAddModal.set(false)">
+      <div class="acct__modal" (click)="$event.stopPropagation()">
+        <div class="acct__modal-title">Ajouter une visite</div>
+
+        <label class="acct__label">
+          Prestation
+          <select class="acct__input" [(ngModel)]="addForm.serviceType"
+            (change)="addForm.price = services().find(s => s.name === addForm.serviceType)?.price ?? addForm.price">
+            <option value="">— Choisir —</option>
+            @for (s of services(); track s._id) {
+              <option [value]="s.name">{{ s.name }} ({{ s.price }} €)</option>
+            }
+          </select>
+        </label>
+
+        <label class="acct__label">
+          Prix (€)
+          <input type="number" class="acct__input" [(ngModel)]="addForm.price" min="0" step="0.5" />
+        </label>
+
+        <label class="acct__label">
+          Mode de paiement
+          <select class="acct__input" [(ngModel)]="addForm.paymentMethod">
+            <option value="especes">Espèces</option>
+            <option value="virement">Virement</option>
+            <option value="en_ligne">En ligne</option>
+          </select>
+        </label>
+
+        <label class="acct__label">
+          Nom du client (optionnel)
+          <input type="text" class="acct__input" [(ngModel)]="addForm.clientName" placeholder="ex : Karim B." />
+        </label>
+
+        <label class="acct__label">
+          Date (optionnel — défaut : aujourd'hui)
+          <input type="date" class="acct__input" [(ngModel)]="addForm.visitDate" />
+        </label>
+
+        <div class="acct__modal-actions">
+          <button class="acct__btn-save" (click)="saveVisit()" [disabled]="saving()">
+            {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+          </button>
+          <button class="acct__btn-cancel" (click)="showAddModal.set(false)">Annuler</button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>
