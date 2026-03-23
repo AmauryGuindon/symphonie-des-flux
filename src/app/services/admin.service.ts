@@ -104,6 +104,14 @@ export class AdminService {
     return this.http.patch<ServiceConfig>(`${API}/services/${id}`, data);
   }
 
+  createService(data: { name: string; price: number; loyaltyPoints: number }): Observable<ServiceConfig> {
+    return this.http.post<ServiceConfig>(`${API}/services`, data);
+  }
+
+  toggleService(id: string): Observable<ServiceConfig> {
+    return this.http.patch<ServiceConfig>(`${API}/services/${id}/toggle`, {});
+  }
+
   // Fidélité
   getLoyaltyStats(): Observable<LoyaltyStats> {
     return this.http.get<LoyaltyStats>(`${API}/loyalty`);

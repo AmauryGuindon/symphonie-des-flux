@@ -107,7 +107,7 @@ export class AdminAccountingComponent implements OnInit {
   }
 
   saveVisit() {
-    if (!this.addForm.serviceType || this.addForm.price <= 0) return;
+    if (!this.addForm.serviceType || this.addForm.price < 0) return;
     this.saving.set(true);
     this.accounting.createManualVisit(this.addForm).subscribe({
       next: () => { this.showAddModal.set(false); this.saving.set(false); this.load(); },
@@ -132,7 +132,7 @@ export class AdminAccountingComponent implements OnInit {
         v.price.toString().replace('.', ','),
       ].join(';')),
     ];
-    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `revenus-${this.selectedDate()}.csv`;

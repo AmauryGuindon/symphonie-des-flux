@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from '../users/schemas/user.schema';
@@ -216,10 +216,6 @@ export class AdminService implements OnModuleInit {
 
   // ── Configuration des prestations ─────────────────────────────────────────
 
-  async getServiceConfigs() {
-    return this.serviceConfigModel.find().sort({ name: 1 });
-  }
-
   async updateServiceConfig(id: string, dto: UpdateServiceConfigDto) {
     return this.serviceConfigModel.findByIdAndUpdate(id, dto, { new: true });
   }
@@ -290,10 +286,14 @@ export class AdminService implements OnModuleInit {
   async getAccounting(period: string, date: string) {
     const { start, end } = this.parsePeriod(period, date);
 
+    const startStr = start.toISOString().slice(0, 10);
+    const endStr = end.toISOString().slice(0, 10);
+
+    // visitDate: null matches both missing field and explicit null
     const dateFilter = {
       $or: [
-        { visitDate: { $gte: start.toISOString().slice(0, 10), $lte: end.toISOString().slice(0, 10) } },
-        { visitDate: { $exists: false }, createdAt: { $gte: start, $lte: end } },
+        { visitDate: { $gte: startStr, $lte: endStr } },
+        { visitDate: null, createdAt: { $gte: start, $lte: end } },
       ],
     };
 
@@ -316,10 +316,15 @@ export class AdminService implements OnModuleInit {
     const now = new Date();
     const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
     const yStart = new Date(now.getFullYear(), 0, 1);
+    const qStartStr = qStart.toISOString().slice(0, 10);
+    const yStartStr = yStart.toISOString().slice(0, 10);
+
+    const qFilter = { $or: [{ visitDate: { $gte: qStartStr } }, { visitDate: null, createdAt: { $gte: qStart } }] };
+    const yFilter = { $or: [{ visitDate: { $gte: yStartStr } }, { visitDate: null, createdAt: { $gte: yStart } }] };
 
     const [revQuarter, revYear] = await Promise.all([
-      this.visitModel.aggregate([{ $match: { createdAt: { $gte: qStart } } }, { $group: { _id: null, t: { $sum: '$price' } } }]),
-      this.visitModel.aggregate([{ $match: { createdAt: { $gte: yStart } } }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+      this.visitModel.aggregate([{ $match: qFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+      this.visitModel.aggregate([{ $match: yFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
     ]);
 
     return {
@@ -354,7 +359,16 @@ export class AdminService implements OnModuleInit {
   }
 
   async deleteVisit(id: string) {
-    return this.visitModel.findByIdAndDelete(id);
+    const visit = await this.visitModel.findById(id);
+    if (!visit) return null;
+    if (visit.clientId && visit.clientId !== 'walk-in') {
+      const config = await this.serviceConfigModel.findOne({ name: visit.serviceType });
+      const points = config?.loyaltyPoints ?? LOYALTY_POINTS_PER_VISIT;
+      await this.userModel.findByIdAndUpdate(visit.clientId, {
+        $inc: { loyaltyPoints: -points, visitCount: -1 },
+      });
+    }
+    return visit.deleteOne();
   }
 
   private parsePeriod(period: string, date: string): { start: Date; end: Date } {
@@ -374,22 +388,30 @@ export class AdminService implements OnModuleInit {
         end: new Date(parseInt(y), startMonth + 3, 0, 23, 59, 59),
       };
     }
-    const y = parseInt(date);
-    return {
-      start: new Date(y, 0, 1),
-      end: new Date(y, 11, 31, 23, 59, 59),
-    };
+    if (period === 'year') {
+      const y = parseInt(date);
+      return {
+        start: new Date(y, 0, 1),
+        end: new Date(y, 11, 31, 23, 59, 59),
+      };
+    }
+    throw new BadRequestException(`Période invalide : ${period}`);
   }
 
   // ── Gestion des prestations ───────────────────────────────────────────────────
 
   async createService(dto: { name: string; price: number; loyaltyPoints?: number }) {
-    return this.serviceConfigModel.create({
-      name: dto.name,
-      price: dto.price,
-      loyaltyPoints: dto.loyaltyPoints ?? 0,
-      active: true,
-    });
+    try {
+      return await this.serviceConfigModel.create({
+        name: dto.name,
+        price: dto.price,
+        loyaltyPoints: dto.loyaltyPoints ?? 0,
+        active: true,
+      });
+    } catch (err: any) {
+      if (err?.code === 11000) throw new ConflictException(`Une prestation nommée "${dto.name}" existe déjà.`);
+      throw err;
+    }
   }
 
   async toggleService(id: string) {

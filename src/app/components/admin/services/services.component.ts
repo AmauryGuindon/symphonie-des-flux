@@ -1,10 +1,7 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { AdminService, ServiceConfig } from '../../../services/admin.service';
-
-const API = 'http://localhost:3000/api/admin';
 
 @Component({
   selector: 'app-admin-services',
@@ -27,7 +24,7 @@ export class AdminServicesComponent implements OnInit {
   active = computed(() => this.services().filter(s => s.active));
   inactive = computed(() => this.services().filter(s => !s.active));
 
-  constructor(private adminService: AdminService, private http: HttpClient) {}
+  constructor(private adminService: AdminService) {}
 
   ngOnInit() { this.load(); }
 
@@ -52,12 +49,12 @@ export class AdminServicesComponent implements OnInit {
   }
 
   save() {
-    if (!this.form.name || this.form.price <= 0) return;
+    if (!this.form.name || this.form.price < 0) return;
     this.saving.set(true);
     const id = this.editingId();
     const obs = id
       ? this.adminService.updateServiceConfig(id, { price: this.form.price, loyaltyPoints: this.form.loyaltyPoints })
-      : this.http.post<ServiceConfig>(`${API}/services`, this.form);
+      : this.adminService.createService(this.form);
 
     obs.subscribe({
       next: () => {
@@ -74,6 +71,6 @@ export class AdminServicesComponent implements OnInit {
   toggle(s: ServiceConfig) {
     const label = s.active ? 'Désactiver' : 'Réactiver';
     if (!confirm(`${label} la prestation "${s.name}" ?`)) return;
-    this.http.patch(`${API}/services/${s._id}/toggle`, {}).subscribe(() => this.load());
+    this.adminService.toggleService(s._id).subscribe(() => this.load());
   }
 }

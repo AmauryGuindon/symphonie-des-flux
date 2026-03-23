@@ -66,7 +66,7 @@ export class AdminLoyaltyComponent implements OnInit {
 
   saveEdit(svc: ServiceConfig) {
     this.saveLoading.set(true);
-    this.adminService.updateServiceConfig(svc._id, this.editPoints).subscribe({
+    this.adminService.updateServiceConfig(svc._id, { loyaltyPoints: this.editPoints }).subscribe({
       next: updated => {
         this.services.update(list => list.map(s => s._id === updated._id ? updated : s));
         this.editingId.set(null);
