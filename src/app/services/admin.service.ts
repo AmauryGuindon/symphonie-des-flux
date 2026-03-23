@@ -8,9 +8,12 @@ const API = 'http://localhost:3000/api/admin';
 export interface Visit {
   _id: string;
   clientId: string;
+  clientName?: string;
   serviceType: string;
   price: number;
   notes?: string;
+  paymentMethod?: string;
+  visitDate?: string;
   createdAt: string;
 }
 
@@ -19,6 +22,7 @@ export interface ServiceConfig {
   name: string;
   price: number;
   loyaltyPoints: number;
+  active: boolean;
 }
 
 export interface DashboardStats {
@@ -96,8 +100,8 @@ export class AdminService {
     return this.http.get<ServiceConfig[]>(`${API}/services`);
   }
 
-  updateServiceConfig(id: string, loyaltyPoints: number): Observable<ServiceConfig> {
-    return this.http.patch<ServiceConfig>(`${API}/services/${id}`, { loyaltyPoints });
+  updateServiceConfig(id: string, data: Partial<Pick<ServiceConfig, 'price' | 'loyaltyPoints'>>): Observable<ServiceConfig> {
+    return this.http.patch<ServiceConfig>(`${API}/services/${id}`, data);
   }
 
   // Fidélité
