@@ -7,6 +7,8 @@ import { BookingComponent } from './components/booking/booking.component';
 import { AppointmentBookingComponent } from './components/appointment-booking/appointment-booking.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
+import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password.component';
 import { AccountComponent } from './components/account/account.component';
 import { AdminComponent } from './components/admin/admin.component';
 import { AdminDashboardComponent } from './components/admin/dashboard/dashboard.component';
@@ -29,6 +31,8 @@ export const routes: Routes = [
   { path: 'appointment', component: AppointmentBookingComponent },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'account', component: AccountComponent, canActivate: [authGuard] },
   {
     path: 'admin',

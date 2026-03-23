@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import * as crypto from 'crypto';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 
@@ -42,6 +43,29 @@ export class AuthService {
         referralCode: user.referralCode,
       },
     };
+  }
+
+  async forgotPassword(email: string) {
+    const user = await this.usersService.findByEmail(email);
+    // Réponse générique même si l'email n'existe pas (sécurité)
+    if (!user) return;
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
+    await this.usersService.setResetToken(user._id.toString(), token, expiry);
+
+    // Sans service email configuré : le lien est loggé en console
+    const resetUrl = `http://localhost:4200/reset-password?token=${token}`;
+    console.log(`[RESET PASSWORD] ${user.email} → ${resetUrl}`);
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.usersService.findByResetToken(token);
+    if (!user || !user.resetTokenExpiry || user.resetTokenExpiry < new Date()) {
+      throw new BadRequestException('Lien invalide ou expiré.');
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await this.usersService.updatePassword(user._id.toString(), hashed);
   }
 
   async register(dto: CreateUserDto) {

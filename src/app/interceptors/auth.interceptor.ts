@@ -13,7 +13,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   }
   return next(req).pipe(
     catchError((err: HttpErrorResponse) => {
-      if (err.status === 401) {
+      // Ne pas logout sur un 401 de la route de login elle-même
+      if (err.status === 401 && !req.url.includes('/auth/login')) {
         auth.logout();
       }
       return throwError(() => err);

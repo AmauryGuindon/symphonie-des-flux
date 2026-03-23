@@ -1,0 +1,167 @@
+<h2>Maquette — Page Prestations</h2>
+<p class="subtitle">Voici la structure proposée pour <code>/admin/prestations</code></p>
+
+<div class="mockup" style="margin-top:1.5rem">
+  <div class="mockup-header">Prestations — gestion des services</div>
+  <div class="mockup-body" style="background:#0d0d0d;padding:1.5rem;font-family:sans-serif">
+
+    <!-- Header -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+      <div>
+        <div style="font-size:1.6rem;color:#fff;font-weight:300;letter-spacing:.03em">Prestations</div>
+        <div style="font-size:.7rem;color:rgba(255,255,255,.3);letter-spacing:.15em;text-transform:uppercase;margin-top:.3rem">Gestion des services</div>
+      </div>
+      <button style="background:#C9A44A;border:none;color:#000;padding:.5rem 1.1rem;border-radius:6px;font-size:.8rem;font-weight:500;cursor:pointer">+ Ajouter une prestation</button>
+    </div>
+
+    <!-- Prestations actives -->
+    <div style="background:#161616;border:1px solid rgba(201,164,74,.1);border-radius:10px;padding:1.25rem;margin-bottom:1rem">
+      <div style="font-size:.6rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1rem">Prestations actives</div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="text-align:left;font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.06)">Nom</th>
+            <th style="text-align:center;font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.06)">Prix</th>
+            <th style="text-align:center;font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.06)">Points fidélité</th>
+            <th style="text-align:right;font-size:.65rem;color:rgba(255,255,255,.28);font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.06)">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Row 1 -->
+          <tr>
+            <td style="padding:.7rem .75rem;font-size:.82rem;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.04)">Coupe</td>
+            <td style="padding:.7rem .75rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:.85rem;color:#C9A44A;font-weight:500">20 €</span>
+            </td>
+            <td style="padding:.7rem .75rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.04)">10 pts</td>
+            <td style="padding:.7rem .75rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:inline-flex;gap:.4rem">
+                <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Modifier</button>
+                <button style="background:none;border:1px solid rgba(231,76,60,.25);color:rgba(231,76,60,.6);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Désactiver</button>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 2 -->
+          <tr>
+            <td style="padding:.7rem .75rem;font-size:.82rem;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.04)">Coupe + Dégradé</td>
+            <td style="padding:.7rem .75rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:.85rem;color:#C9A44A;font-weight:500">22 €</span>
+            </td>
+            <td style="padding:.7rem .75rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.04)">12 pts</td>
+            <td style="padding:.7rem .75rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:inline-flex;gap:.4rem">
+                <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Modifier</button>
+                <button style="background:none;border:1px solid rgba(231,76,60,.25);color:rgba(231,76,60,.6);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Désactiver</button>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 3 -->
+          <tr>
+            <td style="padding:.7rem .75rem;font-size:.82rem;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.04)">Coupe + Barbe</td>
+            <td style="padding:.7rem .75rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:.85rem;color:#C9A44A;font-weight:500">30 €</span>
+            </td>
+            <td style="padding:.7rem .75rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.04)">15 pts</td>
+            <td style="padding:.7rem .75rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:inline-flex;gap:.4rem">
+                <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Modifier</button>
+                <button style="background:none;border:1px solid rgba(231,76,60,.25);color:rgba(231,76,60,.6);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Désactiver</button>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 4 -->
+          <tr>
+            <td style="padding:.7rem .75rem;font-size:.82rem;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.04)">Barbe seule</td>
+            <td style="padding:.7rem .75rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:.85rem;color:#C9A44A;font-weight:500">15 €</span>
+            </td>
+            <td style="padding:.7rem .75rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.04)">8 pts</td>
+            <td style="padding:.7rem .75rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:inline-flex;gap:.4rem">
+                <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Modifier</button>
+                <button style="background:none;border:1px solid rgba(231,76,60,.25);color:rgba(231,76,60,.6);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Désactiver</button>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 5 -->
+          <tr>
+            <td style="padding:.7rem .75rem;font-size:.82rem;color:rgba(255,255,255,.85);border-bottom:1px solid rgba(255,255,255,.04)">Dégradé</td>
+            <td style="padding:.7rem .75rem;text-align:center;border-bottom:1px solid rgba(255,255,255,.04)">
+              <span style="font-size:.85rem;color:#C9A44A;font-weight:500">18 €</span>
+            </td>
+            <td style="padding:.7rem .75rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.04)">9 pts</td>
+            <td style="padding:.7rem .75rem;text-align:right;border-bottom:1px solid rgba(255,255,255,.04)">
+              <div style="display:inline-flex;gap:.4rem">
+                <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Modifier</button>
+                <button style="background:none;border:1px solid rgba(231,76,60,.25);color:rgba(231,76,60,.6);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Désactiver</button>
+              </div>
+            </td>
+          </tr>
+          <!-- Row 6 -->
+          <tr>
+            <td style="padding:.7rem .75rem;font-size:.82rem;color:rgba(255,255,255,.85)">Coupe enfant</td>
+            <td style="padding:.7rem .75rem;text-align:center">
+              <span style="font-size:.85rem;color:#C9A44A;font-weight:500">15 €</span>
+            </td>
+            <td style="padding:.7rem .75rem;text-align:center;font-size:.8rem;color:rgba(255,255,255,.5)">8 pts</td>
+            <td style="padding:.7rem .75rem;text-align:right">
+              <div style="display:inline-flex;gap:.4rem">
+                <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Modifier</button>
+                <button style="background:none;border:1px solid rgba(231,76,60,.25);color:rgba(231,76,60,.6);padding:.25rem .6rem;border-radius:5px;font-size:.75rem;cursor:pointer">Désactiver</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Prestations désactivées -->
+    <div style="background:#161616;border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer">
+        <div style="font-size:.6rem;color:rgba(255,255,255,.2);text-transform:uppercase;letter-spacing:.15em">Prestations désactivées (2)</div>
+        <span style="color:rgba(255,255,255,.2);font-size:.8rem">▾ Afficher</span>
+      </div>
+      <!-- Exemple désactivé -->
+      <div style="margin-top:1rem;display:flex;flex-direction:column;gap:.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .75rem;background:rgba(255,255,255,.02);border-radius:6px;opacity:.5">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:.82rem;color:rgba(255,255,255,.6);text-decoration:line-through">Coloration</span>
+            <span style="font-size:.72rem;color:rgba(255,255,255,.25)">35 €</span>
+          </div>
+          <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);padding:.2rem .6rem;border-radius:5px;font-size:.72rem;cursor:pointer">Réactiver</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .75rem;background:rgba(255,255,255,.02);border-radius:6px;opacity:.5">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:.82rem;color:rgba(255,255,255,.6);text-decoration:line-through">Lissage</span>
+            <span style="font-size:.72rem;color:rgba(255,255,255,.25)">50 €</span>
+          </div>
+          <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.4);padding:.2rem .6rem;border-radius:5px;font-size:.72rem;cursor:pointer">Réactiver</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal ajouter/modifier (preview) -->
+    <div style="margin-top:1.5rem;background:#161616;border:1px solid rgba(201,164,74,.15);border-radius:10px;padding:1.25rem">
+      <div style="font-size:.6rem;color:rgba(201,164,74,.5);text-transform:uppercase;letter-spacing:.15em;margin-bottom:1rem">Exemple — modal "Ajouter / Modifier"</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem">
+        <div>
+          <label style="display:block;font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.35rem">Nom de la prestation</label>
+          <input style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;padding:.45rem .75rem;font-size:.82rem;box-sizing:border-box" placeholder="ex : Coupe enfant" />
+        </div>
+        <div>
+          <label style="display:block;font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.35rem">Prix (€)</label>
+          <input type="number" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;padding:.45rem .75rem;font-size:.82rem;box-sizing:border-box" placeholder="ex : 20" />
+        </div>
+        <div>
+          <label style="display:block;font-size:.72rem;color:rgba(255,255,255,.4);margin-bottom:.35rem">Points fidélité</label>
+          <input type="number" style="width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;color:#fff;padding:.45rem .75rem;font-size:.82rem;box-sizing:border-box" placeholder="ex : 10" />
+        </div>
+      </div>
+      <div style="display:flex;gap:.75rem">
+        <button style="background:#C9A44A;border:none;color:#000;padding:.5rem 1.2rem;border-radius:6px;font-size:.8rem;font-weight:500;cursor:pointer">Enregistrer</button>
+        <button style="background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.5);padding:.5rem 1rem;border-radius:6px;font-size:.8rem;cursor:pointer">Annuler</button>
+      </div>
+    </div>
+
+  </div>
+</div>

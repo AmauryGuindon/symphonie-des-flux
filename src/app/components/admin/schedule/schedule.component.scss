@@ -12,12 +12,13 @@
     margin-bottom: 1.25rem;
 
     &-title {
-      font-size: .75rem;
-      font-weight: 600;
+      font-family: 'Outfit', sans-serif;
+      font-size: .6rem;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: .08em;
-      color: rgba(255,255,255,.4);
-      margin: 0 0 1rem;
+      letter-spacing: .2em;
+      color: rgba(255,255,255,.3);
+      margin: 0 0 1.1rem;
     }
   }
 

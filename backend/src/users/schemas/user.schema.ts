@@ -65,6 +65,13 @@ export class User {
   // --- Dernière visite ---
   @Prop()
   lastVisitAt?: Date;
+
+  // --- Réinitialisation mot de passe ---
+  @Prop({ select: false })
+  resetToken?: string;
+
+  @Prop()
+  resetTokenExpiry?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

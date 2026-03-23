@@ -159,4 +159,20 @@ export class UsersService {
       .findByIdAndUpdate(userId, { $inc: { loyaltyPoints: -points } }, { new: true })
       .select('-password');
   }
+
+  async setResetToken(userId: string, token: string, expiry: Date) {
+    await this.userModel.findByIdAndUpdate(userId, { resetToken: token, resetTokenExpiry: expiry });
+  }
+
+  async findByResetToken(token: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ resetToken: token }).select('+resetToken +resetTokenExpiry');
+  }
+
+  async updatePassword(userId: string, hashedPassword: string) {
+    await this.userModel.findByIdAndUpdate(userId, {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpiry: null,
+    });
+  }
 }

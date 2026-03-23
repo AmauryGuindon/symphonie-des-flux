@@ -35,7 +35,7 @@ export class LoginComponent {
 
     this.auth.login(this.email, this.password).subscribe({
       next: () => {
-        const dest = redirect ?? (this.auth.isAdmin() ? '/admin' : '/account');
+        const dest = this.auth.isAdmin() ? '/admin' : (redirect ?? '/account');
         this.router.navigateByUrl(dest);
       },
       error: (err) => {
