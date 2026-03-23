@@ -96,6 +96,11 @@ export class AdminAccountingComponent implements OnInit {
     return new Date(raw).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
+  onServiceChange() {
+    const match = this.services().find(s => s.name === this.addForm.serviceType);
+    if (match) this.addForm.price = match.price;
+  }
+
   openAddModal() {
     this.addForm = { serviceType: '', price: 0, paymentMethod: 'especes' };
     this.showAddModal.set(true);

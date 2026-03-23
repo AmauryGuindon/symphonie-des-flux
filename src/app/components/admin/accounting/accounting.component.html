@@ -152,7 +152,7 @@
         <label class="acct__label">
           Prestation
           <select class="acct__input" [(ngModel)]="addForm.serviceType"
-            (change)="addForm.price = services().find(s => s.name === addForm.serviceType)?.price ?? addForm.price">
+            (change)="onServiceChange()">
             <option value="">— Choisir —</option>
             @for (s of services(); track s._id) {
               <option [value]="s.name">{{ s.name }} ({{ s.price }} €)</option>
