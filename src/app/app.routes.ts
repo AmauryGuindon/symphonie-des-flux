@@ -16,6 +16,8 @@ import { AdminLoyaltyComponent } from './components/admin/loyalty/loyalty.compon
 import { AdminReferralsComponent } from './components/admin/referrals/referrals.component';
 import { AdminAppointmentsComponent } from './components/admin/appointments/appointments.component';
 import { AdminScheduleComponent } from './components/admin/schedule/schedule.component';
+import { AdminAccountingComponent } from './components/admin/accounting/accounting.component';
+import { AdminServicesComponent } from './components/admin/services/services.component';
 import { authGuard, adminGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -41,6 +43,8 @@ export const routes: Routes = [
       { path: 'referrals', component: AdminReferralsComponent },
       { path: 'appointments', component: AdminAppointmentsComponent },
       { path: 'schedule', component: AdminScheduleComponent },
+      { path: 'comptabilite', component: AdminAccountingComponent },
+      { path: 'prestations', component: AdminServicesComponent },
     ],
   },
   { path: '**', redirectTo: '' },
