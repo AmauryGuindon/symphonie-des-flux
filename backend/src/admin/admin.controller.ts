@@ -15,6 +15,8 @@ import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
 import { UpdateAppointmentDto } from '../appointments/dto/update-appointment.dto';
 import { ScheduleService } from '../schedule/schedule.service';
 import { UpdateBusinessConfigDto } from '../schedule/dto/update-business-config.dto';
+import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
+import { CreateServiceDto } from './dto/create-service.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -73,8 +75,8 @@ export class AdminController {
   // ── Configuration des prestations ─────────────────────────────────────────
 
   @Get('services')
-  getServiceConfigs() {
-    return this.adminService.getServiceConfigs();
+  getAllServiceConfigs() {
+    return this.adminService.getAllServiceConfigs();
   }
 
   @Patch('services/:id')
@@ -123,5 +125,38 @@ export class AdminController {
   @Patch('schedule')
   updateSchedule(@Body() dto: UpdateBusinessConfigDto) {
     return this.scheduleService.updateConfig(dto);
+  }
+
+  // ── Comptabilité ─────────────────────────────────────────────────────────────
+
+  @Get('accounting')
+  getAccounting(
+    @Query('period') period: string = 'month',
+    @Query('date') date: string,
+  ) {
+    const resolvedDate = date ?? new Date().toISOString().slice(0, 7);
+    return this.adminService.getAccounting(period, resolvedDate);
+  }
+
+  @Post('accounting/visits')
+  createManualVisit(@Body() dto: CreateManualVisitDto) {
+    return this.adminService.createManualVisit(dto);
+  }
+
+  @Delete('accounting/visits/:id')
+  deleteVisit(@Param('id') id: string) {
+    return this.adminService.deleteVisit(id);
+  }
+
+  // ── Gestion des prestations ───────────────────────────────────────────────────
+
+  @Post('services')
+  createService(@Body() dto: CreateServiceDto) {
+    return this.adminService.createService(dto);
+  }
+
+  @Patch('services/:id/toggle')
+  toggleService(@Param('id') id: string) {
+    return this.adminService.toggleService(id);
   }
 }
