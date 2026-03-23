@@ -8,6 +8,7 @@ import { UsersService } from '../users/users.service';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { RecordVisitDto } from './dto/record-visit.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
+import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
 import { LOYALTY_POINTS_PER_VISIT } from '../common/enums/role.enum';
 
 const DEFAULT_SERVICES = [
@@ -282,5 +283,123 @@ export class AdminService implements OnModuleInit {
       topReferrers,
       totalReferrals: totalReferrals[0]?.total ?? 0,
     };
+  }
+
+  // ── Comptabilité ──────────────────────────────────────────────────────────────
+
+  async getAccounting(period: string, date: string) {
+    const { start, end } = this.parsePeriod(period, date);
+
+    const dateFilter = {
+      $or: [
+        { visitDate: { $gte: start.toISOString().slice(0, 10), $lte: end.toISOString().slice(0, 10) } },
+        { visitDate: { $exists: false }, createdAt: { $gte: start, $lte: end } },
+      ],
+    };
+
+    const [visits, byService, byPayment, totalVisits] = await Promise.all([
+      this.visitModel.find(dateFilter).sort({ createdAt: -1 }).limit(500),
+      this.visitModel.aggregate([
+        { $match: dateFilter },
+        { $group: { _id: '$serviceType', total: { $sum: '$price' }, count: { $sum: 1 } } },
+        { $sort: { total: -1 } },
+      ]),
+      this.visitModel.aggregate([
+        { $match: dateFilter },
+        { $group: { _id: { $ifNull: ['$paymentMethod', 'especes'] }, total: { $sum: '$price' }, count: { $sum: 1 } } },
+      ]),
+      this.visitModel.countDocuments(dateFilter),
+    ]);
+
+    const totalRevenue = visits.reduce((sum, v) => sum + v.price, 0);
+
+    const now = new Date();
+    const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
+    const yStart = new Date(now.getFullYear(), 0, 1);
+
+    const [revQuarter, revYear] = await Promise.all([
+      this.visitModel.aggregate([{ $match: { createdAt: { $gte: qStart } } }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+      this.visitModel.aggregate([{ $match: { createdAt: { $gte: yStart } } }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+    ]);
+
+    return {
+      kpis: {
+        revenue: totalRevenue,
+        visits: totalVisits,
+        quarter: revQuarter[0]?.t ?? 0,
+        year: revYear[0]?.t ?? 0,
+      },
+      byService,
+      byPayment,
+      visits,
+    };
+  }
+
+  async createManualVisit(dto: CreateManualVisitDto) {
+    const visitData = {
+      clientId: dto.clientId ?? 'walk-in',
+      clientName: dto.clientName,
+      serviceType: dto.serviceType,
+      price: dto.price,
+      paymentMethod: dto.paymentMethod ?? 'especes',
+      visitDate: dto.visitDate,
+    };
+    const visit = await this.visitModel.create(visitData);
+    if (dto.clientId && dto.clientId !== 'walk-in') {
+      const config = await this.serviceConfigModel.findOne({ name: dto.serviceType });
+      const points = config?.loyaltyPoints ?? LOYALTY_POINTS_PER_VISIT;
+      await this.usersService.recordVisit(dto.clientId, points);
+    }
+    return visit;
+  }
+
+  async deleteVisit(id: string) {
+    return this.visitModel.findByIdAndDelete(id);
+  }
+
+  private parsePeriod(period: string, date: string): { start: Date; end: Date } {
+    if (period === 'month') {
+      const [y, m] = date.split('-').map(Number);
+      return {
+        start: new Date(y, m - 1, 1),
+        end: new Date(y, m, 0, 23, 59, 59),
+      };
+    }
+    if (period === 'quarter') {
+      const [y, q] = date.split('-');
+      const qNum = parseInt(q.replace('Q', '')) - 1;
+      const startMonth = qNum * 3;
+      return {
+        start: new Date(parseInt(y), startMonth, 1),
+        end: new Date(parseInt(y), startMonth + 3, 0, 23, 59, 59),
+      };
+    }
+    const y = parseInt(date);
+    return {
+      start: new Date(y, 0, 1),
+      end: new Date(y, 11, 31, 23, 59, 59),
+    };
+  }
+
+  // ── Gestion des prestations ───────────────────────────────────────────────────
+
+  async createService(dto: { name: string; price: number; loyaltyPoints?: number }) {
+    return this.serviceConfigModel.create({
+      name: dto.name,
+      price: dto.price,
+      loyaltyPoints: dto.loyaltyPoints ?? 0,
+      active: true,
+    });
+  }
+
+  async toggleService(id: string) {
+    const svc = await this.serviceConfigModel.findById(id);
+    if (!svc) return null;
+    svc.active = !svc.active;
+    return svc.save();
+  }
+
+  async getAllServiceConfigs() {
+    return this.serviceConfigModel.find().sort({ name: 1 });
   }
 }
