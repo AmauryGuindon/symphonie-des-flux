@@ -24,7 +24,7 @@ export class AppointmentsController {
   // Public: list of services (for the booking form)
   @Get('services')
   getServices() {
-    return this.serviceConfigModel.find().sort({ name: 1 });
+    return this.serviceConfigModel.find({ active: true }).sort({ name: 1 });
   }
 
   // Public: business schedule config
