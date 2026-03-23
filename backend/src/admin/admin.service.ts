@@ -297,7 +297,7 @@ export class AdminService implements OnModuleInit {
       ],
     };
 
-    const [visits, byService, byPayment, totalVisits] = await Promise.all([
+    const [rawVisits, byService, byPayment, totalVisits] = await Promise.all([
       this.visitModel.find(dateFilter).sort({ createdAt: -1 }).limit(500),
       this.visitModel.aggregate([
         { $match: dateFilter },
@@ -310,6 +310,26 @@ export class AdminService implements OnModuleInit {
       ]),
       this.visitModel.countDocuments(dateFilter),
     ]);
+
+    // Enrichir les visites avec le nom des clients enregistrés
+    const clientIds = [...new Set(
+      rawVisits
+        .filter(v => v.clientId && v.clientId !== 'walk-in' && !v.clientName)
+        .map(v => v.clientId),
+    )];
+    const userMap = new Map<string, string>();
+    if (clientIds.length) {
+      const users = await this.userModel
+        .find({ _id: { $in: clientIds } })
+        .select('firstName lastName');
+      for (const u of users) {
+        userMap.set(u._id.toString(), `${u.firstName} ${u.lastName}`);
+      }
+    }
+    const visits = rawVisits.map(v => ({
+      ...v.toObject(),
+      clientName: v.clientName || userMap.get(v.clientId) || null,
+    }));
 
     const totalRevenue = visits.reduce((sum, v) => sum + v.price, 0);
 

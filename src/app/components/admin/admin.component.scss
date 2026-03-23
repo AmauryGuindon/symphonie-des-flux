@@ -32,9 +32,10 @@
   }
 
   &__title {
-    font-size: 1rem;
-    font-weight: 900;
-    letter-spacing: .1em;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: .08em;
     color: #fff;
     span { color: #C9A44A; }
   }
@@ -55,10 +56,9 @@
   display: flex;
   min-height: 100vh;
   background: #0a0a0a;
-  font-family: 'Inter', sans-serif;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-family: 'Outfit', sans-serif;
   -webkit-font-smoothing: antialiased;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
 
   &.sidebar-open {
     .admin-overlay { display: block; }
@@ -85,19 +85,22 @@
 
     &-name {
       display: block;
-      font-size: 1.25rem;
-      font-weight: 900;
-      letter-spacing: .1em;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: .08em;
       color: #fff;
+      line-height: 1;
       span { color: #C9A44A; }
     }
     &-label {
       display: block;
-      font-size: .65rem;
-      letter-spacing: .2em;
-      color: rgba(255,255,255,.35);
+      font-family: 'Outfit', sans-serif;
+      font-size: .6rem;
+      letter-spacing: .28em;
+      color: rgba(255,255,255,.3);
       text-transform: uppercase;
-      margin-top: .25rem;
+      margin-top: .4rem;
     }
   }
 
@@ -107,6 +110,7 @@
     display: flex;
     flex-direction: column;
     gap: .25rem;
+    overflow-y: auto;
   }
 
   &__link {
@@ -115,10 +119,11 @@
     gap: .75rem;
     padding: .7rem .875rem;
     border-radius: 8px;
-    color: rgba(255,255,255,.45);
+    color: rgba(255,255,255,.4);
     text-decoration: none;
-    font-size: .875rem;
-    font-weight: 500;
+    font-size: .8rem;
+    font-weight: 400;
+    letter-spacing: .04em;
     transition: all .2s;
 
     svg { width: 18px; height: 18px; flex-shrink: 0; }
