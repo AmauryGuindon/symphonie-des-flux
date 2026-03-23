@@ -1,0 +1,202 @@
+<div class="cd">
+  <div class="cd__back">
+    <a routerLink="/admin/clients" class="cd__back-link">← Retour aux clients</a>
+  </div>
+
+  @if (loading()) {
+    <div class="cd__loading">Chargement…</div>
+  } @else {
+    @if (client(); as c) {
+
+      <div class="cd__header">
+        <div>
+          <h1 class="cd__name">{{ c.firstName }} {{ c.lastName }}</h1>
+          <span class="cd__tier" [style.color]="getTierColor(c.loyaltyTier)" [style.border-color]="getTierColor(c.loyaltyTier) + '40'">
+            {{ getTierLabel(c.loyaltyTier) }}
+          </span>
+        </div>
+        <div class="cd__header-actions">
+          @if (visitSuccess()) {
+            <span class="cd__success">✓ Visite enregistrée (+10 pts)</span>
+          }
+          <button class="cd__btn-visit" (click)="visitPanelOpen.set(true)">
+            + Enregistrer une visite
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel enregistrement visite -->
+      @if (visitPanelOpen()) {
+        <div class="cd__visit-panel">
+          <h3 class="cd__visit-panel-title">Nouvelle prestation</h3>
+          <div class="cd__visit-form">
+            <div class="cd__field">
+              <label>Prestation</label>
+              <select [(ngModel)]="visitService" (change)="onServiceChange()" name="svc">
+                @for (s of services(); track s._id) {
+                  <option [value]="s.name">{{ s.name }} — {{ s.loyaltyPoints }} pts</option>
+                }
+              </select>
+            </div>
+            <div class="cd__field">
+              <label>Prix (€)</label>
+              <input type="number" [(ngModel)]="visitPrice" name="price" min="0" step="1" />
+            </div>
+            <div class="cd__field cd__field--full">
+              <label>Notes (optionnel)</label>
+              <input [(ngModel)]="visitNotes" name="notes" placeholder="Ex: coupe + barbe taillée" />
+            </div>
+          </div>
+          <div class="cd__visit-actions">
+            <button class="cd__btn-save" (click)="recordVisit()" [disabled]="visitLoading()">
+              {{ visitLoading() ? '…' : 'Confirmer' }}
+            </button>
+            <button class="cd__btn-cancel" (click)="visitPanelOpen.set(false)">Annuler</button>
+          </div>
+        </div>
+      }
+
+      <div class="cd__grid">
+
+        <!-- Stats -->
+        <div class="cd__card cd__card--stats">
+          <div class="cd__stat">
+            <span class="cd__stat-val" [style.color]="getTierColor(c.loyaltyTier)">{{ c.loyaltyPoints }}</span>
+            <span class="cd__stat-lbl">Points</span>
+          </div>
+          <div class="cd__stat">
+            <span class="cd__stat-val">{{ c.visitCount }}</span>
+            <span class="cd__stat-lbl">Visites</span>
+          </div>
+          <div class="cd__stat">
+            <span class="cd__stat-val">{{ c.referralCount }}</span>
+            <span class="cd__stat-lbl">Parrainages</span>
+          </div>
+          <div class="cd__stat">
+            <span class="cd__stat-val">{{ c.lastVisitAt ? (c.lastVisitAt | date:'dd/MM/yy') : '—' }}</span>
+            <span class="cd__stat-lbl">Dernière visite</span>
+          </div>
+        </div>
+
+        <!-- Profil -->
+        <div class="cd__card">
+          <div class="cd__card-header">
+            <h3>Profil</h3>
+            @if (!editMode()) {
+              <button class="cd__btn-edit" (click)="startEdit()">Modifier</button>
+            }
+          </div>
+
+          @if (!editMode()) {
+            <dl class="cd__info">
+              <dt>Email</dt><dd>{{ c.email }}</dd>
+              <dt>Téléphone</dt><dd>{{ c.phone || '—' }}</dd>
+              <dt>Style favori</dt><dd>{{ c.favoriteStyle || '—' }}</dd>
+              <dt>Préférences</dt><dd>{{ c.preferences || '—' }}</dd>
+              <dt>Anniversaire</dt><dd>{{ c.birthDate ? (c.birthDate | date:'dd/MM/yyyy') : '—' }}</dd>
+              <dt>Code parrainage</dt><dd class="cd__code">{{ c.referralCode }}</dd>
+              <dt>Inscrit le</dt><dd>{{ c.createdAt | date:'dd/MM/yyyy' }}</dd>
+            </dl>
+          } @else {
+            <div class="cd__edit-form">
+              <div class="cd__edit-row">
+                <div class="cd__field">
+                  <label>Prénom</label>
+                  <input [(ngModel)]="editFirstName" name="fn" />
+                </div>
+                <div class="cd__field">
+                  <label>Nom</label>
+                  <input [(ngModel)]="editLastName" name="ln" />
+                </div>
+              </div>
+              <div class="cd__field">
+                <label>Téléphone</label>
+                <input [(ngModel)]="editPhone" name="ph" />
+              </div>
+              <div class="cd__field">
+                <label>Style favori</label>
+                <input [(ngModel)]="editFavoriteStyle" name="fs" />
+              </div>
+              <div class="cd__field">
+                <label>Préférences</label>
+                <textarea [(ngModel)]="editPreferences" name="pref" rows="3"></textarea>
+              </div>
+              <div class="cd__edit-actions">
+                <button class="cd__btn-save" (click)="saveEdit()" [disabled]="saveLoading()">
+                  {{ saveLoading() ? '…' : 'Sauvegarder' }}
+                </button>
+                <button class="cd__btn-cancel" (click)="editMode.set(false)">Annuler</button>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Ajuster les points -->
+        <div class="cd__card">
+          <div class="cd__card-header"><h3>Ajuster les points</h3></div>
+          <p class="cd__card-desc">Ajouter ou retirer des points manuellement (nombre négatif pour retirer).</p>
+          <div class="cd__points-form">
+            <input type="number" class="cd__points-input" [(ngModel)]="pointsDelta" placeholder="Ex: +20 ou -10" />
+            <button class="cd__btn-pts" (click)="applyPoints()" [disabled]="pointsLoading() || pointsDelta === 0">
+              {{ pointsLoading() ? '…' : 'Appliquer' }}
+            </button>
+          </div>
+          @if (pointsSuccess()) {
+            <p class="cd__pts-success">✓ {{ pointsSuccess() }}</p>
+          }
+        </div>
+
+        <!-- Zone danger -->
+        <div class="cd__card cd__card--danger">
+          <div class="cd__card-header"><h3>Zone danger</h3></div>
+          @if (!deleteConfirm()) {
+            <button class="cd__btn-delete" (click)="deleteConfirm.set(true)">Supprimer ce client</button>
+          } @else {
+            <p class="cd__delete-confirm-text">
+              Supprimer <strong>{{ c.firstName }} {{ c.lastName }}</strong> ? Cette action est irréversible.
+            </p>
+            <div class="cd__delete-actions">
+              <button class="cd__btn-delete-confirm" (click)="deleteClient()">Oui, supprimer</button>
+              <button class="cd__btn-cancel" (click)="deleteConfirm.set(false)">Annuler</button>
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <!-- Historique des prestations -->
+      <div class="cd__card cd__history">
+        <div class="cd__card-header">
+          <h3>Historique des prestations</h3>
+          <span class="cd__history-count">{{ visits().length }} prestation(s)</span>
+        </div>
+
+        @if (visits().length === 0) {
+          <p class="cd__empty">Aucune prestation enregistrée pour ce client.</p>
+        } @else {
+          <table class="cd__table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Prestation</th>
+                <th>Prix</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (v of visits(); track v._id) {
+                <tr>
+                  <td class="cd__visit-date">{{ v.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td class="cd__visit-service">{{ v.serviceType }}</td>
+                  <td class="cd__visit-price">{{ v.price }} €</td>
+                  <td class="cd__visit-notes">{{ v.notes || '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+    }
+  }
+</div>

@@ -1,0 +1,165 @@
+@use '../admin-shared' as *;
+
+.svc {
+  @include page-padding;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__title { @include page-title; }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__btn-add { @include btn-primary; }
+
+  &__saved { font-size: .82rem; color: #4ade80; font-weight: 600; }
+
+  &__loading { @include loading; }
+
+  &__card {
+    @include card;
+    margin-bottom: 1.25rem;
+
+    &-title {
+      font-size: .6rem;
+      color: rgba(255,255,255,.3);
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      margin: 0 0 1rem;
+    }
+
+    &--inactive {
+      border-color: rgba(255,255,255,.06);
+      background: rgba(255,255,255,.01);
+    }
+  }
+
+  &__table { @include table; }
+
+  &__col-center { text-align: center; }
+  &__col-right  { text-align: right; }
+
+  &__price { color: #C9A44A !important; font-weight: 500; }
+  &__pts   { color: rgba(255,255,255,.4) !important; }
+
+  &__actions { display: inline-flex; gap: .4rem; }
+
+  &__btn-edit       { @include btn-ghost;   padding: .25rem .6rem; font-size: .75rem; }
+  &__btn-deactivate { @include btn-danger;  padding: .25rem .6rem; font-size: .75rem; }
+
+  &__empty { font-size: .82rem; color: rgba(255,255,255,.3); }
+
+  &__inactive-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: rgba(255,255,255,.3);
+    font-size: .78rem;
+    font-family: 'Outfit', sans-serif;
+
+    .svc__card-title { margin: 0; }
+  }
+
+  &__inactive-list {
+    list-style: none;
+    margin: .75rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+  }
+
+  &__inactive-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .4rem .6rem;
+    background: rgba(255,255,255,.02);
+    border-radius: 6px;
+    opacity: .6;
+  }
+
+  &__inactive-name {
+    flex: 1;
+    font-size: .82rem;
+    color: rgba(255,255,255,.5);
+    text-decoration: line-through;
+  }
+
+  &__inactive-price { font-size: .78rem; color: rgba(255,255,255,.3); }
+
+  &__btn-reactivate { @include btn-ghost; padding: .2rem .6rem; font-size: .72rem; }
+
+  &__modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  &__modal {
+    background: #161616;
+    border: 1px solid rgba(201,164,74,.15);
+    border-radius: 12px;
+    padding: 1.75rem;
+    width: 100%;
+    max-width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  &__modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem;
+    color: #fff;
+    font-weight: 400;
+    margin: 0;
+  }
+
+  &__label {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+    font-size: .78rem;
+    color: rgba(255,255,255,.5);
+  }
+
+  &__input {
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 6px;
+    color: #fff;
+    padding: .45rem .75rem;
+    font-size: .82rem;
+    font-family: 'Outfit', sans-serif;
+    outline: none;
+    transition: border-color .2s;
+
+    &:focus { border-color: rgba(201,164,74,.5); }
+  }
+
+  &__modal-actions { display: flex; gap: .75rem; margin-top: .25rem; }
+
+  &__btn-save   { @include btn-primary; padding: .5rem 1.2rem; }
+  &__btn-cancel { @include btn-ghost; }
+}

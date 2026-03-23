@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { filter } from 'rxjs/operators';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
@@ -7,12 +8,13 @@ import { FooterComponent } from './components/footer/footer.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, FooterComponent],
+  imports: [RouterOutlet, CommonModule, NavbarComponent, FooterComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
   private revealObserver: IntersectionObserver | null = null;
+  isAdminRoute = signal(false);
 
   constructor(private router: Router) {}
 
@@ -20,7 +22,9 @@ export class AppComponent implements OnInit {
     this.initCursor();
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
-    ).subscribe(() => {
+    ).subscribe((e) => {
+      const url = (e as NavigationEnd).urlAfterRedirects;
+      this.isAdminRoute.set(url.startsWith('/admin'));
       window.scrollTo(0, 0);
       setTimeout(() => this.initRevealObserver(), 120);
     });

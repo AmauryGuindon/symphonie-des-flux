@@ -4,6 +4,21 @@ import { ServicesComponent } from './components/services/services.component';
 import { GalleryComponent } from './components/gallery/gallery.component';
 import { AboutComponent } from './components/about/about.component';
 import { BookingComponent } from './components/booking/booking.component';
+import { AppointmentBookingComponent } from './components/appointment-booking/appointment-booking.component';
+import { LoginComponent } from './components/auth/login/login.component';
+import { RegisterComponent } from './components/auth/register/register.component';
+import { AccountComponent } from './components/account/account.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { AdminDashboardComponent } from './components/admin/dashboard/dashboard.component';
+import { AdminClientsComponent } from './components/admin/clients/clients.component';
+import { AdminClientDetailComponent } from './components/admin/client-detail/client-detail.component';
+import { AdminLoyaltyComponent } from './components/admin/loyalty/loyalty.component';
+import { AdminReferralsComponent } from './components/admin/referrals/referrals.component';
+import { AdminAppointmentsComponent } from './components/admin/appointments/appointments.component';
+import { AdminScheduleComponent } from './components/admin/schedule/schedule.component';
+import { AdminAccountingComponent } from './components/admin/accounting/accounting.component';
+import { AdminServicesComponent } from './components/admin/services/services.component';
+import { authGuard, adminGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', component: HeroComponent },
@@ -11,5 +26,26 @@ export const routes: Routes = [
   { path: 'gallery', component: GalleryComponent },
   { path: 'about', component: AboutComponent },
   { path: 'booking', component: BookingComponent },
-  { path: '**', redirectTo: '' }
+  { path: 'appointment', component: AppointmentBookingComponent },
+  { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+  { path: 'account', component: AccountComponent, canActivate: [authGuard] },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    canActivate: [adminGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: AdminDashboardComponent },
+      { path: 'clients', component: AdminClientsComponent },
+      { path: 'clients/:id', component: AdminClientDetailComponent },
+      { path: 'loyalty', component: AdminLoyaltyComponent },
+      { path: 'referrals', component: AdminReferralsComponent },
+      { path: 'appointments', component: AdminAppointmentsComponent },
+      { path: 'schedule', component: AdminScheduleComponent },
+      { path: 'comptabilite', component: AdminAccountingComponent },
+      { path: 'prestations', component: AdminServicesComponent },
+    ],
+  },
+  { path: '**', redirectTo: '' },
 ];

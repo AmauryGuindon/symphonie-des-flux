@@ -1,10 +1,14 @@
 <div class="cursor"></div>
 <div class="cursor-follower"></div>
 
-<app-navbar></app-navbar>
+@if (!isAdminRoute()) {
+  <app-navbar></app-navbar>
+}
 
-<main class="main-content">
+<main [class.main-content]="!isAdminRoute()">
   <router-outlet></router-outlet>
 </main>
 
-<app-footer></app-footer>
+@if (!isAdminRoute()) {
+  <app-footer></app-footer>
+}

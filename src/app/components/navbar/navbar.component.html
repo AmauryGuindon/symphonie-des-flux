@@ -9,9 +9,21 @@
       <li><a routerLink="/gallery" routerLinkActive="active">Galerie</a></li>
       <li><a routerLink="/about" routerLinkActive="active">À Propos</a></li>
       <li>
-        <a href="https://dany1stbarber.setmore.com/" target="_blank" rel="noopener" class="navbar__cta">
+        <a routerLink="/appointment" routerLinkActive="active" class="navbar__cta">
           Réserver
         </a>
+      </li>
+      <li>
+        @if (auth.isAuthenticated()) {
+          <a routerLink="/account" routerLinkActive="active" class="navbar__account">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" aria-hidden="true">
+              <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+            </svg>
+            {{ auth.user()?.firstName }}
+          </a>
+        } @else {
+          <a routerLink="/login" routerLinkActive="active" class="navbar__account">Connexion</a>
+        }
       </li>
     </ul>
 
@@ -29,9 +41,16 @@
       <li><a routerLink="/gallery" routerLinkActive="active" (click)="closeMenu()">Galerie</a></li>
       <li><a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">À Propos</a></li>
       <li>
-        <a href="https://dany1stbarber.setmore.com/" target="_blank" rel="noopener" (click)="closeMenu()">
+        <a routerLink="/appointment" routerLinkActive="active" (click)="closeMenu()">
           Réserver
         </a>
+      </li>
+      <li>
+        @if (auth.isAuthenticated()) {
+          <a routerLink="/account" (click)="closeMenu()">Mon Compte</a>
+        } @else {
+          <a routerLink="/login" (click)="closeMenu()">Connexion</a>
+        }
       </li>
     </ul>
     <div class="navbar__mobile-footer">

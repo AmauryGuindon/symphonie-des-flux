@@ -1,0 +1,194 @@
+@use '../admin-shared' as *;
+
+.loyalty {
+  @include page-padding;
+
+  &__header { margin-bottom: 2rem; }
+  &__title  { @include page-title; }
+  &__loading { @include loading; }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    @media (max-width: 1000px) { grid-template-columns: 1fr; }
+  }
+
+  &__card {
+    @include card;
+
+    &-title {
+      font-size: .85rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.5);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 0 0 1.5rem;
+    }
+
+    &--full { margin-top: 0; }
+  }
+
+  // Tier grid
+  &__tier-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  &__tier-bloc {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+  }
+
+  &__tier-value {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--tc);
+    line-height: 1;
+  }
+
+  &__tier-label {
+    font-size: .75rem;
+    color: rgba(255,255,255,.5);
+  }
+
+  &__tier-bar-wrap {
+    height: 4px;
+    background: rgba(255,255,255,.07);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: .25rem;
+  }
+
+  &__tier-bar {
+    height: 100%;
+    background: var(--tc);
+    border-radius: 2px;
+  }
+
+  &__tier-pct {
+    font-size: .7rem;
+    color: rgba(255,255,255,.3);
+  }
+
+  &__total {
+    margin-top: 1rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,.3);
+    text-align: right;
+  }
+
+  // Birthday list
+  &__empty-text {
+    font-size: .85rem;
+    color: rgba(255,255,255,.3);
+    margin: 0;
+  }
+
+  &__birthday-list { display: flex; flex-direction: column; gap: .75rem; }
+
+  &__birthday-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .625rem .875rem;
+    background: rgba(201,164,74,.06);
+    border: 1px solid rgba(201,164,74,.12);
+    border-radius: 8px;
+  }
+
+  &__birthday-name {
+    flex: 1;
+    font-size: .85rem;
+    color: #fff;
+    font-weight: 500;
+  }
+
+  &__birthday-date {
+    font-size: .8rem;
+    color: #C9A44A;
+    font-weight: 600;
+  }
+
+  &__btn-view {
+    @include btn-ghost;
+    text-decoration: none;
+    font-size: .75rem;
+    padding: .25rem .625rem;
+  }
+
+  // Table
+  &__table { @include table; }
+
+  &__row--podium td { background: rgba(201,164,74,.03); }
+
+  &__rank { font-size: 1.1rem; }
+
+  &__client-name { font-weight: 600; color: #fff !important; }
+
+  &__tier-badge {
+    display: inline-block;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    border: 1px solid;
+    font-size: .7rem;
+    font-weight: 600;
+  }
+
+  &__visits { color: rgba(255,255,255,.7) !important; font-weight: 600; }
+  &__points { color: #C9A44A !important; font-weight: 600; }
+
+  // ── Configuration des prestations ─────────────────────────────────────────
+
+  &__services { margin-top: 1.25rem; }
+
+  &__services-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: .5rem;
+  }
+
+  &__services-desc {
+    font-size: .8rem;
+    color: rgba(255,255,255,.35);
+    margin: 0 0 1.25rem;
+  }
+
+  &__save-success { font-size: .8rem; color: #2ecc71; }
+
+  &__services-table { @include table; }
+
+  &__svc-name  { font-weight: 600; color: #fff !important; }
+  &__svc-price { color: rgba(255,255,255,.5) !important; }
+  &__svc-pts   { color: #C9A44A !important; font-weight: 600; }
+
+  &__pts-input {
+    width: 80px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(201,164,74,.4);
+    border-radius: 6px;
+    padding: .35rem .6rem;
+    color: #C9A44A;
+    font-size: .875rem;
+    font-weight: 700;
+    outline: none;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  &__svc-actions { display: flex; gap: .5rem; justify-content: flex-end; }
+
+  &__btn-edit   { @include btn-ghost;   font-size: .75rem; padding: .3rem .75rem; }
+  &__btn-save   { @include btn-primary; font-size: .75rem; padding: .3rem .75rem; }
+  &__btn-cancel { @include btn-ghost;   font-size: .75rem; padding: .3rem .75rem; }
+}

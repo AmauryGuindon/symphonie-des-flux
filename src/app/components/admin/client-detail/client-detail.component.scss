@@ -1,0 +1,288 @@
+@use '../admin-shared' as *;
+
+.cd {
+  @include page-padding;
+
+  &__back { margin-bottom: 1.5rem; }
+
+  &__back-link {
+    font-size: .8rem;
+    color: rgba(255,255,255,.35);
+    text-decoration: none;
+    transition: color .2s;
+    &:hover { color: #C9A44A; }
+  }
+
+  &__loading { @include loading; }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__name {
+    @include page-title;
+    margin-bottom: .5rem;
+  }
+
+  &__tier {
+    display: inline-block;
+    padding: .25rem .75rem;
+    border-radius: 20px;
+    border: 1px solid;
+    font-size: .75rem;
+    font-weight: 600;
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__success {
+    font-size: .8rem;
+    color: #2ecc71;
+  }
+
+  &__btn-visit {
+    @include btn-primary;
+    font-size: .85rem;
+    padding: .6rem 1.25rem;
+  }
+
+  // ── Panel nouvelle visite ─────────────────────────────────────────────────
+
+  &__visit-panel {
+    background: rgba(201,164,74,.06);
+    border: 1px solid rgba(201,164,74,.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__visit-panel-title {
+    font-size: .85rem;
+    font-weight: 600;
+    color: #C9A44A;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin: 0 0 1.25rem;
+  }
+
+  &__visit-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: .875rem;
+    margin-bottom: 1.25rem;
+
+    @media (max-width: 700px) { grid-template-columns: 1fr; }
+  }
+
+  &__visit-actions { display: flex; gap: .75rem; }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+
+    @media (max-width: 900px) { grid-template-columns: 1fr; }
+  }
+
+  &__card {
+    @include card;
+
+    &--stats {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    &--danger {
+      border-color: rgba(231,76,60,.2);
+    }
+
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      h3 {
+        font-size: .85rem;
+        font-weight: 600;
+        color: rgba(255,255,255,.6);
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        margin: 0;
+      }
+    }
+
+    &-desc {
+      font-size: .8rem;
+      color: rgba(255,255,255,.4);
+      margin: 0 0 1rem;
+    }
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+
+    &-val {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #C9A44A;
+      line-height: 1;
+    }
+    &-lbl {
+      font-size: .75rem;
+      color: rgba(255,255,255,.4);
+    }
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: .5rem .75rem;
+    margin: 0;
+
+    dt { font-size: .75rem; color: rgba(255,255,255,.35); align-self: start; padding-top: .1rem; }
+    dd { font-size: .85rem; color: rgba(255,255,255,.8); margin: 0; }
+  }
+
+  &__code {
+    font-family: monospace;
+    font-size: .9rem !important;
+    color: #C9A44A !important;
+    letter-spacing: .1em;
+  }
+
+  &__edit-form { display: flex; flex-direction: column; gap: .875rem; }
+  &__edit-row { display: grid; grid-template-columns: 1fr 1fr; gap: .875rem; }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: .35rem;
+
+    &--full { grid-column: 1 / -1; }
+
+    label { font-size: .75rem; color: rgba(255,255,255,.4); }
+
+    select {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 6px;
+      padding: .6rem .875rem;
+      color: #fff;
+      font-size: .875rem;
+      outline: none;
+      transition: border-color .2s;
+      cursor: pointer;
+      &:focus { border-color: rgba(201,164,74,.5); }
+      option { background: #1a1a1a; }
+    }
+
+    input, textarea {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 6px;
+      padding: .6rem .875rem;
+      color: #fff;
+      font-size: .875rem;
+      outline: none;
+      transition: border-color .2s;
+      &:focus { border-color: rgba(201,164,74,.5); }
+    }
+    textarea { resize: vertical; font-family: inherit; }
+  }
+
+  &__edit-actions { display: flex; gap: .75rem; margin-top: .25rem; }
+
+  &__btn-edit   { @include btn-ghost; }
+  &__btn-save   { @include btn-primary; }
+  &__btn-cancel { @include btn-ghost; }
+  &__btn-delete { @include btn-danger; }
+
+  &__points-form {
+    display: flex;
+    gap: .75rem;
+    align-items: center;
+  }
+
+  &__points-input {
+    flex: 1;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 6px;
+    padding: .6rem .875rem;
+    color: #fff;
+    font-size: .875rem;
+    outline: none;
+    &:focus { border-color: rgba(201,164,74,.5); }
+  }
+
+  &__btn-pts { @include btn-primary; white-space: nowrap; }
+
+  &__pts-success {
+    margin-top: .75rem;
+    font-size: .8rem;
+    color: #2ecc71;
+  }
+
+  &__delete-confirm-text {
+    font-size: .85rem;
+    color: rgba(255,255,255,.6);
+    margin: 0 0 1rem;
+    strong { color: #fff; }
+  }
+
+  &__delete-actions { display: flex; gap: .75rem; }
+
+  &__btn-delete-confirm {
+    background: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: .5rem 1rem;
+    border-radius: 6px;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity .2s;
+    &:hover { opacity: .85; }
+  }
+
+  // ── Historique des prestations ────────────────────────────────────────────
+
+  &__history {
+    margin-top: 1.25rem;
+    grid-column: 1 / -1;
+
+    &-count {
+      font-size: .75rem;
+      color: rgba(255,255,255,.3);
+    }
+  }
+
+  &__empty {
+    font-size: .85rem;
+    color: rgba(255,255,255,.3);
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+
+  &__table { @include table; }
+
+  &__visit-date    { color: rgba(255,255,255,.45) !important; font-size: .8rem !important; }
+  &__visit-service { font-weight: 600; color: #fff !important; }
+  &__visit-price   { color: #C9A44A !important; font-weight: 700; }
+  &__visit-notes   { color: rgba(255,255,255,.4) !important; font-size: .8rem !important; font-style: italic; }
+}

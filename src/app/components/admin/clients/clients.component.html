@@ -1,0 +1,93 @@
+<div class="clients">
+  <div class="clients__header">
+    <h1 class="clients__title">Clients</h1>
+    <span class="clients__count">{{ clients().length }} client(s)</span>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="clients__search-wrap">
+    <svg class="clients__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      class="clients__search"
+      type="text"
+      placeholder="Rechercher par nom, email, téléphone…"
+      [(ngModel)]="search"
+      (keyup.enter)="onSearch()"
+      (input)="onSearch()"
+    />
+  </div>
+
+  @if (loading()) {
+    <div class="clients__loading">Chargement…</div>
+  } @else if (clients().length === 0) {
+    <div class="clients__empty">Aucun client trouvé.</div>
+  } @else {
+    <div class="clients__table-wrap">
+      <table class="clients__table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Palier</th>
+            <th>Points</th>
+            <th>Visites</th>
+            <th>Inscription</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of pagedClients(); track c._id) {
+            <tr>
+              <td class="clients__name">{{ c.firstName }} {{ c.lastName }}</td>
+              <td class="clients__email">{{ c.email }}</td>
+              <td>{{ c.phone || '—' }}</td>
+              <td>
+                <span class="clients__tier" [style.color]="getTierColor(c.loyaltyTier)" [style.border-color]="getTierColor(c.loyaltyTier) + '40'">
+                  {{ getTierLabel(c.loyaltyTier) }}
+                </span>
+              </td>
+              <td class="clients__pts">{{ c.loyaltyPoints }} pts</td>
+              <td>{{ c.visitCount }}</td>
+              <td>{{ c.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <a [routerLink]="['/admin/clients', c._id]" class="clients__btn-detail">Voir</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages() > 1) {
+      <div class="clients__pagination">
+        <button class="clients__page-btn clients__page-btn--nav"
+          [disabled]="page() === 1"
+          (click)="goTo(page() - 1)">
+          ←
+        </button>
+
+        @for (p of pageNumbers(); track p) {
+          <button class="clients__page-btn"
+            [class.clients__page-btn--active]="p === page()"
+            (click)="goTo(p)">
+            {{ p }}
+          </button>
+        }
+
+        <button class="clients__page-btn clients__page-btn--nav"
+          [disabled]="page() === totalPages()"
+          (click)="goTo(page() + 1)">
+          →
+        </button>
+
+        <span class="clients__page-info">
+          {{ pageStart() }}–{{ pageEnd() }} sur {{ clients().length }}
+        </span>
+      </div>
+    }
+  }
+</div>

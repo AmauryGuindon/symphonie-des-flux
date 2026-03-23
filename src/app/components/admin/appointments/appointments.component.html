@@ -1,0 +1,198 @@
+<div class="appt-admin">
+  <div class="appt-admin__header">
+    <h1 class="appt-admin__title">Rendez-vous</h1>
+    <div class="appt-admin__header-actions">
+      <div class="appt-admin__view-toggle">
+        <button [class.active]="viewMode() === 'week'" (click)="viewMode.set('week')">Semaine</button>
+        <button [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')">Liste</button>
+      </div>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="appt-admin__loading">Chargement…</div>
+  } @else {
+
+    <!-- ── WEEK VIEW ─────────────────────────────────────────────────── -->
+    @if (viewMode() === 'week') {
+      <div class="appt-admin__week-nav">
+        <button class="appt-admin__nav-btn" (click)="prevWeek()">‹ Semaine préc.</button>
+        <span class="appt-admin__week-label">{{ weekLabel() }}</span>
+        <button class="appt-admin__nav-btn" (click)="nextWeek()">Semaine suiv. ›</button>
+      </div>
+
+      <div class="appt-admin__week-grid">
+        @for (day of weekDays(); track day.toISOString()) {
+          <div class="appt-admin__day" [class.appt-admin__day--today]="isToday(day)">
+            <div class="appt-admin__day-header">{{ dayLabel(day) }}</div>
+
+            @if (day.getDay() === 0) {
+              <div class="appt-admin__day-closed">Fermé</div>
+            } @else {
+              @if (appointmentsForDay(day).length === 0) {
+                <div class="appt-admin__day-empty">Libre</div>
+              } @else {
+                @for (a of appointmentsForDay(day); track a._id) {
+                  <div class="appt-admin__event" [class.appt-admin__event--confirmed]="a.status === 'confirmed'">
+                    <span class="appt-admin__event-time">{{ a.time }}</span>
+                    <span class="appt-admin__event-service">{{ a.serviceType }}</span>
+                    <span class="appt-admin__event-client">{{ a.clientName }}</span>
+                    <div class="appt-admin__event-actions">
+                      @if (a.status === 'pending') {
+                        <button class="appt-admin__btn-confirm" (click)="confirm(a)">✓</button>
+                      }
+                      <button class="appt-admin__btn-edit" (click)="startEdit(a)">✎</button>
+                      <button class="appt-admin__btn-del" (click)="delete(a._id)">✕</button>
+                    </div>
+                  </div>
+                }
+              }
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ── LIST VIEW ─────────────────────────────────────────────────── -->
+    @if (viewMode() === 'list') {
+      <div class="appt-admin__filter-row">
+        <select class="appt-admin__filter-select" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
+          <option value="all">Tous les statuts</option>
+          <option value="pending">En attente</option>
+          <option value="confirmed">Confirmés</option>
+          <option value="cancelled">Annulés</option>
+        </select>
+        <div class="appt-admin__date-range">
+          <input class="appt-admin__input appt-admin__date-input" type="date"
+            [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event)"
+            placeholder="Du" title="Date de début" />
+          <span class="appt-admin__date-sep">→</span>
+          <input class="appt-admin__input appt-admin__date-input" type="date"
+            [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event)"
+            placeholder="Au" title="Date de fin" />
+          @if (dateFrom() || dateTo()) {
+            <button class="appt-admin__btn-ghost appt-admin__date-clear" (click)="clearDateFilter()" title="Effacer">✕</button>
+          }
+        </div>
+      </div>
+
+      @if (filteredAppointments().length === 0) {
+        <p class="appt-admin__empty">Aucun rendez-vous.</p>
+      } @else {
+        <table class="appt-admin__table">
+          <thead>
+            <tr>
+              <th class="appt-admin__th-sort" (click)="toggleSort()">
+                Date
+                <span class="appt-admin__sort-icon">{{ sortDir() === 'asc' ? '↑' : '↓' }}</span>
+              </th>
+              <th>Heure</th>
+              <th>Client</th>
+              <th>Prestation</th>
+              <th>Statut</th>
+              <th>Paiement</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (a of filteredAppointments(); track a._id) {
+              <tr>
+                @if (editingId() === a._id) {
+                  <!-- Inline edit row -->
+                  <td>
+                    <input class="appt-admin__input" type="date" [(ngModel)]="editDate" />
+                  </td>
+                  <td>
+                    <select class="appt-admin__input" [(ngModel)]="editTime">
+                      @for (t of TIMES; track t) {
+                        <option [value]="t">{{ t }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td>{{ a.clientName }}</td>
+                  <td>{{ a.serviceType }}</td>
+                  <td>
+                    <select class="appt-admin__input" [(ngModel)]="editStatus">
+                      <option value="pending">En attente</option>
+                      <option value="confirmed">Confirmé</option>
+                      <option value="cancelled">Annulé</option>
+                    </select>
+                  </td>
+                  <td>—</td>
+                  <td>{{ a.notes || '—' }}</td>
+                  <td class="appt-admin__actions">
+                    <button class="appt-admin__btn-save" (click)="saveEdit(a)" [disabled]="saveLoading()">
+                      {{ saveLoading() ? '…' : 'Sauvegarder' }}
+                    </button>
+                    <button class="appt-admin__btn-ghost" (click)="cancelEdit()">Annuler</button>
+                  </td>
+                } @else {
+                  <td>{{ formatDate(a.date) }}</td>
+                  <td>{{ a.time }}</td>
+                  <td>{{ a.clientName }}<br><small>{{ a.clientEmail }}</small></td>
+                  <td>{{ a.serviceType }}</td>
+                  <td>
+                    <span class="appt-admin__status" [ngClass]="statusClass(a.status)">
+                      {{ statusLabel(a.status) }}
+                    </span>
+                  </td>
+                  <td>{{ paymentLabel(a.paymentMethod) }}</td>
+                  <td class="appt-admin__notes">{{ a.notes || '—' }}</td>
+                  <td class="appt-admin__actions">
+                    @if (a.status === 'pending') {
+                      <button class="appt-admin__btn-confirm" (click)="confirm(a)">Confirmer</button>
+                    }
+                    @if (a.status !== 'cancelled') {
+                      <button class="appt-admin__btn-ghost" (click)="cancel(a)">Annuler</button>
+                    }
+                    <button class="appt-admin__btn-edit" (click)="startEdit(a)">Modifier</button>
+                    <button class="appt-admin__btn-del" (click)="delete(a._id)">Supprimer</button>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
+
+  <!-- ── EDIT MODAL ────────────────────────────────────────────────── -->
+  @if (editingId()) {
+    <div class="appt-admin__modal-backdrop" (click)="cancelEdit()">
+      <div class="appt-admin__modal" (click)="$event.stopPropagation()">
+        <h3 class="appt-admin__modal-title">Modifier le rendez-vous</h3>
+        <div class="appt-admin__modal-fields">
+          <label class="appt-admin__modal-label">
+            Date
+            <input class="appt-admin__input" type="date" [(ngModel)]="editDate" />
+          </label>
+          <label class="appt-admin__modal-label">
+            Heure
+            <select class="appt-admin__input" [(ngModel)]="editTime">
+              @for (t of TIMES; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </label>
+          <label class="appt-admin__modal-label">
+            Statut
+            <select class="appt-admin__input" [(ngModel)]="editStatus">
+              <option value="pending">En attente</option>
+              <option value="confirmed">Confirmé</option>
+              <option value="cancelled">Annulé</option>
+            </select>
+          </label>
+        </div>
+        <div class="appt-admin__modal-actions">
+          <button class="appt-admin__btn-save" (click)="saveEditById()" [disabled]="saveLoading()">
+            {{ saveLoading() ? '…' : 'Sauvegarder' }}
+          </button>
+          <button class="appt-admin__btn-ghost" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  }
+</div>

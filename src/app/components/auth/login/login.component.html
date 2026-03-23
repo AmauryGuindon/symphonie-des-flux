@@ -1,0 +1,59 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__logo">
+      <a routerLink="/">
+        <img src="assets/logo/logo_dany1st.webp" alt="Dany1st" />
+      </a>
+    </div>
+
+    <div class="auth-card__header">
+      <span class="section-label">Espace Client</span>
+      <h1 class="auth-card__title">CONNEXION</h1>
+      <div class="gold-divider"></div>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="submit()" #f="ngForm">
+      <div class="auth-form__field">
+        <label>Email</label>
+        <input
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="votre@email.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div class="auth-form__field">
+        <label>Mot de passe</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+
+      @if (error()) {
+        <p class="auth-form__error">{{ error() }}</p>
+      }
+
+      <button type="submit" class="auth-form__submit" [class.loading]="loading()">
+        @if (loading()) {
+          <span class="auth-form__spinner"></span>
+        } @else {
+          <span>Se connecter</span>
+          <span class="auth-form__arrow">→</span>
+        }
+      </button>
+    </form>
+
+    <p class="auth-card__switch">
+      Pas encore de compte ?
+      <a routerLink="/register">S'inscrire</a>
+    </p>
+  </div>
+</section>

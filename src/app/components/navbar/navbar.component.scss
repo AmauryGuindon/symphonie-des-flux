@@ -115,6 +115,25 @@
     }
   }
 
+  &__account {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--white-muted) !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.12em !important;
+    transition: color 0.3s ease !important;
+
+    svg { opacity: 0.6; transition: opacity 0.3s; }
+
+    &:hover, &.active {
+      color: var(--gold) !important;
+      svg { opacity: 1; }
+    }
+
+    &::after { display: none !important; }
+  }
+
   &__burger {
     display: none;
     flex-direction: column;

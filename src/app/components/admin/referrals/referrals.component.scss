@@ -1,0 +1,80 @@
+@use '../admin-shared' as *;
+
+.ref {
+  @include page-padding;
+
+  &__header { margin-bottom: 1.5rem; }
+  &__title  { @include page-title; }
+  &__loading { @include loading; }
+
+  &__kpi {
+    @include card;
+    display: inline-flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin-bottom: 1.5rem;
+
+    &-value {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #C9A44A;
+      line-height: 1;
+    }
+    &-label {
+      font-size: .8rem;
+      color: rgba(255,255,255,.4);
+    }
+  }
+
+  &__card {
+    @include card;
+
+    &-title {
+      font-size: .85rem;
+      font-weight: 600;
+      color: rgba(255,255,255,.5);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin: 0 0 1.5rem;
+    }
+  }
+
+  &__empty {
+    font-size: .85rem;
+    color: rgba(255,255,255,.3);
+  }
+
+  &__table { @include table; }
+
+  &__rank { font-size: 1.1rem; }
+  &__name { font-weight: 600; color: #fff !important; }
+
+  &__code {
+    font-family: monospace;
+    font-size: .85rem;
+    color: #C9A44A;
+    letter-spacing: .08em;
+    background: rgba(201,164,74,.08);
+    padding: .15rem .5rem;
+    border-radius: 4px;
+  }
+
+  &__tier {
+    display: inline-block;
+    padding: .2rem .6rem;
+    border-radius: 20px;
+    border: 1px solid;
+    font-size: .7rem;
+    font-weight: 600;
+  }
+
+  &__count { font-weight: 700; color: #fff !important; }
+  &__pts   { color: #C9A44A !important; font-weight: 600; }
+
+  &__btn-view {
+    @include btn-ghost;
+    text-decoration: none;
+    font-size: .75rem;
+    padding: .25rem .625rem;
+  }
+}
