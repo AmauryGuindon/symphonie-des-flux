@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService, DashboardStats } from '../../../services/admin.service';
 import { Chart, registerables } from 'chart.js';
@@ -12,7 +12,7 @@ Chart.register(...registerables);
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class AdminDashboardComponent implements OnInit, AfterViewInit {
+export class AdminDashboardComponent implements OnInit, OnDestroy {
   stats = signal<DashboardStats | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
@@ -26,11 +26,14 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   };
 
   today = new Date();
-  private chartsBuilt = false;
 
   @ViewChild('revenueChart') revenueChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('clientsChart') clientsChartRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('tiersChart') tiersChartRef!: ElementRef<HTMLCanvasElement>;
+
+  private revenueChart?: Chart;
+  private clientsChart?: Chart;
+  private tiersChart?: Chart;
 
   constructor(private adminService: AdminService) {}
 
@@ -39,8 +42,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       next: s => {
         this.stats.set(s);
         this.loading.set(false);
-        // Build charts after next render cycle
-        setTimeout(() => this.tryBuildCharts(), 0);
+        setTimeout(() => this.buildChartsIfReady(), 0);
       },
       error: (err) => {
         this.error.set(err?.status === 401 ? 'Non autorisé (token invalide ?)' : `Impossible de contacter le backend (${err?.status ?? 'réseau'})`);
@@ -49,15 +51,21 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     });
   }
 
-  ngAfterViewInit() {
-    this.tryBuildCharts();
+  ngOnDestroy() {
+    this.destroyCharts();
   }
 
-  private tryBuildCharts() {
+  private destroyCharts() {
+    this.revenueChart?.destroy(); this.revenueChart = undefined;
+    this.clientsChart?.destroy(); this.clientsChart = undefined;
+    this.tiersChart?.destroy();   this.tiersChart = undefined;
+  }
+
+  private buildChartsIfReady() {
     const s = this.stats();
-    if (!s || this.chartsBuilt) return;
+    if (!s) return;
     if (!this.revenueChartRef || !this.clientsChartRef || !this.tiersChartRef) return;
-    this.chartsBuilt = true;
+    this.destroyCharts();
     this.buildCharts(s);
   }
 
@@ -65,7 +73,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     const labels = s.monthlyActivity.map(m => m.month);
     const gold = '#C9A44A';
 
-    new Chart(this.revenueChartRef.nativeElement, {
+    this.revenueChart = new Chart(this.revenueChartRef.nativeElement, {
       type: 'line',
       data: {
         labels,
@@ -89,7 +97,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       },
     });
 
-    new Chart(this.clientsChartRef.nativeElement, {
+    this.clientsChart = new Chart(this.clientsChartRef.nativeElement, {
       type: 'bar',
       data: {
         labels,
@@ -116,7 +124,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       },
     });
 
-    new Chart(this.tiersChartRef.nativeElement, {
+    this.tiersChart = new Chart(this.tiersChartRef.nativeElement, {
       type: 'doughnut',
       data: {
         labels: ['Bronze', 'Argent', 'Or', 'Platine'],

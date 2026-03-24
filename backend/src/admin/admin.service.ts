@@ -144,27 +144,32 @@ export class AdminService implements OnModuleInit {
   }
 
   private async getMonthlyActivity(months: number) {
-    const result = [];
     const now = new Date();
-    for (let i = months - 1; i >= 0; i--) {
-      const start = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const end = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
-      const [newClients, activeClients, revenueAgg] = await Promise.all([
-        this.userModel.countDocuments({ role: 'client', createdAt: { $gte: start, $lte: end } }),
-        this.userModel.countDocuments({ role: 'client', lastVisitAt: { $gte: start, $lte: end } }),
-        this.visitModel.aggregate([
-          { $match: { createdAt: { $gte: start, $lte: end } } },
-          { $group: { _id: null, total: { $sum: '$price' } } },
-        ]),
-      ]);
-      result.push({
-        month: start.toLocaleString('fr-FR', { month: 'short', year: '2-digit' }),
-        newClients,
-        activeClients,
-        revenue: revenueAgg[0]?.total ?? 0,
-      });
-    }
-    return result;
+    const monthRanges = Array.from({ length: months }, (_, i) => {
+      const offset = months - 1 - i;
+      const start = new Date(now.getFullYear(), now.getMonth() - offset, 1);
+      const end = new Date(now.getFullYear(), now.getMonth() - offset + 1, 0, 23, 59, 59);
+      return { start, end };
+    });
+
+    return Promise.all(
+      monthRanges.map(async ({ start, end }) => {
+        const [newClients, activeClients, revenueAgg] = await Promise.all([
+          this.userModel.countDocuments({ role: 'client', createdAt: { $gte: start, $lte: end } }),
+          this.userModel.countDocuments({ role: 'client', lastVisitAt: { $gte: start, $lte: end } }),
+          this.visitModel.aggregate([
+            { $match: { createdAt: { $gte: start, $lte: end } } },
+            { $group: { _id: null, total: { $sum: '$price' } } },
+          ]),
+        ]);
+        return {
+          month: start.toLocaleString('fr-FR', { month: 'short', year: '2-digit' }),
+          newClients,
+          activeClients,
+          revenue: revenueAgg[0]?.total ?? 0,
+        };
+      }),
+    );
   }
 
   // ── Clients ───────────────────────────────────────────────────────────────
