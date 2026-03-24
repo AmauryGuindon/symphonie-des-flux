@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
@@ -66,6 +66,17 @@ export class AuthService {
     }
     const hashed = await bcrypt.hash(newPassword, 10);
     await this.usersService.updatePassword(user._id.toString(), hashed);
+  }
+
+  async changePassword(userId: string, currentPassword: string, newPassword: string) {
+    const user = await this.usersService.findByEmail(
+      (await this.usersService.findById(userId)).email,
+    );
+    if (!user) throw new UnauthorizedException();
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) throw new UnauthorizedException('Mot de passe actuel incorrect.');
+    const hashed = await bcrypt.hash(newPassword, 12);
+    await this.usersService.updatePassword(userId, hashed);
   }
 
   async register(dto: CreateUserDto) {

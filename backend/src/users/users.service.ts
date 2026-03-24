@@ -83,10 +83,18 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserDto): Promise<UserDocument> {
+    const existing = await this.userModel.findById(id).select('birthDate');
+    if (!existing) throw new NotFoundException('Utilisateur non trouvé');
+
+    // La date de naissance ne peut être définie qu'une seule fois
+    const birthDate = existing.birthDate
+      ? undefined
+      : dto.birthDate ? new Date(dto.birthDate) : undefined;
+
     const user = await this.userModel
       .findByIdAndUpdate(
         id,
-        { ...dto, birthDate: dto.birthDate ? new Date(dto.birthDate) : undefined },
+        { ...dto, birthDate },
         { new: true },
       )
       .select('-password');

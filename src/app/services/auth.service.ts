@@ -89,6 +89,22 @@ export class AuthService {
     );
   }
 
+  getMyVisits(limit = 10): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API}/users/me/visits?limit=${limit}`);
+  }
+
+  getMyAppointments(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API}/appointments/my`);
+  }
+
+  cancelAppointment(id: string): Observable<any> {
+    return this.http.patch(`${this.API}/appointments/${id}/cancel`, {});
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.API}/auth/change-password`, { currentPassword, newPassword });
+  }
+
   private saveSession(res: AuthResponse): void {
     localStorage.setItem(this.TOKEN_KEY, res.accessToken);
     localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));

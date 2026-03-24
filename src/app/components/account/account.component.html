@@ -52,6 +52,54 @@
       <p class="account__tier-hint">{{ nextTierLabel() }}</p>
     </div>
 
+    <!-- ── Prochains RDV ─────────────────────────────────────────────── -->
+    <div class="account__section-title reveal">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Prochains rendez-vous
+    </div>
+
+    <div class="account__card reveal">
+      @if (appointmentsLoading()) {
+        <p class="account__loading-inline">Chargement…</p>
+      } @else if (upcomingAppointments().length === 0) {
+        <div class="account__empty-inline">
+          <p>Aucun rendez-vous à venir.</p>
+          <a [routerLink]="['/appointment']" class="account__link-gold">Réserver maintenant →</a>
+        </div>
+      } @else {
+        <div class="account__appt-list">
+          @for (a of upcomingAppointments(); track a._id) {
+            <div class="account__appt-item">
+              <div class="account__appt-accent" [class]="'account__appt-accent--' + a.status"></div>
+              <div class="account__appt-body">
+                <div class="account__appt-service">{{ a.serviceType }}</div>
+                <div class="account__appt-meta">
+                  <span>{{ formatDate(a.date) }}</span>
+                  <span class="account__appt-dot">·</span>
+                  <span>{{ a.time }}</span>
+                </div>
+              </div>
+              <div class="account__appt-right">
+                <span class="account__appt-status account__appt-status--{{ a.status }}">
+                  {{ statusLabel(a.status) }}
+                </span>
+                @if (a.status !== 'cancelled') {
+                  <button
+                    class="account__appt-cancel"
+                    (click)="cancelAppointment(a._id)"
+                    [disabled]="cancellingId() === a._id"
+                  >
+                    {{ cancellingId() === a._id ? '…' : 'Annuler' }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- ── Grille principale ─────────────────────────────────────────── -->
     <div class="account__grid">
 
       <!-- Profil -->
@@ -71,6 +119,41 @@
             <dt>Préférences</dt><dd>{{ u.preferences || '—' }}</dd>
             <dt>Anniversaire</dt><dd>{{ u.birthDate ? (u.birthDate | date:'dd/MM/yyyy') : '—' }}</dd>
           </dl>
+
+          <!-- Changer mot de passe -->
+          <div class="account__pwd-toggle">
+            <button class="account__card-edit" (click)="showChangePwd.set(!showChangePwd())">
+              {{ showChangePwd() ? 'Annuler' : 'Changer le mot de passe' }}
+            </button>
+          </div>
+
+          @if (showChangePwd()) {
+            <div class="account__pwd-form">
+              @if (pwdSuccess()) {
+                <p class="account__pwd-success">✓ Mot de passe modifié avec succès !</p>
+              } @else {
+                @if (pwdError()) {
+                  <p class="account__pwd-error">{{ pwdError() }}</p>
+                }
+                <div class="account__field">
+                  <label>Mot de passe actuel</label>
+                  <input type="password" [(ngModel)]="pwdCurrent" name="pwdCurrent" autocomplete="current-password" />
+                </div>
+                <div class="account__field">
+                  <label>Nouveau mot de passe</label>
+                  <input type="password" [(ngModel)]="pwdNew" name="pwdNew" autocomplete="new-password" />
+                </div>
+                <div class="account__field">
+                  <label>Confirmer le nouveau mot de passe</label>
+                  <input type="password" [(ngModel)]="pwdConfirm" name="pwdConfirm" autocomplete="new-password" />
+                </div>
+                <button class="account__btn-save" (click)="submitChangePwd()" [disabled]="pwdLoading()">
+                  {{ pwdLoading() ? '…' : 'Confirmer' }}
+                </button>
+              }
+            </div>
+          }
+
         } @else {
           <div class="account__edit-form">
             <div class="account__edit-row">
@@ -88,6 +171,18 @@
               <input [(ngModel)]="editPhone" name="ph" placeholder="06 XX XX XX XX" />
             </div>
             <div class="account__field">
+              <label>Date de naissance</label>
+              @if (u.birthDate) {
+                <div class="account__field-locked">
+                  <span>{{ u.birthDate | date:'dd/MM/yyyy' }}</span>
+                  <span class="account__field-locked-hint">Non modifiable après enregistrement</span>
+                </div>
+              } @else {
+                <input type="date" [(ngModel)]="editBirthDate" name="bd" />
+                <span class="account__field-hint">⚠ Cette date ne pourra plus être modifiée une fois sauvegardée.</span>
+              }
+            </div>
+            <div class="account__field">
               <label>Style favori</label>
               <input [(ngModel)]="editFavoriteStyle" name="fs" placeholder="Ex: Dégradé propre, tempes rasées" />
             </div>
@@ -101,6 +196,59 @@
               </button>
               <button class="account__btn-cancel" (click)="editMode.set(false)">Annuler</button>
             </div>
+          </div>
+        }
+      </div>
+
+      <!-- Avantages palier -->
+      <div class="account__card reveal">
+        <div class="account__card-header">
+          <h3>Avantages {{ tierConfig[u.loyaltyTier].label }}</h3>
+          <span class="account__tier-chip" [style.--tier-color]="getTierColor(u.loyaltyTier)">
+            {{ tierConfig[u.loyaltyTier].label }}
+          </span>
+        </div>
+        <ul class="account__perks-list">
+          @for (perk of tierBenefits[u.loyaltyTier].perks; track perk) {
+            <li class="account__perk account__perk--active">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              {{ perk }}
+            </li>
+          }
+        </ul>
+        @if (tierBenefits[u.loyaltyTier].nextPerks.length > 0) {
+          <p class="account__perks-next-label">Au prochain palier :</p>
+          <ul class="account__perks-list account__perks-list--next">
+            @for (perk of tierBenefits[u.loyaltyTier].nextPerks; track perk) {
+              <li class="account__perk account__perk--next">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                {{ perk }}
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <!-- Historique des visites -->
+      <div class="account__card reveal">
+        <div class="account__card-header">
+          <h3>Historique des visites</h3>
+        </div>
+        @if (visitsLoading()) {
+          <p class="account__loading-inline">Chargement…</p>
+        } @else if (visits().length === 0) {
+          <p class="account__empty-text">Aucune visite enregistrée.</p>
+        } @else {
+          <div class="account__visits-list">
+            @for (v of visits(); track v._id) {
+              <div class="account__visit-item">
+                <div class="account__visit-info">
+                  <span class="account__visit-service">{{ v.serviceType }}</span>
+                  <span class="account__visit-date">{{ formatDate(v.visitDate || v.createdAt.slice(0,10)) }}</span>
+                </div>
+                <span class="account__visit-price">{{ v.price }}€</span>
+              </div>
+            }
           </div>
         }
       </div>
@@ -130,7 +278,9 @@
         <p class="account__card-desc">
           Réclame <strong>15 pts bonus</strong> dans les 7 jours autour de ton anniversaire.
         </p>
-        @if (birthdaySuccess()) {
+        @if (!u.birthDate) {
+          <p class="account__card-hint">Renseigne ta date de naissance dans ton profil pour activer ce bonus.</p>
+        } @else if (birthdaySuccess()) {
           <p class="account__birthday-success">🎂 +15 pts ajoutés à ton compte !</p>
         } @else {
           @if (birthdayError()) {
