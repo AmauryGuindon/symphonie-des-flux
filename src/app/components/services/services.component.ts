@@ -1,14 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-
-interface ServiceConfig {
-  _id: string;
-  name: string;
-  price: number;
-  loyaltyPoints: number;
-  active: boolean;
-}
+import { AppointmentService } from '../../services/appointment.service';
 
 const ICONS: Record<string, string> = {
   'Coupe': '✦',
@@ -27,12 +19,12 @@ const ICONS: Record<string, string> = {
   styleUrl: './services.component.scss',
 })
 export class ServicesComponent implements OnInit {
-  services = signal<ServiceConfig[]>([]);
+  services = signal<any[]>([]);
 
-  constructor(private http: HttpClient) {}
+  constructor(private appointmentService: AppointmentService) {}
 
   ngOnInit() {
-    this.http.get<ServiceConfig[]>('http://localhost:3000/api/appointments/services')
+    this.appointmentService.getPublicServices()
       .subscribe({ next: s => this.services.set(s), error: () => {} });
   }
 

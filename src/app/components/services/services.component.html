@@ -10,7 +10,7 @@
     </div>
 
     <div class="services__grid">
-      @for (service of services(); track $index) {
+      @for (service of services(); track service._id) {
         <div class="service-card reveal" [class]="'reveal-delay-' + (($index % 3) + 1)">
           <div class="service-card__icon">{{ iconFor(service.name) }}</div>
           <h3 class="service-card__name">{{ service.name }}</h3>
