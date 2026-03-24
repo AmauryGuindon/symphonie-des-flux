@@ -190,8 +190,12 @@ export class AccountComponent implements OnInit {
           list.map(a => a._id === id ? { ...a, status: 'cancelled' } : a),
         );
         this.cancellingId.set(null);
+        this.confirmCancelId.set(null);
       },
-      error: () => this.cancellingId.set(null),
+      error: () => {
+        this.cancellingId.set(null);
+        this.confirmCancelId.set(null);
+      },
     });
   }
 
