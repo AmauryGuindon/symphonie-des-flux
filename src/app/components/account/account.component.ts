@@ -203,10 +203,12 @@ export class AccountComponent implements OnInit {
 
   onRescheduled() {
     this.auth.getMyAppointments().subscribe({
-      next: appts => this.appointments.set(appts),
-      error: () => {},
+      next: appts => {
+        this.appointments.set(appts);
+        this.rescheduleId.set(null);
+      },
+      error: () => this.rescheduleId.set(null),
     });
-    this.rescheduleId.set(null);
   }
 
   // ── Changer mdp ───────────────────────────────────────────────────────────

@@ -9,6 +9,7 @@ import { AppointmentsService } from './appointments.service';
 import { UsersService } from '../users/users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { RescheduleAppointmentDto } from './dto/reschedule-appointment.dto';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
 import { ScheduleService } from '../schedule/schedule.service';
 
@@ -74,7 +75,7 @@ export class AppointmentsController {
   async rescheduleMyAppointment(
     @Param('id') id: string,
     @Request() req: any,
-    @Body() dto: { date: string; time: string },
+    @Body() dto: RescheduleAppointmentDto,
   ) {
     try {
       return await this.appointmentsService.rescheduleMyAppointment(
