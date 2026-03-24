@@ -20,6 +20,7 @@ import { AdminAppointmentsComponent } from './components/admin/appointments/appo
 import { AdminScheduleComponent } from './components/admin/schedule/schedule.component';
 import { AdminAccountingComponent } from './components/admin/accounting/accounting.component';
 import { AdminServicesComponent } from './components/admin/services/services.component';
+import { AdminGalleryComponent } from './components/admin/gallery/gallery.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { authGuard, adminGuard, guestGuard } from './guards/auth.guard';
 
@@ -50,6 +51,7 @@ export const routes: Routes = [
       { path: 'schedule', component: AdminScheduleComponent },
       { path: 'comptabilite', component: AdminAccountingComponent },
       { path: 'prestations', component: AdminServicesComponent },
+      { path: 'gallery', component: AdminGalleryComponent },
     ],
   },
   { path: '**', component: NotFoundComponent },

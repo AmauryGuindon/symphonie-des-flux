@@ -1,0 +1,64 @@
+<div class="agallery">
+  <div class="agallery__header">
+    <h2 class="agallery__title">Galerie</h2>
+    <label class="agallery__upload-btn" [class.agallery__upload-btn--loading]="uploading()">
+      {{ uploading() ? 'Upload…' : '+ Ajouter une photo' }}
+      <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="uploading()" hidden />
+    </label>
+  </div>
+
+  @if (loading()) {
+    <p class="agallery__loading">Chargement…</p>
+  } @else if (items().length === 0) {
+    <p class="agallery__empty">Aucune photo. Ajoutez-en une ci-dessus.</p>
+  } @else {
+    <div class="agallery__grid">
+      @for (item of items(); track item._id) {
+        <div class="agallery__item">
+          <div class="agallery__preview">
+            @if (item.url) {
+              <img [src]="imageUrl(item)" [alt]="item.alt || item.filename" />
+            } @else {
+              <div class="agallery__preview-placeholder">Pas d'image</div>
+            }
+            <div class="agallery__preview-overlay">
+              <span class="agallery__filename">{{ item.filename }}</span>
+            </div>
+          </div>
+
+          <div class="agallery__fields">
+            <div class="agallery__field">
+              <label>Alt</label>
+              <input [(ngModel)]="item.alt" placeholder="Description de l'image" />
+            </div>
+            <div class="agallery__field-row">
+              <div class="agallery__field">
+                <label>Span</label>
+                <select [(ngModel)]="item.span">
+                  @for (s of spanOptions; track s) {
+                    <option [value]="s">{{ s || 'Normal' }}</option>
+                  }
+                </select>
+              </div>
+              <div class="agallery__field">
+                <label>Ordre</label>
+                <input type="number" [(ngModel)]="item.order" min="0" />
+              </div>
+              <label class="agallery__toggle">
+                <input type="checkbox" [(ngModel)]="item.active" />
+                Actif
+              </label>
+            </div>
+          </div>
+
+          <div class="agallery__actions">
+            <button class="agallery__btn-save" (click)="save(item)" [disabled]="savingId() === item._id">
+              {{ savingId() === item._id ? '…' : 'Sauvegarder' }}
+            </button>
+            <button class="agallery__btn-delete" (click)="delete(item)">Supprimer</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

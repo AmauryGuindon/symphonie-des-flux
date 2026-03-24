@@ -1,63 +1,39 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
 interface GalleryItem {
-  src: string;
-  alt: string;
-  span?: 'wide' | 'tall' | 'large';
-  gradient: string;
+  _id: string;
+  url: string;
+  alt?: string;
+  span?: string;
+  active: boolean;
 }
 
 @Component({
   selector: 'app-gallery',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './gallery.component.html',
-  styleUrl: './gallery.component.scss'
+  styleUrl: './gallery.component.scss',
 })
-export class GalleryComponent {
-  items: GalleryItem[] = [
-    {
-      src: 'assets/taper1.png',
-      alt: 'Dégradé signature Dany1st',
-      span: 'tall',
-      gradient: 'linear-gradient(135deg, #1a1208 0%, #2d1f0a 50%, #111 100%)'
-    },
-    {
-      src: 'assets/burstfade1.png',
-      alt: 'Burst fade',
-      gradient: 'linear-gradient(135deg, #0d1a14 0%, #0a1510 100%)'
-    },
-    {
-      src: 'assets/burstfade2.png',
-      alt: 'Burst fade 2',
-      gradient: 'linear-gradient(135deg, #1a0d0d 0%, #150a0a 100%)'
-    },
-    {
-      src: 'assets/taper2.png',
-      alt: 'Taper fade',
-      span: 'wide',
-      gradient: 'linear-gradient(135deg, #110d1a 0%, #0e0a15 100%)'
-    },
-    {
-      src: '',
-      alt: 'Style urbain',
-      gradient: 'linear-gradient(135deg, #1a1a0d 0%, #141409 100%)'
-    },
-    {
-      src: '',
-      alt: 'Dégradé américain',
-      gradient: 'linear-gradient(135deg, #0d1a1a 0%, #091212 100%)'
-    },
-    {
-      src: '',
-      alt: 'Coup de lame',
-      span: 'tall',
-      gradient: 'linear-gradient(135deg, #1a120d 0%, #150e09 100%)'
-    },
-    {
-      src: '',
-      alt: 'Résultat premium',
-      gradient: 'linear-gradient(135deg, #1a0d1a 0%, #120912 100%)'
-    }
+export class GalleryComponent implements OnInit {
+  items = signal<GalleryItem[]>([]);
+
+  // Fallback items shown when API returns empty or fails
+  private readonly fallbackItems = [
+    { _id: '1', url: 'assets/taper1.png', alt: 'Dégradé signature Dany1st', span: 'tall', active: true },
+    { _id: '2', url: 'assets/burstfade1.png', alt: 'Burst fade', span: '', active: true },
+    { _id: '3', url: 'assets/burstfade2.png', alt: 'Burst fade 2', span: '', active: true },
+    { _id: '4', url: 'assets/taper2.png', alt: 'Taper fade', span: 'wide', active: true },
   ];
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.http.get<GalleryItem[]>('http://localhost:3000/api/gallery').subscribe({
+      next: items => this.items.set(items.length > 0 ? items : this.fallbackItems),
+      error: () => this.items.set(this.fallbackItems),
+    });
+  }
 }

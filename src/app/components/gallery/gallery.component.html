@@ -13,17 +13,17 @@
   </div>
 
   <div class="gallery__grid">
-    @for (item of items; track $index) {
+    @for (item of items(); track item._id) {
       <div
         class="gallery__item reveal"
         [class.gallery__item--tall]="item.span === 'tall'"
         [class.gallery__item--wide]="item.span === 'wide'"
         [class]="'reveal-delay-' + (($index % 4) + 1)"
       >
-        @if (item.src) {
-          <img [src]="item.src" [alt]="item.alt" loading="lazy" />
+        @if (item.url) {
+          <img [src]="item.url" [alt]="item.alt" loading="lazy" />
         } @else {
-          <div class="gallery__placeholder" [style.background]="item.gradient">
+          <div class="gallery__placeholder">
             <span class="gallery__placeholder-icon">✦</span>
           </div>
         }
