@@ -378,3 +378,41 @@
     font-weight: 600;
   }
 }
+
+.dash__charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dash__chart-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+  padding: 1.25rem;
+
+  &--narrow {
+    grid-column: span 1;
+    max-width: 360px;
+    justify-self: center;
+    width: 100%;
+
+    @media (max-width: 900px) {
+      max-width: 100%;
+    }
+  }
+}
+
+.dash__chart-title {
+  font-family: var(--font-body);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+  margin: 0 0 1rem;
+}

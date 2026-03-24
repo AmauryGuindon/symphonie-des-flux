@@ -39,7 +39,7 @@ export interface DashboardStats {
   retentionRate: number | null;
   recentClients: User[];
   topClientThisMonth: User | null;
-  monthlyActivity: { month: string; newClients: number; activeClients: number }[];
+  monthlyActivity: { month: string; newClients: number; activeClients: number; revenue: number }[];
   revenue: { today: number; week: number; month: number; year: number };
 }
 
