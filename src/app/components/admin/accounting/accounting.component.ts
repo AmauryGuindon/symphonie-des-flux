@@ -119,7 +119,10 @@ export class AdminAccountingComponent implements OnInit {
 
   deleteVisit(id: string) {
     if (!confirm('Supprimer cette visite ?')) return;
-    this.accounting.deleteVisit(id).subscribe(() => this.load());
+    this.accounting.deleteVisit(id).subscribe({
+      next: () => this.load(),
+      error: () => {},
+    });
   }
 
   exportCsv() {
@@ -168,7 +171,7 @@ export class AdminAccountingComponent implements OnInit {
       startY: 56,
       head: [['Date', 'Client', 'Prestation', 'Paiement', 'Prix']],
       body: visits.map(v => [
-        v.visitDate ?? (v.createdAt as string)?.slice(0, 10) ?? '',
+        this.formatDate(v),
         v.clientName ?? 'Walk-in',
         v.serviceType,
         v.paymentMethod ?? 'espèces',
