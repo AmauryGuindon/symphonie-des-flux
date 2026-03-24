@@ -60,6 +60,7 @@ export class AccountComponent implements OnInit {
   appointments = signal<any[]>([]);
   appointmentsLoading = signal(true);
   cancellingId = signal<string | null>(null);
+  confirmCancelId = signal<string | null>(null);
 
   // ── Visites ───────────────────────────────────────────────────────────────
   visits = signal<any[]>([]);

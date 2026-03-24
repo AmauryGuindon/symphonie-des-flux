@@ -84,13 +84,21 @@
                   {{ statusLabel(a.status) }}
                 </span>
                 @if (a.status !== 'cancelled') {
-                  <button
-                    class="account__appt-cancel"
-                    (click)="cancelAppointment(a._id)"
-                    [disabled]="cancellingId() === a._id"
-                  >
-                    {{ cancellingId() === a._id ? '…' : 'Annuler' }}
-                  </button>
+                  @if (confirmCancelId() === a._id) {
+                    <div class="account__appt-confirm">
+                      <span>Confirmer l'annulation ?</span>
+                      <button class="account__appt-confirm-yes"
+                        (click)="cancelAppointment(a._id); confirmCancelId.set(null)"
+                        [disabled]="cancellingId() === a._id">
+                        Oui
+                      </button>
+                      <button class="account__appt-confirm-no" (click)="confirmCancelId.set(null)">Non</button>
+                    </div>
+                  } @else {
+                    <button class="account__appt-cancel" (click)="confirmCancelId.set(a._id)">
+                      Annuler
+                    </button>
+                  }
                 }
               </div>
             </div>
