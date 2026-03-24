@@ -8,8 +8,10 @@ if (!process.env.JWT_SECRET) {
 }
 
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:4200')
@@ -17,10 +19,13 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS ?? 'http://localhost:4200')
   .map(o => o.trim());
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Headers de sécurité HTTP (X-Frame-Options, CSP, HSTS, etc.)
   app.use(helmet());
+
+  // Servir les fichiers uploadés (galerie, etc.)
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' });
 
   // CORS restreint aux origines déclarées
   app.enableCors({
