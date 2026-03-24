@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccountingService, AccountingData, ManualVisitDto } from '../../../services/accounting.service';
 import { AdminService, ServiceConfig } from '../../../services/admin.service';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 @Component({
   selector: 'app-admin-accounting',
@@ -140,6 +142,42 @@ export class AdminAccountingComponent implements OnInit {
   }
 
   printPdf() {
-    window.print();
+    const doc = new jsPDF();
+    const period = this.selectedDate();
+
+    // En-tête
+    doc.setFontSize(18);
+    doc.setTextColor(201, 164, 74);
+    doc.text('Dany1st Barber', 14, 20);
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Rapport comptable — ${period}`, 14, 28);
+    doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, 14, 35);
+
+    // KPIs
+    const d = this.data();
+    doc.setFontSize(10);
+    doc.setTextColor(0);
+    doc.text(`Total visites : ${d?.totals?.count ?? 0}`, 14, 48);
+    doc.text(`Chiffre d'affaires : ${d?.totals?.revenue ?? 0}€`, 80, 48);
+    doc.text(`Panier moyen : ${d?.totals?.avg ?? 0}€`, 150, 48);
+
+    // Tableau
+    const visits = this.data()?.visits ?? [];
+    autoTable(doc, {
+      startY: 56,
+      head: [['Date', 'Client', 'Prestation', 'Paiement', 'Prix']],
+      body: visits.map(v => [
+        v.visitDate ?? (v.createdAt as string)?.slice(0, 10) ?? '',
+        v.clientName ?? 'Walk-in',
+        v.serviceType,
+        v.paymentMethod ?? 'espèces',
+        `${v.price}€`,
+      ]),
+      headStyles: { fillColor: [30, 30, 30], textColor: [201, 164, 74] },
+      alternateRowStyles: { fillColor: [250, 250, 250] },
+    });
+
+    doc.save(`revenus-${period}.pdf`);
   }
 }

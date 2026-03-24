@@ -19,6 +19,8 @@
     "@angular/router": "^17.3.0",
     "chart.js": "^4.5.1",
     "gsap": "^3.12.5",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"
