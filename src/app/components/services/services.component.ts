@@ -1,53 +1,42 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 
-interface Service {
-  icon: string;
+interface ServiceConfig {
+  _id: string;
   name: string;
-  description: string;
-  tag?: string;
+  price: number;
+  loyaltyPoints: number;
+  active: boolean;
 }
+
+const ICONS: Record<string, string> = {
+  'Coupe': '✦',
+  'Coupe + Dégradé': '◆',
+  'Coupe + Barbe': '◈',
+  'Barbe seule': '◇',
+  'Dégradé': '◉',
+  'Coupe enfant': '✧',
+};
 
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './services.component.html',
-  styleUrl: './services.component.scss'
+  styleUrl: './services.component.scss',
 })
-export class ServicesComponent {
-  services: Service[] = [
-    {
-      icon: '✦',
-      name: 'Coupe Classique',
-      description: 'Dégradé précis ou coupe ciseau — fini propre, contours nets.',
-      tag: 'BESTSELLER'
-    },
-    {
-      icon: '◆',
-      name: 'Coupe + Barbe',
-      description: 'Le duo signature. Coupe sur mesure associée à un travail de barbe soigné.',
-      tag: 'SIGNATURE'
-    },
-    {
-      icon: '◈',
-      name: 'Dégradé Américain',
-      description: 'Dégradé de 0 à 3, précis au millimètre. Propre, net, élégant.',
-    },
-    {
-      icon: '◇',
-      name: 'Barbe Express',
-      description: 'Taille, contour et finitions — pour une barbe toujours impeccable.',
-    },
-    {
-      icon: '❋',
-      name: 'Rasage Traditionnel',
-      description: 'Rasoir droit, mousse chaude, serviette chaude. Une expérience old school premium.',
-      tag: 'PREMIUM'
-    },
-    {
-      icon: '◉',
-      name: 'Retouche',
-      description: 'Rafraîchissement rapide des contours — pour garder le style entre deux coupes.',
-    }
-  ];
+export class ServicesComponent implements OnInit {
+  services = signal<ServiceConfig[]>([]);
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit() {
+    this.http.get<ServiceConfig[]>('http://localhost:3000/api/appointments/services')
+      .subscribe({ next: s => this.services.set(s), error: () => {} });
+  }
+
+  iconFor(name: string): string {
+    return ICONS[name] ?? '✦';
+  }
 }

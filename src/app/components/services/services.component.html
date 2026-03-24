@@ -10,16 +10,12 @@
     </div>
 
     <div class="services__grid">
-      @for (service of services; track $index) {
+      @for (service of services(); track $index) {
         <div class="service-card reveal" [class]="'reveal-delay-' + (($index % 3) + 1)">
-          @if (service.tag) {
-            <span class="service-card__tag">{{ service.tag }}</span>
-          }
-          <div class="service-card__icon">{{ service.icon }}</div>
+          <div class="service-card__icon">{{ iconFor(service.name) }}</div>
           <h3 class="service-card__name">{{ service.name }}</h3>
-          <p class="service-card__desc">{{ service.description }}</p>
           <div class="service-card__bottom">
-            <span class="service-card__price">Sur devis</span>
+            <span class="service-card__price">{{ service.price }}€</span>
             <a
               href="https://dany1stbarber.setmore.com/"
               target="_blank"
