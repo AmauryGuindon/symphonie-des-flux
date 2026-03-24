@@ -1,0 +1,53 @@
+<div class="rmodal-overlay" (click)="closed.emit()">
+  <div class="rmodal" (click)="$event.stopPropagation()">
+    <div class="rmodal__header">
+      <h3>Reprogrammer le rendez-vous</h3>
+      <button class="rmodal__close" (click)="closed.emit()">&#10005;</button>
+    </div>
+
+    <p class="rmodal__label">Choisir une date</p>
+    <div class="rmodal__dates">
+      @for (d of availableDates; track d) {
+        <button
+          class="rmodal__date-btn"
+          [class.rmodal__date-btn--active]="selectedDate() === d"
+          (click)="selectDate(d)"
+        >{{ formatDate(d) }}</button>
+      }
+    </div>
+
+    @if (selectedDate()) {
+      <p class="rmodal__label">Choisir un horaire</p>
+      @if (slotsLoading()) {
+        <p class="rmodal__loading">Chargement&#8230;</p>
+      } @else {
+        <div class="rmodal__slots">
+          @for (s of slots(); track s.time) {
+            @if (s.available) {
+              <button
+                class="rmodal__slot"
+                [class.rmodal__slot--active]="selectedTime() === s.time"
+                (click)="selectTime(s.time)"
+              >{{ s.time }}</button>
+            }
+          }
+        </div>
+      }
+    }
+
+    @if (error()) {
+      <p class="rmodal__error">{{ error() }}</p>
+    }
+
+    <div class="rmodal__actions">
+      <button
+        class="rmodal__btn-confirm"
+        (click)="confirm()"
+        [disabled]="!selectedDate() || !selectedTime() || loading()"
+      >
+        {{ loading() ? '&#8230;' : 'Confirmer' }}
+      </button>
+      <button class="rmodal__btn-cancel" (click)="closed.emit()">Annuler</button>
+    </div>
+  </div>
+</div>

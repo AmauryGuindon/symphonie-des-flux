@@ -101,6 +101,14 @@ export class AuthService {
     return this.http.patch(`${this.API}/appointments/${id}/cancel`, {});
   }
 
+  rescheduleAppointment(id: string, date: string, time: string): Observable<any> {
+    return this.http.patch(`${this.API}/appointments/${id}/reschedule`, { date, time });
+  }
+
+  getAvailableSlots(date: string): Observable<{ slots: { time: string; available: boolean }[] }> {
+    return this.http.get<any>(`${this.API}/appointments/slots?date=${date}`);
+  }
+
   changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.API}/auth/change-password`, { currentPassword, newPassword });
   }

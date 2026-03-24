@@ -67,4 +67,21 @@ export class AppointmentsController {
   cancelMyAppointment(@Param('id') id: string, @Request() req: any) {
     return this.appointmentsService.cancelMyAppointment(id, req.user.userId);
   }
+
+  // Auth: reschedule my appointment
+  @Patch(':id/reschedule')
+  @UseGuards(JwtAuthGuard)
+  async rescheduleMyAppointment(
+    @Param('id') id: string,
+    @Request() req: any,
+    @Body() dto: { date: string; time: string },
+  ) {
+    try {
+      return await this.appointmentsService.rescheduleMyAppointment(
+        id, req.user.userId, dto.date, dto.time,
+      );
+    } catch (e: any) {
+      throw new BadRequestException(e.message);
+    }
+  }
 }

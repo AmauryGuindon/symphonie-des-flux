@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TIER_CONFIG, LoyaltyTier } from '../../models/user.model';
+import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.component';
 
 export const TIER_BENEFITS: Record<LoyaltyTier, { perks: string[]; nextPerks: string[] }> = {
   bronze: {
@@ -27,7 +28,7 @@ export const TIER_BENEFITS: Record<LoyaltyTier, { perks: string[]; nextPerks: st
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, RouterLink],
+  imports: [CommonModule, FormsModule, DatePipe, RouterLink, RescheduleModalComponent],
   templateUrl: './account.component.html',
   styleUrl: './account.component.scss',
 })
@@ -61,6 +62,7 @@ export class AccountComponent implements OnInit {
   appointmentsLoading = signal(true);
   cancellingId = signal<string | null>(null);
   confirmCancelId = signal<string | null>(null);
+  rescheduleId = signal<string | null>(null);
 
   // ── Visites ───────────────────────────────────────────────────────────────
   visits = signal<any[]>([]);
@@ -197,6 +199,14 @@ export class AccountComponent implements OnInit {
         this.confirmCancelId.set(null);
       },
     });
+  }
+
+  onRescheduled() {
+    this.auth.getMyAppointments().subscribe({
+      next: appts => this.appointments.set(appts),
+      error: () => {},
+    });
+    this.rescheduleId.set(null);
   }
 
   // ── Changer mdp ───────────────────────────────────────────────────────────

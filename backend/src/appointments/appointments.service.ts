@@ -98,6 +98,20 @@ export class AppointmentsService {
     );
   }
 
+  async rescheduleMyAppointment(id: string, clientId: string, date: string, time: string) {
+    // Vérifier que le créneau cible est disponible
+    const conflict = await this.appointmentModel.findOne({
+      date, time, status: { $ne: 'cancelled' }, _id: { $ne: id },
+    });
+    if (conflict) throw new Error('Ce créneau n\'est plus disponible.');
+
+    return this.appointmentModel.findOneAndUpdate(
+      { _id: id, clientId },
+      { date, time, status: 'pending' },
+      { new: true },
+    );
+  }
+
   // ── Admin ──────────────────────────────────────────────────────────────────
 
   async getAllAppointments(from?: string, to?: string) {

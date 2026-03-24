@@ -100,6 +100,11 @@
                     </button>
                   }
                 }
+                @if (a.status !== 'cancelled') {
+                  <button class="account__appt-reschedule" (click)="rescheduleId.set(a._id)">
+                    Reprogrammer
+                  </button>
+                }
               </div>
             </div>
           }
@@ -305,6 +310,14 @@
       </div>
 
     </div>
+
+    @if (rescheduleId()) {
+      <app-reschedule-modal
+        [appointmentId]="rescheduleId()!"
+        (rescheduled)="onRescheduled()"
+        (closed)="rescheduleId.set(null)"
+      ></app-reschedule-modal>
+    }
 
     } @else {
       <div class="account__loading">Chargement…</div>
