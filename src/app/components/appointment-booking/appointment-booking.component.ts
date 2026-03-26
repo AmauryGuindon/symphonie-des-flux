@@ -39,7 +39,9 @@ export class AppointmentBookingComponent implements OnInit {
     openDays: [1, 2, 3, 4, 5, 6],
     openTime: '09:00',
     closeTime: '19:00',
-    slotDuration: 60,
+    slotDuration: 30,
+    breakStart: '13:00',
+    breakEnd: '14:00',
     closedDates: [],
   };
 
@@ -159,6 +161,12 @@ export class AppointmentBookingComponent implements OnInit {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
+  selectService(name: string) {
+    this.selectedService.set(name);
+    const date = this.selectedDate();
+    if (date) this.loadSlots(date);
+  }
+
   selectDate(d: Date | null) {
     if (!d || this.isPast(d) || this.isClosedDay(d)) return;
     const ds = this.toDateString(d);
@@ -169,7 +177,7 @@ export class AppointmentBookingComponent implements OnInit {
 
   private loadSlots(date: string) {
     this.slotsLoading.set(true);
-    this.appointmentService.getSlots(date).subscribe({
+    this.appointmentService.getSlots(date, this.selectedService() || undefined).subscribe({
       next: res => {
         this.slots.set(res.slots);
         this.closed.set(res.closed);

@@ -24,6 +24,16 @@ export class UpdateBusinessConfigDto {
   @IsOptional()
   slotDuration?: number;
 
+  @IsString()
+  @Matches(/^(\d{2}:\d{2})?$/)
+  @IsOptional()
+  breakStart?: string;
+
+  @IsString()
+  @Matches(/^(\d{2}:\d{2})?$/)
+  @IsOptional()
+  breakEnd?: string;
+
   @IsArray()
   @IsString({ each: true })
   @IsOptional()

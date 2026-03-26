@@ -38,7 +38,7 @@
                 <button
                   class="appt__svc"
                   [class.appt__svc--selected]="selectedService() === svc.name"
-                  (click)="selectedService.set(svc.name)"
+                  (click)="selectService(svc.name)"
                 >
                   <span class="appt__svc-name">{{ svc.name }}</span>
                   <span class="appt__svc-meta">

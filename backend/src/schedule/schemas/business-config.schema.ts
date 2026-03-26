@@ -19,7 +19,13 @@ export class BusinessConfig {
   @Prop({ default: '19:00' }) closeTime: string;
 
   /** Slot duration in minutes */
-  @Prop({ default: 60 }) slotDuration: number;
+  @Prop({ default: 30 }) slotDuration: number;
+
+  /** Lunch break start HH:mm (empty = no break) */
+  @Prop({ default: '13:00' }) breakStart: string;
+
+  /** Lunch break end HH:mm (exclusive) */
+  @Prop({ default: '14:00' }) breakEnd: string;
 
   /** Exceptional closed dates YYYY-MM-DD */
   @Prop({ type: [String], default: [] }) closedDates: string[];

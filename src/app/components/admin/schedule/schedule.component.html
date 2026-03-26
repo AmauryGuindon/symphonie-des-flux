@@ -38,6 +38,22 @@
       </div>
     </section>
 
+    <!-- Pause méridienne -->
+    <section class="sched__card">
+      <h2 class="sched__card-title">Pause méridienne</h2>
+      <div class="sched__hours">
+        <label class="sched__label">
+          Début
+          <input class="sched__input" type="time" [(ngModel)]="breakStart" />
+        </label>
+        <span class="sched__sep">→</span>
+        <label class="sched__label">
+          Fin
+          <input class="sched__input" type="time" [(ngModel)]="breakEnd" />
+        </label>
+      </div>
+    </section>
+
     <!-- Durée des créneaux -->
     <section class="sched__card">
       <h2 class="sched__card-title">Durée des créneaux</h2>

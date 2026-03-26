@@ -9,6 +9,8 @@ export interface BusinessConfig {
   openTime: string;
   closeTime: string;
   slotDuration: number;
+  breakStart: string;
+  breakEnd: string;
   closedDates: string[];
 }
 
@@ -36,8 +38,11 @@ export class AppointmentService {
     return this.http.get<{ _id: string; name: string; price: number; loyaltyPoints: number; duration: number }[]>(`${API}/appointments/services`);
   }
 
-  getSlots(date: string) {
-    return this.http.get<SlotsResponse>(`${API}/appointments/slots?date=${date}`);
+  getSlots(date: string, serviceType?: string) {
+    const params = serviceType
+      ? `date=${encodeURIComponent(date)}&serviceType=${encodeURIComponent(serviceType)}`
+      : `date=${encodeURIComponent(date)}`;
+    return this.http.get<SlotsResponse>(`${API}/appointments/slots?${params}`);
   }
 
   bookAppointment(dto: { serviceType: string; date: string; time: string; notes?: string; paymentMethod?: string }) {

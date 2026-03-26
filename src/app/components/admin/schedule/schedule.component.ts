@@ -20,7 +20,9 @@ export class AdminScheduleComponent implements OnInit {
   openDays: boolean[] = Array(7).fill(false);
   openTime = '09:00';
   closeTime = '19:00';
-  slotDuration = 60;
+  slotDuration = 30;
+  breakStart = '13:00';
+  breakEnd = '14:00';
   closedDates: string[] = [];
   newClosedDate = '';
 
@@ -37,6 +39,8 @@ export class AdminScheduleComponent implements OnInit {
         this.openTime = cfg.openTime;
         this.closeTime = cfg.closeTime;
         this.slotDuration = cfg.slotDuration;
+        this.breakStart = cfg.breakStart ?? '13:00';
+        this.breakEnd = cfg.breakEnd ?? '14:00';
         this.closedDates = [...cfg.closedDates].sort();
         this.loading.set(false);
       },
@@ -71,6 +75,8 @@ export class AdminScheduleComponent implements OnInit {
       openTime: this.openTime,
       closeTime: this.closeTime,
       slotDuration: this.slotDuration,
+      breakStart: this.breakStart,
+      breakEnd: this.breakEnd,
       closedDates: this.closedDates,
     };
     this.appointmentService.updateAdminSchedule(dto).subscribe({

@@ -34,11 +34,14 @@ export class AppointmentsController {
     return this.scheduleService.getConfig();
   }
 
-  // Public: available slots for a date
+  // Public: available slots for a date (optionally filtered by service duration)
   @Get('slots')
-  getSlots(@Query('date') date: string) {
+  getSlots(
+    @Query('date') date: string,
+    @Query('serviceType') serviceType?: string,
+  ) {
     if (!date) throw new BadRequestException('date required');
-    return this.appointmentsService.getAvailableSlots(date);
+    return this.appointmentsService.getAvailableSlots(date, serviceType);
   }
 
   // Auth: book an appointment

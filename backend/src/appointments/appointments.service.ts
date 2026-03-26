@@ -32,7 +32,7 @@ export class AppointmentsService {
 
   // ── Slots disponibles ──────────────────────────────────────────────────────
 
-  async getAvailableSlots(date: string) {
+  async getAvailableSlots(date: string, serviceType?: string) {
     const cfg = await this.scheduleService.getConfig();
     const d = new Date(date + 'T00:00:00');
     const weekday = d.getDay();
@@ -42,16 +42,58 @@ export class AppointmentsService {
       return { date, slots: [], closed: true };
     }
 
+    // Service duration for the requested service (defaults to slotDuration)
+    let serviceDuration = cfg.slotDuration;
+    if (serviceType) {
+      const svc = await this.serviceConfigModel.findOne({ name: serviceType });
+      if (svc?.duration) serviceDuration = svc.duration;
+    }
+
+    // Break window in minutes
+    const breakStartMin = cfg.breakStart ? (() => {
+      const [h, m] = cfg.breakStart.split(':').map(Number);
+      return h * 60 + m;
+    })() : -1;
+    const breakEndMin = cfg.breakEnd ? (() => {
+      const [h, m] = cfg.breakEnd.split(':').map(Number);
+      return h * 60 + m;
+    })() : -1;
+
     const allSlots = this.scheduleService.generateSlots(cfg);
     const booked = await this.appointmentModel
       .find({ date, status: { $ne: 'cancelled' } })
-      .select('time');
+      .select('time duration serviceType');
 
-    const bookedTimes = new Set(booked.map(a => a.time));
-    const slots = allSlots.map(time => ({
-      time,
-      available: !bookedTimes.has(time),
-    }));
+    // Resolve each booked appointment to a [start, end) interval in minutes
+    const blockedIntervals: { start: number; end: number }[] = await Promise.all(
+      booked.map(async (a) => {
+        let dur: number = (a as any).duration ?? 0;
+        if (!dur) {
+          const svcCfg = await this.serviceConfigModel.findOne({ name: a.serviceType });
+          dur = svcCfg?.duration ?? cfg.slotDuration;
+        }
+        const [h, m] = a.time.split(':').map(Number);
+        const start = h * 60 + m;
+        return { start, end: start + dur };
+      }),
+    );
+
+    const slots = allSlots.map(time => {
+      const [h, m] = time.split(':').map(Number);
+      const slotStart = h * 60 + m;
+      const slotEnd = slotStart + serviceDuration;
+
+      // Service window must not overlap with the break
+      if (breakStartMin >= 0 && slotStart < breakEndMin && slotEnd > breakStartMin) {
+        return { time, available: false };
+      }
+
+      // Service window must not overlap with any booked appointment
+      const hasConflict = blockedIntervals.some(
+        iv => slotStart < iv.end && slotEnd > iv.start,
+      );
+      return { time, available: !hasConflict };
+    });
 
     return { date, slots, closed: false };
   }
@@ -64,18 +106,37 @@ export class AppointmentsService {
     clientEmail: string,
     dto: CreateAppointmentDto,
   ) {
-    const existing = await this.appointmentModel.findOne({
-      date: dto.date,
-      time: dto.time,
-      status: { $ne: 'cancelled' },
-    });
-    if (existing) throw new Error('Ce créneau n\'est plus disponible.');
+    // Look up service config (needed for points and duration)
+    const svcCfg = await this.serviceConfigModel.findOne({ name: dto.serviceType });
+
+    // Duration-based conflict check
+    const cfg = await this.scheduleService.getConfig();
+    const serviceDuration = svcCfg?.duration ?? cfg.slotDuration;
+    const [newH, newM] = dto.time.split(':').map(Number);
+    const newStart = newH * 60 + newM;
+    const newEnd = newStart + serviceDuration;
+
+    const dayBooked = await this.appointmentModel
+      .find({ date: dto.date, status: { $ne: 'cancelled' } })
+      .select('time duration serviceType');
+
+    for (const a of dayBooked) {
+      let dur: number = (a as any).duration ?? 0;
+      if (!dur) {
+        const s = await this.serviceConfigModel.findOne({ name: a.serviceType });
+        dur = s?.duration ?? cfg.slotDuration;
+      }
+      const [h, m] = a.time.split(':').map(Number);
+      const aStart = h * 60 + m;
+      if (newStart < aStart + dur && newEnd > aStart) {
+        throw new Error('Ce créneau n\'est plus disponible.');
+      }
+    }
 
     // Paiement par points : vérifier et déduire avant de créer le RDV
     if (dto.paymentMethod === 'points') {
-      const svc = await this.serviceConfigModel.findOne({ name: dto.serviceType });
-      if (!svc) throw new BadRequestException('Prestation introuvable.');
-      const required = svc.price * 10;
+      if (!svcCfg) throw new BadRequestException('Prestation introuvable.');
+      const required = svcCfg.price * 10;
       await this.usersService.redeemPoints(clientId, required);
     }
 
@@ -89,6 +150,7 @@ export class AppointmentsService {
       notes: dto.notes,
       paymentMethod: dto.paymentMethod ?? 'especes',
       status: 'pending',
+      duration: serviceDuration,
     });
 
     this.sendConfirmationEmail(clientEmail, clientName, appointment).catch(() => {});
