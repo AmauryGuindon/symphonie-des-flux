@@ -26,6 +26,17 @@ export class AdminAppointmentsComponent implements OnInit {
   // Week navigation
   weekStart = signal(this.getWeekStart(new Date()));
 
+  // Detail popup (mobile tap)
+  detailAppt = signal<Appointment | null>(null);
+
+  openDetail(a: Appointment) { this.detailAppt.set(a); }
+  closeDetail() { this.detailAppt.set(null); }
+
+  confirmFromDetail(a: Appointment) { this.confirm(a); this.closeDetail(); }
+  cancelFromDetail(a: Appointment)  { this.cancel(a);  this.closeDetail(); }
+  deleteFromDetail(id: string)      { this.delete(id); this.closeDetail(); }
+  editFromDetail(a: Appointment)    { this.closeDetail(); this.startEdit(a); }
+
   // For rescheduling
   editingId = signal<string | null>(null);
   private editingAppointment: Appointment | null = null;
@@ -39,6 +50,12 @@ export class AdminAppointmentsComponent implements OnInit {
     const m = i % 2 === 0 ? '00' : '30';
     return `${String(h).padStart(2, '0')}:${m}`;
   });
+
+  readonly HOUR_HEIGHT = 80;
+  readonly DAY_START = 9;
+  readonly HOURS = Array.from({ length: 11 }, (_, i) =>
+    `${String(9 + i).padStart(2, '0')}:00`
+  );
 
   weekDays = computed(() => {
     const start = this.weekStart();
@@ -134,6 +151,47 @@ export class AdminAppointmentsComponent implements OnInit {
 
   dayLabel(d: Date): string {
     return d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' });
+  }
+
+  dayName(d: Date): string {
+    return d.toLocaleDateString('fr-FR', { weekday: 'short' });
+  }
+
+  getEventTop(time: string): number {
+    const [h, m] = time.split(':').map(Number);
+    return ((h - this.DAY_START) * 60 + m) / 60 * this.HOUR_HEIGHT;
+  }
+
+  get nowTop(): number {
+    const now = new Date();
+    return ((now.getHours() - this.DAY_START) * 60 + now.getMinutes()) / 60 * this.HOUR_HEIGHT;
+  }
+
+  isClosedDay(d: Date): boolean {
+    return d.getDay() === 0; // Sunday
+  }
+
+  private timeToMinutes(time: string): number {
+    const [h, m] = time.split(':').map(Number);
+    return h * 60 + m;
+  }
+
+  getEventPosition(a: Appointment, dayAppts: Appointment[]): { left: string; width: string } {
+    const aStart = this.timeToMinutes(a.time);
+    const aEnd = aStart + 60;
+    const overlapping = dayAppts.filter(b => {
+      if (b._id === a._id) return false;
+      const bStart = this.timeToMinutes(b.time);
+      return aStart < bStart + 60 && aEnd > bStart;
+    });
+    if (overlapping.length === 0) return { left: '3px', width: 'calc(100% - 6px)' };
+    const group = [a, ...overlapping].sort((x, y) =>
+      x.time.localeCompare(y.time) || x._id.localeCompare(y._id)
+    );
+    const idx = group.findIndex(x => x._id === a._id);
+    const n = group.length;
+    const pct = 100 / n;
+    return { left: `calc(${idx * pct}% + 2px)`, width: `calc(${pct}% - 4px)` };
   }
 
   isToday(d: Date): boolean {
