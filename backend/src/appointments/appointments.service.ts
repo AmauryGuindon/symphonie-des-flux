@@ -252,11 +252,14 @@ export class AppointmentsService {
   <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
 
     <!-- Header -->
-    <div style="background:#1a1a1a;padding:28px 32px;text-align:center">
-      <div style="font-size:22px;font-weight:700;letter-spacing:3px;color:#ffffff">
-        DANY<span style="color:#C9A44A">1ST</span>
-      </div>
-      <div style="font-size:11px;letter-spacing:2px;color:#888;margin-top:4px;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
+    <div style="background:#1a1a1a;padding:24px 32px;text-align:center">
+      <img
+        src="${process.env.APP_URL ?? 'http://localhost:4200'}/assets/logo/logo_dany1st.webp"
+        alt="Dany1st Barber"
+        width="120"
+        style="display:block;margin:0 auto 10px;width:120px;height:auto"
+      />
+      <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
     </div>
 
     <!-- Gold bar -->
