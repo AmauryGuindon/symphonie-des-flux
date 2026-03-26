@@ -288,11 +288,8 @@
               {{ validateLoading() ? '…' : 'Valider la visite' }}
             </button>
           }
-          @if (validateSuccess()) {
-            <span class="detail-sheet__validate-ok">✓ Visite enregistrée</span>
-          }
           @if (detailAppt()!.visitRecorded) {
-            <span class="detail-sheet__validate-ok">✓ Visite déjà enregistrée</span>
+            <span class="detail-sheet__validate-ok">✓ Visite enregistrée</span>
           }
           @if (detailAppt()!.status === 'pending') {
             <button class="detail-sheet__btn detail-sheet__btn--confirm" (click)="confirmFromDetail(detailAppt()!)">

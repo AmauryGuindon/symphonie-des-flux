@@ -29,9 +29,8 @@ export class AdminAppointmentsComponent implements OnInit {
   // Detail popup (mobile tap)
   detailAppt = signal<Appointment | null>(null);
   validateLoading = signal(false);
-  validateSuccess = signal(false);
 
-  openDetail(a: Appointment) { this.detailAppt.set(a); this.validateSuccess.set(false); }
+  openDetail(a: Appointment) { this.detailAppt.set(a); }
   closeDetail() { this.detailAppt.set(null); }
 
   confirmFromDetail(a: Appointment) { this.confirm(a); this.closeDetail(); }
@@ -52,7 +51,6 @@ export class AdminAppointmentsComponent implements OnInit {
         );
         this.detailAppt.update(d => d ? { ...d, visitRecorded: true } : d);
         this.validateLoading.set(false);
-        this.validateSuccess.set(true);
       },
       error: () => this.validateLoading.set(false),
     });
