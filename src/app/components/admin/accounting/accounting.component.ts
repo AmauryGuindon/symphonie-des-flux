@@ -6,6 +6,8 @@ import { AdminService, ServiceConfig } from '../../../services/admin.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
+const VISITS_PAGE_SIZE = 12;
+
 @Component({
   selector: 'app-admin-accounting',
   standalone: true,
@@ -25,6 +27,25 @@ export class AdminAccountingComponent implements OnInit {
   showAddModal = signal(false);
   addForm: ManualVisitDto = { serviceType: '', price: 0, paymentMethod: 'especes' };
   saving = signal(false);
+  visitsPage = signal(1);
+
+  private readonly paymentColorMap: Record<string, string> = {
+    especes: '#C9A44A',
+    virement: '#4BA3C7',
+    en_ligne: '#73C97B',
+    carte: '#C97BB5',
+  };
+
+  private readonly serviceColorMap: Record<string, string> = {
+    coupe: '#4BA3C7',
+    degrade: '#73C97B',
+    'coupe + degrade': '#D98B4A',
+    'coupe + barbe': '#C97BB5',
+    'barbe seule': '#7E8EF1',
+    'coupe enfant': '#E4B94C',
+  };
+
+  private readonly servicePalette = ['#4BA3C7', '#73C97B', '#D98B4A', '#C97BB5', '#7E8EF1', '#E4B94C', '#4DC3A6'];
 
   // Label période courante
   periodLabel = computed(() => {
@@ -47,6 +68,29 @@ export class AdminAccountingComponent implements OnInit {
     (new Date().getFullYear() - 1).toString(),
   ];
 
+  visits = computed(() => this.data()?.visits ?? []);
+
+  pagedVisits = computed(() => {
+    const start = (this.visitsPage() - 1) * VISITS_PAGE_SIZE;
+    const end = start + VISITS_PAGE_SIZE;
+    return this.visits().slice(start, end);
+  });
+
+  visitsTotalPages = computed(() => Math.max(1, Math.ceil(this.visits().length / VISITS_PAGE_SIZE)));
+
+  visitsPageNumbers = computed(() =>
+    Array.from({ length: this.visitsTotalPages() }, (_, i) => i + 1),
+  );
+
+  visitsPageStart = computed(() => {
+    if (this.visits().length === 0) return 0;
+    return (this.visitsPage() - 1) * VISITS_PAGE_SIZE + 1;
+  });
+
+  visitsPageEnd = computed(() =>
+    Math.min(this.visitsPage() * VISITS_PAGE_SIZE, this.visits().length),
+  );
+
   constructor(
     private accounting: AccountingService,
     private adminService: AdminService,
@@ -59,6 +103,7 @@ export class AdminAccountingComponent implements OnInit {
 
   load() {
     this.loading.set(true);
+    this.visitsPage.set(1);
     this.accounting.getAccounting(this.period(), this.selectedDate()).subscribe({
       next: d => { this.data.set(d); this.loading.set(false); },
       error: () => this.loading.set(false),
@@ -93,6 +138,43 @@ export class AdminAccountingComponent implements OnInit {
     return ({ especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne' } as Record<string, string>)[id] ?? id;
   }
 
+  paymentColor(id: string | null | undefined): string {
+    const key = this.normalizeKey(id ?? 'especes');
+    return this.paymentColorMap[key] ?? '#9FA6B2';
+  }
+
+  paymentBadgeStyles(id: string | null | undefined): Record<string, string> {
+    const color = this.paymentColor(id);
+    return {
+      color,
+      borderColor: `${color}66`,
+      background: `${color}1A`,
+    };
+  }
+
+  serviceColor(service: string | null | undefined): string {
+    const key = this.normalizeKey(service ?? '');
+    if (!key) return '#9FA6B2';
+
+    const mapped = this.serviceColorMap[key];
+    if (mapped) return mapped;
+
+    let hash = 0;
+    for (let i = 0; i < key.length; i++) {
+      hash = (hash * 31 + key.charCodeAt(i)) | 0;
+    }
+    return this.servicePalette[Math.abs(hash) % this.servicePalette.length];
+  }
+
+  serviceBadgeStyles(service: string | null | undefined): Record<string, string> {
+    const color = this.serviceColor(service);
+    return {
+      color,
+      borderColor: `${color}66`,
+      background: `${color}1A`,
+    };
+  }
+
   formatDate(visit: any): string {
     const raw = visit.visitDate ?? visit.createdAt;
     return new Date(raw).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -123,6 +205,10 @@ export class AdminAccountingComponent implements OnInit {
       next: () => this.load(),
       error: () => {},
     });
+  }
+
+  goToVisitsPage(page: number) {
+    this.visitsPage.set(Math.min(Math.max(1, page), this.visitsTotalPages()));
   }
 
   exportCsv() {
@@ -159,11 +245,14 @@ export class AdminAccountingComponent implements OnInit {
 
     // KPIs
     const d = this.data();
+    const visitsCount = d?.kpis?.visits ?? 0;
+    const revenue = d?.kpis?.revenue ?? 0;
+    const avgBasket = visitsCount > 0 ? +(revenue / visitsCount).toFixed(2) : 0;
     doc.setFontSize(10);
     doc.setTextColor(0);
-    doc.text(`Total visites : ${d?.totals?.count ?? 0}`, 14, 48);
-    doc.text(`Chiffre d'affaires : ${d?.totals?.revenue ?? 0}€`, 80, 48);
-    doc.text(`Panier moyen : ${d?.totals?.avg ?? 0}€`, 150, 48);
+    doc.text(`Total visites : ${visitsCount}`, 14, 48);
+    doc.text(`Chiffre d'affaires : ${revenue}€`, 80, 48);
+    doc.text(`Panier moyen : ${avgBasket}€`, 150, 48);
 
     // Tableau
     const visits = this.data()?.visits ?? [];
@@ -182,5 +271,13 @@ export class AdminAccountingComponent implements OnInit {
     });
 
     doc.save(`revenus-${period}.pdf`);
+  }
+
+  private normalizeKey(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
   }
 }

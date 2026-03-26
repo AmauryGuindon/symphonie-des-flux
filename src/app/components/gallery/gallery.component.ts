@@ -2,6 +2,9 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
+const API = 'http://localhost:3000/api';
+const API_ORIGIN = API.replace(/\/api.*$/, '');
+
 interface GalleryItem {
   _id: string;
   url: string;
@@ -31,9 +34,19 @@ export class GalleryComponent implements OnInit {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.http.get<GalleryItem[]>('http://localhost:3000/api/gallery').subscribe({
-      next: items => this.items.set(items.length > 0 ? items : this.fallbackItems),
+    this.http.get<GalleryItem[]>(`${API}/gallery`).subscribe({
+      next: items => {
+        const normalizedItems = items.map(item => this.withAbsoluteUrl(item));
+        this.items.set(normalizedItems.length > 0 ? normalizedItems : this.fallbackItems);
+      },
       error: () => this.items.set(this.fallbackItems),
     });
+  }
+
+  private withAbsoluteUrl(item: GalleryItem): GalleryItem {
+    if (!item.url || item.url.startsWith('http://') || item.url.startsWith('https://') || !item.url.startsWith('/')) {
+      return item;
+    }
+    return { ...item, url: `${API_ORIGIN}${item.url}` };
   }
 }

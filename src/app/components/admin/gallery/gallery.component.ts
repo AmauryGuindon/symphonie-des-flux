@@ -26,6 +26,7 @@ export class AdminGalleryComponent implements OnInit {
   items = signal<GalleryItem[]>([]);
   loading = signal(true);
   uploading = signal(false);
+  dragOver = signal(false);
   savingId = signal<string | null>(null);
 
   spanOptions = ['', 'wide', 'tall', 'large'];
@@ -38,7 +39,10 @@ export class AdminGalleryComponent implements OnInit {
 
   load() {
     this.http.get<GalleryItem[]>(`${API}/admin/gallery`).subscribe({
-      next: items => { this.items.set(items); this.loading.set(false); },
+      next: items => {
+        this.items.set(items);
+        this.loading.set(false);
+      },
       error: () => this.loading.set(false),
     });
   }
@@ -47,31 +51,40 @@ export class AdminGalleryComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
+    this.uploadFile(file, input);
+  }
 
-    const formData = new FormData();
-    formData.append('file', file);
-    this.uploading.set(true);
-    this.http.post<GalleryItem>(`${API}/admin/gallery`, formData).subscribe({
-      next: item => {
-        this.items.update(list => [item, ...list]);
-        this.uploading.set(false);
-        input.value = '';
-      },
-      error: () => this.uploading.set(false),
-    });
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver.set(true);
+  }
+
+  onDragLeave(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver.set(false);
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    this.dragOver.set(false);
+    const file = event.dataTransfer?.files?.[0];
+    if (!file) return;
+    this.uploadFile(file);
   }
 
   save(item: GalleryItem) {
     this.savingId.set(item._id);
-    this.http.patch(`${API}/admin/gallery/${item._id}`, {
-      alt: item.alt,
-      span: item.span,
-      active: item.active,
-      order: item.order,
-    }).subscribe({
-      next: () => this.savingId.set(null),
-      error: () => this.savingId.set(null),
-    });
+    this.http
+      .patch(`${API}/admin/gallery/${item._id}`, {
+        alt: item.alt,
+        span: item.span,
+        active: item.active,
+        order: item.order,
+      })
+      .subscribe({
+        next: () => this.savingId.set(null),
+        error: () => this.savingId.set(null),
+      });
   }
 
   delete(item: GalleryItem) {
@@ -83,6 +96,25 @@ export class AdminGalleryComponent implements OnInit {
   }
 
   imageUrl(item: GalleryItem): string {
-    return `http://localhost:3000${item.url}`;
+    const origin = API.replace(/\/api.*$/, '');
+    return `${origin}${item.url}`;
+  }
+
+  private uploadFile(file: File, input?: HTMLInputElement) {
+    const formData = new FormData();
+    formData.append('file', file);
+    this.uploading.set(true);
+
+    this.http.post<GalleryItem>(`${API}/admin/gallery`, formData).subscribe({
+      next: item => {
+        this.items.update(list => [item, ...list]);
+        this.uploading.set(false);
+        if (input) input.value = '';
+      },
+      error: () => {
+        this.uploading.set(false);
+        if (input) input.value = '';
+      },
+    });
   }
 }

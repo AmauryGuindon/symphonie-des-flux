@@ -16,7 +16,11 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { GalleryService } from './gallery.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AdminGuard } from '../auth/guards/admin.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
+import { Role } from '../common/enums/role.enum';
+import { UpdateGalleryItemDto } from './dto/update-gallery-item.dto';
+import { UploadGalleryItemDto } from './dto/upload-gallery-item.dto';
 
 const UPLOADS_PATH = join(process.cwd(), 'uploads', 'gallery');
 
@@ -32,13 +36,15 @@ export class GalleryController {
 
   // Admin endpoints
   @Get('admin/gallery')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   getAll() {
     return this.galleryService.findAll();
   }
 
   @Post('admin/gallery')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({
       destination: UPLOADS_PATH,
@@ -57,7 +63,7 @@ export class GalleryController {
   }))
   async upload(
     @UploadedFile() file: Express.Multer.File,
-    @Body() body: { alt?: string; span?: string },
+    @Body() body: UploadGalleryItemDto,
   ) {
     if (!file) throw new BadRequestException('Fichier requis');
     const url = `/uploads/gallery/${file.filename}`;
@@ -65,16 +71,18 @@ export class GalleryController {
   }
 
   @Patch('admin/gallery/:id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   update(
     @Param('id') id: string,
-    @Body() dto: { alt?: string; span?: string; active?: boolean; order?: number },
+    @Body() dto: UpdateGalleryItemDto,
   ) {
     return this.galleryService.update(id, dto);
   }
 
   @Delete('admin/gallery/:id')
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   delete(@Param('id') id: string) {
     return this.galleryService.delete(id, UPLOADS_PATH);
   }

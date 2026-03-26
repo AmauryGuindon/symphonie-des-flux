@@ -66,4 +66,8 @@ export class RescheduleModalComponent implements OnInit {
     const [y, m, day] = d.split('-');
     return `${day}/${m}/${y}`;
   }
+
+  hasAvailableSlots(): boolean {
+    return this.slots().some(s => s.available);
+  }
 }

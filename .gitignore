@@ -4,6 +4,10 @@ node_modules/
 # Build Angular
 dist/
 .angular/
+out-tsc/
+
+# Uploads (fichiers binaires générés)
+backend/uploads/
 
 # Fichiers système
 .DS_Store

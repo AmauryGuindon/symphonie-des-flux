@@ -150,11 +150,26 @@
   &__service-info {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: .25rem;
   }
 
-  &__service-name { font-size: .82rem; color: rgba(255,255,255,.7); }
-  &__service-amount { font-size: .82rem; color: #C9A44A; font-weight: 500; }
+  &__service-name-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    min-width: 0;
+  }
+
+  &__service-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  &__service-name { font-size: .82rem; }
+  &__service-amount { font-size: .82rem; font-weight: 500; }
 
   &__bar-track {
     height: 4px;
@@ -210,11 +225,67 @@
     color: rgba(255,255,255,.5);
     padding: .15rem .5rem;
     border-radius: 4px;
+    border: 1px solid rgba(255,255,255,.08);
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  &__badge--service,
+  &__badge--payment {
+    font-weight: 500;
   }
 
   &__btn-delete { @include btn-danger; padding: .15rem .5rem; font-size: .72rem; border-radius: 4px; }
 
   &__empty { font-size: .82rem; color: rgba(255,255,255,.3); }
+
+  &__pagination {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__page-btn {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 .5rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 6px;
+    color: rgba(255,255,255,.55);
+    font-size: .8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+    font-family: inherit;
+
+    &:hover:not(:disabled) {
+      background: rgba(255,255,255,.1);
+      color: #fff;
+    }
+
+    &:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+
+    &--active {
+      background: rgba(201,164,74,.15);
+      border-color: rgba(201,164,74,.4);
+      color: #C9A44A;
+      font-weight: 700;
+    }
+
+    &--nav { font-size: .9rem; }
+  }
+
+  &__page-info {
+    margin-left: .5rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,.3);
+  }
 
   &__modal-overlay {
     position: fixed;

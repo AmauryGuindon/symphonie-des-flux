@@ -20,7 +20,7 @@
       <p class="rmodal__label">Choisir un horaire</p>
       @if (slotsLoading()) {
         <p class="rmodal__loading">Chargement&#8230;</p>
-      } @else if (slots().length === 0 || slots().every(s => !s.available)) {
+      } @else if (!hasAvailableSlots()) {
         <p class="rmodal__loading">Aucun créneau disponible ce jour-là.</p>
       } @else {
         <div class="rmodal__slots">

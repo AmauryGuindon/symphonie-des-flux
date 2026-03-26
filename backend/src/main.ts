@@ -25,7 +25,7 @@ async function bootstrap() {
   app.use(helmet());
 
   // Servir les fichiers uploadés (galerie, etc.)
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/uploads' });
+  app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
   // CORS restreint aux origines déclarées
   app.enableCors({

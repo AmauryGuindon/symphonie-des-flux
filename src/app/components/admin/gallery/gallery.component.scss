@@ -4,7 +4,8 @@
   &__header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 1rem;
     margin-bottom: 1.5rem;
   }
 
@@ -14,6 +15,26 @@
     color: var(--white);
     letter-spacing: .06em;
     margin: 0;
+  }
+
+  &__upload-zone {
+    border: 1px dashed rgba(201, 164, 74, .45);
+    background: rgba(201, 164, 74, .05);
+    border-radius: 8px;
+    padding: .45rem;
+    min-width: 260px;
+    text-align: center;
+    transition: border-color .2s, background-color .2s;
+
+    &--dragover {
+      border-color: rgba(201, 164, 74, .85);
+      background: rgba(201, 164, 74, .12);
+    }
+
+    &--loading {
+      opacity: .75;
+      pointer-events: none;
+    }
   }
 
   &__upload-btn {
@@ -32,6 +53,15 @@
     transition: opacity .2s;
 
     &--loading { opacity: .6; cursor: not-allowed; }
+  }
+
+  &__upload-hint {
+    margin: .45rem 0 0;
+    font-family: var(--font-body);
+    font-size: .64rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.5);
   }
 
   &__loading, &__empty {

@@ -1,14 +1,24 @@
 <div class="agallery">
   <div class="agallery__header">
     <h2 class="agallery__title">Galerie</h2>
-    <label class="agallery__upload-btn" [class.agallery__upload-btn--loading]="uploading()">
-      {{ uploading() ? 'Upload…' : '+ Ajouter une photo' }}
-      <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="uploading()" hidden />
-    </label>
+    <div
+      class="agallery__upload-zone"
+      [class.agallery__upload-zone--dragover]="dragOver()"
+      [class.agallery__upload-zone--loading]="uploading()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      <label class="agallery__upload-btn" [class.agallery__upload-btn--loading]="uploading()">
+        {{ uploading() ? 'Upload...' : '+ Ajouter une photo' }}
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="uploading()" hidden />
+      </label>
+      <p class="agallery__upload-hint">Glisser/deposer une image ici ou cliquer</p>
+    </div>
   </div>
 
   @if (loading()) {
-    <p class="agallery__loading">Chargement…</p>
+    <p class="agallery__loading">Chargement...</p>
   } @else if (items().length === 0) {
     <p class="agallery__empty">Aucune photo. Ajoutez-en une ci-dessus.</p>
   } @else {
@@ -53,7 +63,7 @@
 
           <div class="agallery__actions">
             <button class="agallery__btn-save" (click)="save(item)" [disabled]="savingId() === item._id">
-              {{ savingId() === item._id ? '…' : 'Sauvegarder' }}
+              {{ savingId() === item._id ? '...' : 'Sauvegarder' }}
             </button>
             <button class="agallery__btn-delete" (click)="delete(item)">Supprimer</button>
           </div>
