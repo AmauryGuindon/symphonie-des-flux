@@ -1,20 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BusinessConfig, BusinessConfigDocument } from './schemas/business-config.schema';
 import { UpdateBusinessConfigDto } from './dto/update-business-config.dto';
 
 @Injectable()
-export class ScheduleService {
+export class ScheduleService implements OnModuleInit {
   constructor(
     @InjectModel(BusinessConfig.name)
     private configModel: Model<BusinessConfigDocument>,
   ) {}
 
+  async onModuleInit() {
+    const cfg = await this.configModel.findById('main');
+    if (!cfg) {
+      await this.configModel.create({ _id: 'main' });
+      return;
+    }
+    // Migrate existing config to new defaults
+    const updates: Record<string, unknown> = {};
+    if (cfg.slotDuration === 60) updates['slotDuration'] = 30;
+    if (!cfg.breakStart) updates['breakStart'] = '13:00';
+    if (!cfg.breakEnd) updates['breakEnd'] = '14:00';
+    if (Object.keys(updates).length > 0) {
+      await this.configModel.updateOne({ _id: 'main' }, { $set: updates });
+    }
+  }
+
   async getConfig(): Promise<BusinessConfig> {
     const cfg = await this.configModel.findById('main');
     if (cfg) return cfg;
-    // Bootstrap default config if not yet in DB
     return this.configModel.create({ _id: 'main' });
   }
 
