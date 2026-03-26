@@ -20,3 +20,11 @@ export function computeTier(visitCount: number): LoyaltyTier {
 export const LOYALTY_POINTS_PER_VISIT = 10;
 export const LOYALTY_REFERRAL_BONUS = 20;
 export const LOYALTY_BIRTHDAY_BONUS = 15;
+
+/** Bonus de points offerts par palier, en plus des points de base de la prestation */
+export const LOYALTY_TIER_BONUS: Record<LoyaltyTier, number> = {
+  [LoyaltyTier.BRONZE]:    5,
+  [LoyaltyTier.SILVER]:   10,
+  [LoyaltyTier.GOLD]:     15,
+  [LoyaltyTier.PLATINUM]: 20,
+};

@@ -14,6 +14,8 @@ import {
   LOYALTY_POINTS_PER_VISIT,
   LOYALTY_REFERRAL_BONUS,
   LOYALTY_BIRTHDAY_BONUS,
+  LOYALTY_TIER_BONUS,
+  computeTier,
 } from '../common/enums/role.enum';
 
 @Injectable()
@@ -109,11 +111,18 @@ export class UsersService {
 
   // --- Fidélité ---
 
-  async recordVisit(userId: string, points: number = LOYALTY_POINTS_PER_VISIT): Promise<UserDocument> {
+  async recordVisit(userId: string, basePoints: number = LOYALTY_POINTS_PER_VISIT): Promise<UserDocument> {
+    // Récupérer le visitCount actuel pour calculer le palier avant cette visite
+    const current = await this.userModel.findById(userId).select('visitCount');
+    if (!current) throw new NotFoundException('Utilisateur non trouvé');
+
+    const tier = computeTier(current.visitCount);
+    const totalPoints = basePoints + LOYALTY_TIER_BONUS[tier];
+
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       {
-        $inc: { loyaltyPoints: points, visitCount: 1 },
+        $inc: { loyaltyPoints: totalPoints, visitCount: 1 },
         lastVisitAt: new Date(),
       },
       { new: true },

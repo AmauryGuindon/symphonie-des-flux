@@ -8,19 +8,19 @@ import { RescheduleModalComponent } from './reschedule-modal/reschedule-modal.co
 
 export const TIER_BENEFITS: Record<LoyaltyTier, { perks: string[]; nextPerks: string[] }> = {
   bronze: {
-    perks: ['10 pts par visite', 'Bonus anniversaire (+15 pts)', 'Code de parrainage'],
-    nextPerks: ['Jusqu\'à 12 pts par visite', 'Accès aux offres promotionnelles'],
+    perks: ['Points de prestation + 5 pts bonus/visite', 'Bonus anniversaire (+15 pts)', 'Code de parrainage'],
+    nextPerks: ['Points de prestation + 10 pts bonus/visite', 'Accès aux offres promotionnelles'],
   },
   silver: {
-    perks: ['Jusqu\'à 12 pts par visite', 'Accès aux offres promotionnelles', 'Bonus anniversaire'],
-    nextPerks: ['Points x1.5, priorité créneaux', 'Réduction 10% sur les prestations'],
+    perks: ['Points de prestation + 10 pts bonus/visite', 'Accès aux offres promotionnelles', 'Bonus anniversaire (+15 pts)'],
+    nextPerks: ['Points de prestation + 15 pts bonus/visite', 'Priorité sur les créneaux'],
   },
   gold: {
-    perks: ['Points x1.5', 'Priorité sur les créneaux', '-10% sur les prestations'],
-    nextPerks: ['Points x2', 'Accès VIP & coupe anniversaire offerte'],
+    perks: ['Points de prestation + 15 pts bonus/visite', 'Priorité sur les créneaux', 'Bonus anniversaire (+15 pts)'],
+    nextPerks: ['Points de prestation + 20 pts bonus/visite', 'Accès VIP'],
   },
   platinum: {
-    perks: ['Points x2', 'Accès VIP', 'Coupe anniversaire offerte', '-15% sur les prestations'],
+    perks: ['Points de prestation + 20 pts bonus/visite', 'Accès VIP', 'Bonus anniversaire (+15 pts)'],
     nextPerks: [],
   },
 };

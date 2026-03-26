@@ -9,7 +9,7 @@ import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { RecordVisitDto } from './dto/record-visit.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
 import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
-import { LOYALTY_POINTS_PER_VISIT } from '../common/enums/role.enum';
+import { LOYALTY_POINTS_PER_VISIT, LOYALTY_TIER_BONUS, computeTier } from '../common/enums/role.enum';
 
 const DEFAULT_SERVICES = [
   { name: 'Coupe + Taille de Barbe',      price: 25, loyaltyPoints: 13, duration: 55 },
@@ -32,7 +32,7 @@ export class AdminService implements OnModuleInit {
     for (const s of DEFAULT_SERVICES) {
       await this.serviceConfigModel.findOneAndUpdate(
         { name: s.name },
-        { $set: { price: s.price, loyaltyPoints: s.loyaltyPoints, duration: s.duration }, $setOnInsert: { name: s.name, active: true } },
+        { $set: { price: s.price, duration: s.duration }, $setOnInsert: { name: s.name, active: true, loyaltyPoints: s.loyaltyPoints } },
         { upsert: true },
       );
     }
@@ -390,9 +390,13 @@ export class AdminService implements OnModuleInit {
     if (!visit) return null;
     if (visit.clientId && visit.clientId !== 'walk-in') {
       const config = await this.serviceConfigModel.findOne({ name: visit.serviceType });
-      const points = config?.loyaltyPoints ?? LOYALTY_POINTS_PER_VISIT;
+      const basePoints = config?.loyaltyPoints ?? LOYALTY_POINTS_PER_VISIT;
+      // Recalcule le bonus palier tel qu'il était avant cette visite (visitCount - 1)
+      const user = await this.userModel.findById(visit.clientId).select('visitCount');
+      const tierAtVisit = computeTier(Math.max(0, (user?.visitCount ?? 1) - 1));
+      const totalPoints = basePoints + LOYALTY_TIER_BONUS[tierAtVisit];
       await this.userModel.findByIdAndUpdate(visit.clientId, {
-        $inc: { loyaltyPoints: -points, visitCount: -1 },
+        $inc: { loyaltyPoints: -totalPoints, visitCount: -1 },
       });
     }
     return visit.deleteOne();
