@@ -8,6 +8,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { ScheduleService } from '../schedule/schedule.service';
 import { UsersService } from '../users/users.service';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
+import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
 
 @Injectable()
 export class AppointmentsService {
@@ -16,6 +17,7 @@ export class AppointmentsService {
   constructor(
     @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
     @InjectModel(ServiceConfig.name) private serviceConfigModel: Model<ServiceConfigDocument>,
+    @InjectModel(Visit.name) private visitModel: Model<VisitDocument>,
     private scheduleService: ScheduleService,
     private usersService: UsersService,
   ) {
@@ -218,6 +220,17 @@ export class AppointmentsService {
 
     const config = await this.serviceConfigModel.findOne({ name: appt.serviceType });
     const points = config?.loyaltyPoints ?? 0;
+    const price = config?.price ?? 0;
+
+    // Créer l'entrée dans l'historique des visites
+    await this.visitModel.create({
+      clientId: appt.clientId,
+      clientName: appt.clientName,
+      serviceType: appt.serviceType,
+      price,
+      paymentMethod: appt.paymentMethod,
+      visitDate: appt.date,
+    });
 
     await this.appointmentModel.findByIdAndUpdate(id, { visitRecorded: true });
     return this.usersService.recordVisit(appt.clientId, points);
