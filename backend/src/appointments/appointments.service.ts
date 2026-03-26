@@ -241,6 +241,7 @@ export class AppointmentsService {
       price,
       paymentMethod: appt.paymentMethod,
       visitDate: appt.date,
+      pointsEarned: points,
     });
 
     await this.appointmentModel.findByIdAndUpdate(id, { visitRecorded: true });

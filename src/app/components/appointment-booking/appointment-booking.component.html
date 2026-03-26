@@ -46,6 +46,9 @@
                       <span class="appt__svc-duration">{{ svc.duration }} min</span>
                     }
                     <span class="appt__svc-price">{{ svc.price }} €</span>
+                    @if (isAuth() && svc.loyaltyPoints > 0) {
+                      <span class="appt__svc-pts">+{{ svc.loyaltyPoints }} pts</span>
+                    }
                   </span>
                 </button>
               }

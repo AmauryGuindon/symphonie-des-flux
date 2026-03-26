@@ -200,7 +200,7 @@ export class AdminService implements OnModuleInit {
   async recordVisit(clientId: string, dto: RecordVisitDto) {
     const config = await this.serviceConfigModel.findOne({ name: dto.serviceType });
     const points = config?.loyaltyPoints ?? LOYALTY_POINTS_PER_VISIT;
-    await this.visitModel.create({ clientId, ...dto });
+    await this.visitModel.create({ clientId, ...dto, pointsEarned: points });
     return this.usersService.recordVisit(clientId, points);
   }
 

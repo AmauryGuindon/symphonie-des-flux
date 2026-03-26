@@ -48,7 +48,7 @@ export class AppointmentBookingComponent implements OnInit {
   });
 
   // Services
-  services = signal<{ _id: string; name: string; price: number; duration: number }[]>([]);
+  services = signal<{ _id: string; name: string; price: number; duration: number; loyaltyPoints: number }[]>([]);
   selectedService = signal('');
 
   selectedServiceObj = computed(() =>

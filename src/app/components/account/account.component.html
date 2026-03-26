@@ -276,7 +276,14 @@
                   <span class="account__visit-service">{{ v.serviceType }}</span>
                   <span class="account__visit-date">{{ formatDate(v.visitDate || v.createdAt.slice(0,10)) }}</span>
                 </div>
-                <span class="account__visit-price">{{ v.price }}€</span>
+                <div class="account__visit-right">
+                  <span class="account__visit-price">{{ v.price }}€</span>
+                  @if (v.paymentMethod === 'points') {
+                    <span class="account__visit-points account__visit-points--spent">- {{ v.price * 10 }} pts</span>
+                  } @else if (v.pointsEarned > 0) {
+                    <span class="account__visit-points account__visit-points--earned">+ {{ v.pointsEarned }} pts</span>
+                  }
+                </div>
               </div>
             }
           </div>

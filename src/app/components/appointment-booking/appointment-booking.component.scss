@@ -224,6 +224,18 @@
     letter-spacing: .03em;
   }
 
+  &__svc-pts {
+    font-size: .68rem;
+    font-weight: 700;
+    color: #2ecc71;
+    white-space: nowrap;
+    background: rgba(46,204,113,.08);
+    border: 1px solid rgba(46,204,113,.2);
+    border-radius: 20px;
+    padding: .2rem .5rem;
+    letter-spacing: .02em;
+  }
+
   // ── Datepicker split (calendrier + créneaux côte à côte) ─────────────────
 
   &__datepick {

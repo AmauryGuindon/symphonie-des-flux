@@ -649,12 +649,29 @@
     letter-spacing: .05em;
   }
 
+  &__visit-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: .15rem;
+  }
+
   &__visit-price {
     font-family: var(--font-body);
     font-size: .82rem;
     font-weight: 600;
     color: var(--gold);
     white-space: nowrap;
+  }
+
+  &__visit-points {
+    font-family: var(--font-body);
+    font-size: .7rem;
+    font-weight: 600;
+    white-space: nowrap;
+
+    &--earned { color: #2ecc71; }
+    &--spent  { color: #e74c3c; }
   }
 
   // Changer mot de passe

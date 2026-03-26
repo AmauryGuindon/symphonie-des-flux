@@ -25,6 +25,9 @@ export class Visit {
 
   @Prop({ trim: true })
   visitDate?: string; // YYYY-MM-DD, pour saisie rétroactive manuelle
+
+  @Prop({ default: 0 })
+  pointsEarned: number;
 }
 
 export const VisitSchema = SchemaFactory.createForClass(Visit);
