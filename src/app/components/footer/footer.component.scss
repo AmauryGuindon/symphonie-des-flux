@@ -196,11 +196,31 @@
     border-top: 1px solid rgba(201, 164, 74, 0.1);
   }
 
+  &__copy-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+  }
+
   &__copy {
     font-family: var(--font-body);
     font-size: 0.7rem;
     letter-spacing: 0.1em;
     color: rgba(245, 240, 232, 0.2);
+    margin: 0;
+  }
+
+  &__credit {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: rgba(245, 240, 232, 0.15);
+    margin: 0;
+
+    strong {
+      color: rgba(201, 164, 74, 0.4);
+      font-weight: 500;
+    }
   }
 
   &__legal {
