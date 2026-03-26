@@ -25,6 +25,7 @@ export interface Appointment {
   status: 'pending' | 'confirmed' | 'cancelled';
   notes?: string;
   paymentMethod?: string;
+  visitRecorded?: boolean;
   createdAt: string;
 }
 
@@ -77,6 +78,10 @@ export class AppointmentService {
 
   deleteAdminAppointment(id: string) {
     return this.http.delete(`${API}/admin/appointments/${id}`);
+  }
+
+  validateVisitAdmin(id: string) {
+    return this.http.post(`${API}/admin/appointments/${id}/validate-visit`, {});
   }
 
   getAdminSchedule() {

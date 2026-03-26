@@ -20,6 +20,7 @@ export class Appointment {
   @Prop({ trim: true }) notes?: string;
   @Prop({ enum: ['especes', 'virement', 'en_ligne', 'points'], default: 'especes' }) paymentMethod: string;
   @Prop({ default: 0 }) duration: number;
+  @Prop({ default: false }) visitRecorded: boolean;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

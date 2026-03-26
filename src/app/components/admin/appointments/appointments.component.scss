@@ -444,6 +444,15 @@
     cursor: pointer;
     transition: all .15s;
 
+    &--validate {
+      grid-column: 1 / -1;
+      background: rgba(46,204,113,.12);
+      border-color: rgba(46,204,113,.35);
+      color: #2ecc71;
+      &:hover { background: rgba(46,204,113,.22); }
+      &:disabled { opacity: .5; cursor: not-allowed; }
+    }
+
     &--confirm {
       grid-column: 1 / -1;
       background: rgba(46,204,113,.12);
@@ -473,6 +482,17 @@
       color: rgba(231,76,60,.7);
       &:hover { background: rgba(231,76,60,.15); color: #e74c3c; }
     }
+  }
+
+  &__validate-ok {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8rem;
+    color: #2ecc71;
+    font-weight: 600;
+    padding: .5rem;
   }
 }
 

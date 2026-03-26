@@ -207,6 +207,22 @@ export class AppointmentsService {
     return this.appointmentModel.findByIdAndDelete(id);
   }
 
+  async validateVisitFromAppointment(id: string) {
+    const appt = await this.appointmentModel.findById(id);
+    if (!appt) throw new BadRequestException('Rendez-vous introuvable');
+    if (appt.status !== 'confirmed') throw new BadRequestException('Le rendez-vous doit être confirmé');
+    if (appt.visitRecorded) throw new BadRequestException('Visite déjà enregistrée');
+
+    const apptDateTime = new Date(`${appt.date}T${appt.time}:00`);
+    if (apptDateTime > new Date()) throw new BadRequestException('Le rendez-vous n\'est pas encore passé');
+
+    const config = await this.serviceConfigModel.findOne({ name: appt.serviceType });
+    const points = config?.loyaltyPoints ?? 0;
+
+    await this.appointmentModel.findByIdAndUpdate(id, { visitRecorded: true });
+    return this.usersService.recordVisit(appt.clientId, points);
+  }
+
   // ── Email confirmation ─────────────────────────────────────────────────────
 
   private async sendConfirmationEmail(

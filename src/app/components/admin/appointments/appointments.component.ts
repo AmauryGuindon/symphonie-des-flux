@@ -28,14 +28,35 @@ export class AdminAppointmentsComponent implements OnInit {
 
   // Detail popup (mobile tap)
   detailAppt = signal<Appointment | null>(null);
+  validateLoading = signal(false);
+  validateSuccess = signal(false);
 
-  openDetail(a: Appointment) { this.detailAppt.set(a); }
+  openDetail(a: Appointment) { this.detailAppt.set(a); this.validateSuccess.set(false); }
   closeDetail() { this.detailAppt.set(null); }
 
   confirmFromDetail(a: Appointment) { this.confirm(a); this.closeDetail(); }
   cancelFromDetail(a: Appointment)  { this.cancel(a);  this.closeDetail(); }
   deleteFromDetail(id: string)      { this.delete(id); this.closeDetail(); }
   editFromDetail(a: Appointment)    { this.closeDetail(); this.startEdit(a); }
+
+  isApptPast(a: Appointment): boolean {
+    return new Date(`${a.date}T${a.time}:00`) < new Date();
+  }
+
+  validateVisitFromDetail(a: Appointment) {
+    this.validateLoading.set(true);
+    this.appointmentService.validateVisitAdmin(a._id).subscribe({
+      next: () => {
+        this.appointments.update(list =>
+          list.map(x => x._id === a._id ? { ...x, visitRecorded: true } : x)
+        );
+        this.detailAppt.update(d => d ? { ...d, visitRecorded: true } : d);
+        this.validateLoading.set(false);
+        this.validateSuccess.set(true);
+      },
+      error: () => this.validateLoading.set(false),
+    });
+  }
 
   // For rescheduling
   editingId = signal<string | null>(null);

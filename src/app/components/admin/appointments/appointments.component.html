@@ -282,6 +282,18 @@
         </div>
 
         <div class="detail-sheet__actions">
+          @if (detailAppt()!.status === 'confirmed' && isApptPast(detailAppt()!) && !detailAppt()!.visitRecorded) {
+            <button class="detail-sheet__btn detail-sheet__btn--validate" (click)="validateVisitFromDetail(detailAppt()!)" [disabled]="validateLoading()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              {{ validateLoading() ? '…' : 'Valider la visite' }}
+            </button>
+          }
+          @if (validateSuccess()) {
+            <span class="detail-sheet__validate-ok">✓ Visite enregistrée</span>
+          }
+          @if (detailAppt()!.visitRecorded) {
+            <span class="detail-sheet__validate-ok">✓ Visite déjà enregistrée</span>
+          }
           @if (detailAppt()!.status === 'pending') {
             <button class="detail-sheet__btn detail-sheet__btn--confirm" (click)="confirmFromDetail(detailAppt()!)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>

@@ -115,6 +115,11 @@ export class AdminController {
     return this.appointmentsService.deleteAppointment(id);
   }
 
+  @Post('appointments/:id/validate-visit')
+  validateVisit(@Param('id') id: string) {
+    return this.appointmentsService.validateVisitFromAppointment(id);
+  }
+
   // ── Horaires ──────────────────────────────────────────────────────────────
 
   @Get('schedule')
