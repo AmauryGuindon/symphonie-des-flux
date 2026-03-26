@@ -22,7 +22,9 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Headers de sécurité HTTP (X-Frame-Options, CSP, HSTS, etc.)
-  app.use(helmet());
+  // crossOriginResourcePolicy: cross-origin permet au frontend (port 4200) de charger
+  // les images statiques servies par le backend (port 3000)
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 
   // Servir les fichiers uploadés (galerie, etc.)
   app.useStaticAssets(join(process.cwd(), 'uploads'), { prefix: '/uploads' });
