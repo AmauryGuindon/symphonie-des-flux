@@ -131,9 +131,15 @@ export class AccountComponent implements OnInit {
     return `${d}/${m}/${y}`;
   });
 
-  upcomingAppointments = computed(() =>
-    this.appointments().filter(a => a.status !== 'cancelled' && a.date >= this.today()),
-  );
+  upcomingAppointments = computed(() => {
+    const now = new Date();
+    return this.appointments().filter(a => {
+      if (a.status === 'cancelled') return false;
+      // Comparaison date + heure pour ne pas afficher les RDV dont l'heure est passée
+      const apptDateTime = new Date(`${a.date}T${a.time}:00`);
+      return apptDateTime > now;
+    });
+  });
 
   constructor(private auth: AuthService) {}
 
