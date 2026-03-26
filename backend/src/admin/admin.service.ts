@@ -12,12 +12,13 @@ import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
 import { LOYALTY_POINTS_PER_VISIT } from '../common/enums/role.enum';
 
 const DEFAULT_SERVICES = [
-  { name: 'Coupe',           price: 20, loyaltyPoints: 10 },
-  { name: 'Coupe + Dégradé', price: 22, loyaltyPoints: 12 },
-  { name: 'Coupe + Barbe',   price: 30, loyaltyPoints: 15 },
-  { name: 'Barbe seule',     price: 15, loyaltyPoints: 8  },
-  { name: 'Dégradé',         price: 18, loyaltyPoints: 9  },
-  { name: 'Coupe enfant',    price: 15, loyaltyPoints: 8  },
+  { name: 'Coupe',                        price: 20, loyaltyPoints: 10 },
+  { name: 'Coupe + Barbe',                price: 25, loyaltyPoints: 13 },
+  { name: 'Barbe seule',                  price: 15, loyaltyPoints: 8  },
+  { name: 'Coupe enfant',                 price: 12, loyaltyPoints: 6  },
+  { name: 'Contours (Cheveux ou Barbe)',  price: 8,  loyaltyPoints: 4  },
+  { name: 'Coupe + Dégradé',             price: 22, loyaltyPoints: 12 },
+  { name: 'Dégradé',                      price: 18, loyaltyPoints: 9  },
 ];
 
 @Injectable()
@@ -33,7 +34,7 @@ export class AdminService implements OnModuleInit {
     for (const s of DEFAULT_SERVICES) {
       await this.serviceConfigModel.findOneAndUpdate(
         { name: s.name },
-        { $setOnInsert: s },
+        { $set: { price: s.price, loyaltyPoints: s.loyaltyPoints }, $setOnInsert: { name: s.name, active: true } },
         { upsert: true },
       );
     }

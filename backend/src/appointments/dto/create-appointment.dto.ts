@@ -18,7 +18,7 @@ export class CreateAppointmentDto {
   notes?: string;
 
   @IsString()
-  @IsIn(['especes', 'virement', 'en_ligne'])
+  @IsIn(['especes', 'virement', 'en_ligne', 'points'])
   @IsOptional()
   paymentMethod?: string;
 }

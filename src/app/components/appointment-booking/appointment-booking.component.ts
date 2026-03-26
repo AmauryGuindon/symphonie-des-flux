@@ -15,10 +15,20 @@ import { AuthService } from '../../services/auth.service';
 export class AppointmentBookingComponent implements OnInit {
   // Auth
   isAuth = computed(() => this.auth.isAuthenticated());
+  userPoints = computed(() => this.auth.user()?.loyaltyPoints ?? 0);
 
   // Services
   services = signal<{ _id: string; name: string; price: number }[]>([]);
   selectedService = '';
+
+  selectedServiceObj = computed(() =>
+    this.services().find(s => s.name === this.selectedService) ?? null,
+  );
+  requiredPoints = computed(() => (this.selectedServiceObj()?.price ?? 0) * 10);
+  pointsNeeded = computed(() => Math.max(0, this.requiredPoints() - this.userPoints()));
+  canPayWithPoints = computed(() =>
+    this.isAuth() && this.requiredPoints() > 0 && this.userPoints() >= this.requiredPoints(),
+  );
 
   // Schedule config (dynamic from API)
   private scheduleConfig: BusinessConfig = {

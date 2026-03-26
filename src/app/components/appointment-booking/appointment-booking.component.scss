@@ -451,7 +451,7 @@
 
   &__payment-options {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: .4rem;
   }
 
@@ -485,6 +485,65 @@
       color: #C9A44A !important;
       svg { opacity: 1 !important; }
     }
+
+    &--points { font-size: .7rem; }
+
+    &--points-locked {
+      opacity: .35;
+      cursor: not-allowed;
+      &:hover { border-color: rgba(255,255,255,.07); color: rgba(255,255,255,.5); svg { opacity: .5; } }
+    }
+  }
+
+  &__pay-opt-pts {
+    font-size: .6rem;
+    color: var(--gold);
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+
+  // ── Points hint ───────────────────────────────────────────────────────────
+
+  &__points-hint {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    margin-top: .75rem;
+    padding: .5rem .75rem;
+    border-radius: 7px;
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.07);
+    font-size: .72rem;
+    color: rgba(255,255,255,.45);
+    font-family: var(--font-body);
+
+    svg { flex-shrink: 0; opacity: .6; }
+    strong { color: rgba(255,255,255,.75); }
+
+    &--ok {
+      background: rgba(201,164,74,.06);
+      border-color: rgba(201,164,74,.2);
+      color: rgba(201,164,74,.85);
+      svg { opacity: 1; stroke: var(--gold); }
+    }
+  }
+
+  // ── Points balance (récapitulatif) ────────────────────────────────────────
+
+  &__points-balance {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .45rem .75rem;
+    background: rgba(201,164,74,.06);
+    border: 1px solid rgba(201,164,74,.15);
+    border-radius: 7px;
+    margin-bottom: 1rem;
+    font-size: .72rem;
+    font-family: var(--font-body);
+    color: rgba(201,164,74,.8);
+    font-weight: 600;
+    svg { stroke: var(--gold); opacity: .8; }
   }
 
   // ── Notes ─────────────────────────────────────────────────────────────────

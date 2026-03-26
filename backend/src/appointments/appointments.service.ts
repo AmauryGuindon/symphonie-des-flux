@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as nodemailer from 'nodemailer';
@@ -6,6 +6,8 @@ import { Appointment, AppointmentDocument } from './schemas/appointment.schema';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { ScheduleService } from '../schedule/schedule.service';
+import { UsersService } from '../users/users.service';
+import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
 
 @Injectable()
 export class AppointmentsService {
@@ -13,7 +15,9 @@ export class AppointmentsService {
 
   constructor(
     @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
+    @InjectModel(ServiceConfig.name) private serviceConfigModel: Model<ServiceConfigDocument>,
     private scheduleService: ScheduleService,
+    private usersService: UsersService,
   ) {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
@@ -67,6 +71,14 @@ export class AppointmentsService {
     });
     if (existing) throw new Error('Ce créneau n\'est plus disponible.');
 
+    // Paiement par points : vérifier et déduire avant de créer le RDV
+    if (dto.paymentMethod === 'points') {
+      const svc = await this.serviceConfigModel.findOne({ name: dto.serviceType });
+      if (!svc) throw new BadRequestException('Prestation introuvable.');
+      const required = svc.price * 10;
+      await this.usersService.redeemPoints(clientId, required);
+    }
+
     const appointment = await this.appointmentModel.create({
       clientId,
       clientName,
@@ -75,6 +87,7 @@ export class AppointmentsService {
       date: dto.date,
       time: dto.time,
       notes: dto.notes,
+      paymentMethod: dto.paymentMethod ?? 'especes',
       status: 'pending',
     });
 
