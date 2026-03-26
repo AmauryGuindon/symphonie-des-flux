@@ -22,7 +22,7 @@ export class CreateManualVisitDto {
 
   @IsString()
   @IsOptional()
-  @IsIn(['especes', 'virement', 'en_ligne'])
+  @IsIn(['especes', 'virement'])
   paymentMethod?: string;
 
   @IsDateString()

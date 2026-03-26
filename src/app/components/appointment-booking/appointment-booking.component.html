@@ -209,16 +209,7 @@
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
                       Virement
                     </button>
-                    <button
-                      class="appt__pay-opt"
-                      [class.appt__pay-opt--selected]="paymentMethod === 'en_ligne'"
-                      (click)="paymentMethod = 'en_ligne'"
-                      type="button"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                      En ligne
-                    </button>
-                    <button
+<button
                       class="appt__pay-opt appt__pay-opt--points"
                       [class.appt__pay-opt--selected]="paymentMethod === 'points'"
                       [class.appt__pay-opt--points-locked]="!canPayWithPoints()"
