@@ -218,23 +218,93 @@ export class AppointmentsService {
     const [year, month, day] = appt.date.split('-');
     const dateStr = `${day}/${month}/${year}`;
 
+    const paymentLabels: Record<string, string> = {
+      especes: 'Espèces',
+      virement: 'Virement bancaire',
+      en_ligne: 'Paiement en ligne',
+      points: 'Points fidélité',
+    };
+    const paymentLabel = paymentLabels[appt.paymentMethod] ?? appt.paymentMethod;
+
+    const dur = (appt as any).duration as number | undefined;
+    let endTimeStr = '';
+    if (dur) {
+      const [h, m] = appt.time.split(':').map(Number);
+      const endMin = h * 60 + m + dur;
+      endTimeStr = `${String(Math.floor(endMin / 60)).padStart(2, '0')}:${String(endMin % 60).padStart(2, '0')}`;
+    }
+
+    const row = (label: string, value: string) =>
+      `<tr>
+        <td style="padding:12px 16px;color:#666;font-size:14px;border-bottom:1px solid #f0f0f0;white-space:nowrap">${label}</td>
+        <td style="padding:12px 16px;font-size:14px;font-weight:600;color:#1a1a1a;border-bottom:1px solid #f0f0f0">${value}</td>
+      </tr>`;
+
     await this.transporter.sendMail({
       from: `"Dany1st Barber" <${process.env.SMTP_USER}>`,
       to,
-      subject: 'Confirmation de votre rendez-vous — Dany1st Barber',
+      subject: `Votre RDV du ${dateStr} à ${appt.time} — Dany1st Barber`,
       html: `
-        <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto">
-          <h2 style="color:#C9A44A">Dany1st Barber</h2>
-          <p>Bonjour <strong>${name}</strong>,</p>
-          <p>Votre rendez-vous a bien été enregistré :</p>
-          <table style="border-collapse:collapse;width:100%">
-            <tr><td style="padding:8px;color:#555">Prestation</td><td style="padding:8px"><strong>${appt.serviceType}</strong></td></tr>
-            <tr><td style="padding:8px;color:#555">Date</td><td style="padding:8px"><strong>${dateStr}</strong></td></tr>
-            <tr><td style="padding:8px;color:#555">Heure</td><td style="padding:8px"><strong>${appt.time}</strong></td></tr>
-          </table>
-          <p style="color:#888;font-size:13px">Si vous souhaitez modifier ou annuler votre rendez-vous, connectez-vous à votre espace client.</p>
-          <p>À bientôt,<br><strong>Dany1st Barber</strong><br>Tournan-en-Brie</p>
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+
+    <!-- Header -->
+    <div style="background:#1a1a1a;padding:28px 32px;text-align:center">
+      <div style="font-size:22px;font-weight:700;letter-spacing:3px;color:#ffffff">
+        DANY<span style="color:#C9A44A">1ST</span>
+      </div>
+      <div style="font-size:11px;letter-spacing:2px;color:#888;margin-top:4px;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
+    </div>
+
+    <!-- Gold bar -->
+    <div style="height:3px;background:linear-gradient(90deg,#C9A44A,#e8c870,#C9A44A)"></div>
+
+    <!-- Body -->
+    <div style="padding:32px">
+      <p style="margin:0 0 8px;font-size:16px;color:#1a1a1a">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
+        Votre rendez-vous a bien été enregistré. Nous avons hâte de vous accueillir !
+      </p>
+
+      <!-- Details card -->
+      <div style="background:#fafafa;border:1px solid #ebebeb;border-radius:6px;overflow:hidden;margin-bottom:24px">
+        <div style="background:#C9A44A;padding:10px 16px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#1a1a1a;text-transform:uppercase">Récapitulatif</span>
         </div>
+        <table style="width:100%;border-collapse:collapse">
+          ${row('Prestation', appt.serviceType)}
+          ${row('Date', dateStr)}
+          ${row('Heure', endTimeStr ? `${appt.time} – ${endTimeStr}` : appt.time)}
+          ${row('Règlement', paymentLabel)}
+        </table>
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align:center;margin-bottom:24px">
+        <a href="${process.env.APP_URL ?? 'http://localhost:4200'}/appointment"
+           style="display:inline-block;background:#C9A44A;color:#1a1a1a;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1px;padding:12px 28px;border-radius:4px;text-transform:uppercase">
+          Gérer mon rendez-vous
+        </a>
+      </div>
+
+      <p style="margin:0;font-size:12px;color:#aaa;line-height:1.6;text-align:center">
+        Besoin d'annuler ou de reporter ? Connectez-vous à votre espace client<br>jusqu'à 24h avant votre rendez-vous.
+      </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="background:#f8f8f8;border-top:1px solid #ebebeb;padding:16px 32px;text-align:center">
+      <p style="margin:0;font-size:11px;color:#bbb;letter-spacing:0.5px">
+        © Dany1st Barber · Tournan-en-Brie
+      </p>
+    </div>
+
+  </div>
+</body>
+</html>
       `,
     });
   }
