@@ -1,6 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AppointmentService } from '../../services/appointment.service';
+import { RouterLink } from '@angular/router';
 
 const ICONS: Record<string, string> = {
   'Coupe': '✦',
@@ -14,18 +15,18 @@ const ICONS: Record<string, string> = {
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './services.component.html',
   styleUrl: './services.component.scss',
 })
 export class ServicesComponent implements OnInit {
   services = signal<any[]>([]);
 
-  constructor(private appointmentService: AppointmentService) {}
+  constructor(private appointmentService: AppointmentService) { }
 
   ngOnInit() {
     this.appointmentService.getPublicServices()
-      .subscribe({ next: s => this.services.set(s), error: () => {} });
+      .subscribe({ next: s => this.services.set(s), error: () => { } });
   }
 
   iconFor(name: string): string {
