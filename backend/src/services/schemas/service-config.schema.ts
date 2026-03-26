@@ -14,6 +14,9 @@ export class ServiceConfig {
   @Prop({ required: true, min: 0 })
   loyaltyPoints: number;
 
+  @Prop({ default: 0 })
+  duration: number;
+
   @Prop({ default: true })
   active: boolean;
 }

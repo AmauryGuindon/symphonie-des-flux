@@ -37,16 +37,21 @@
               @for (svc of services(); track svc._id) {
                 <button
                   class="appt__svc"
-                  [class.appt__svc--selected]="selectedService === svc.name"
-                  (click)="selectedService = svc.name"
+                  [class.appt__svc--selected]="selectedService() === svc.name"
+                  (click)="selectedService.set(svc.name)"
                 >
                   <span class="appt__svc-name">{{ svc.name }}</span>
-                  <span class="appt__svc-price">{{ svc.price }} €</span>
+                  <span class="appt__svc-meta">
+                    @if (svc.duration) {
+                      <span class="appt__svc-duration">{{ svc.duration }} min</span>
+                    }
+                    <span class="appt__svc-price">{{ svc.price }} €</span>
+                  </span>
                 </button>
               }
             </div>
 
-            @if (isAuth() && selectedService) {
+            @if (isAuth() && selectedService()) {
               <div class="appt__points-hint" [class.appt__points-hint--ok]="canPayWithPoints()">
                 @if (canPayWithPoints()) {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
@@ -59,30 +64,31 @@
             }
           </div>
 
-          <div class="appt__card">
-            <h3 class="appt__card-title">
-              <span class="appt__step">2</span>
-              Choisissez une date
-            </h3>
-            <div class="appt__cal-nav">
-              <button class="appt__cal-arrow" (click)="prevMonth()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
-              </button>
-              <span class="appt__cal-month">{{ monthLabel }}</span>
-              <button class="appt__cal-arrow" (click)="nextMonth()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
-            <div class="appt__cal-grid">
-              @for (day of ['Lu','Ma','Me','Je','Ve','Sa','Di']; track day) {
-                <div class="appt__cal-head">{{ day }}</div>
-              }
-              @for (d of calendarDays(); track $index) {
-                @if (d === null) {
-                  <div class="appt__cal-cell appt__cal-cell--empty"></div>
-                } @else {
+          <div class="appt__card appt__datepick appt__datepick--split">
+
+            <!-- Calendrier -->
+            <div class="appt__datepick-cal">
+              <h3 class="appt__card-title">
+                <span class="appt__step">2</span>
+                Choisissez une date
+              </h3>
+              <div class="appt__cal-nav">
+                <button class="appt__cal-arrow" (click)="prevMonth()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span class="appt__cal-month">{{ monthLabel }}</span>
+                <button class="appt__cal-arrow" (click)="nextMonth()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              <div class="appt__cal-grid">
+                @for (day of ['Lu','Ma','Me','Je','Ve','Sa','Di']; track day) {
+                  <div class="appt__cal-head">{{ day }}</div>
+                }
+                @for (d of calendarDays(); track $index) {
                   <div
                     class="appt__cal-cell"
+                    [class.appt__cal-cell--other-month]="d.getMonth() !== currentMonth().getMonth()"
                     [class.appt__cal-cell--past]="isPast(d)"
                     [class.appt__cal-cell--closed]="isClosedDay(d)"
                     [class.appt__cal-cell--selected]="selectedDate() === toDateString(d)"
@@ -90,39 +96,51 @@
                     (click)="selectDate(d)"
                   >{{ d.getDate() }}</div>
                 }
-              }
+              </div>
             </div>
-            <p class="appt__cal-legend">Réservation à partir du lendemain</p>
-          </div>
 
-          @if (selectedDate()) {
-            <div class="appt__card">
-              <h3 class="appt__card-title">
-                <span class="appt__step">3</span>
-                Créneaux disponibles — {{ formatDate(selectedDate()!) }}
-              </h3>
-              @if (slotsLoading()) {
-                <div class="appt__slots-loading">
-                  <span class="appt__spinner"></span>
-                  Chargement…
-                </div>
-              } @else if (closed()) {
-                <p class="appt__closed">Fermé ce jour-là.</p>
-              } @else {
-                <div class="appt__slots">
-                  @for (slot of slots(); track slot.time) {
-                    <button
-                      class="appt__slot"
-                      [class.appt__slot--taken]="!slot.available"
-                      [class.appt__slot--selected]="selectedTime() === slot.time"
-                      [disabled]="!slot.available"
-                      (click)="selectedTime.set(slot.time)"
-                    >{{ slot.time }}</button>
-                  }
-                </div>
-              }
-            </div>
-          }
+            <!-- Créneaux (à droite du calendrier) -->
+            @if (!selectedDate()) {
+              <div class="appt__datepick-slots appt__datepick-slots--empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="32" height="32"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <p>Sélectionnez une date<br>pour voir les créneaux</p>
+              </div>
+            } @else {
+              <div class="appt__datepick-slots">
+                <h3 class="appt__card-title">
+                  <span class="appt__step">3</span>
+                  {{ formatDate(selectedDate()!) }}
+                </h3>
+                @if (slotsLoading()) {
+                  <div class="appt__slots-loading">
+                    <span class="appt__spinner"></span> Chargement…
+                  </div>
+                } @else if (closed() || allSlotsTaken()) {
+                  <div class="appt__no-slots">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+                    <p>{{ closed() ? 'Fermé ce jour-là.' : 'Aucun créneau disponible.' }}</p>
+                    <button class="appt__next-month-btn" (click)="nextMonth(); selectedDate.set(null); selectedTime.set(null)">
+                      Voir le mois suivant
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
+                  </div>
+                } @else {
+                  <div class="appt__slots">
+                    @for (slot of slots(); track slot.time) {
+                      <button
+                        class="appt__slot"
+                        [class.appt__slot--taken]="!slot.available"
+                        [class.appt__slot--selected]="selectedTime() === slot.time"
+                        [disabled]="!slot.available"
+                        (click)="selectedTime.set(slot.time)"
+                      >{{ slot.time }}</button>
+                    }
+                  </div>
+                }
+              </div>
+            }
+
+          </div>
         </div>
 
         <!-- Droite : récapitulatif -->
@@ -154,9 +172,9 @@
               }
 
               <div class="appt__summary-rows">
-                <div class="appt__summary-row" [class.appt__summary-row--filled]="selectedService">
+                <div class="appt__summary-row" [class.appt__summary-row--filled]="selectedService()">
                   <span class="appt__summary-key">Prestation</span>
-                  <span class="appt__summary-val">{{ selectedService || '—' }}</span>
+                  <span class="appt__summary-val">{{ selectedService() || '—' }}</span>
                 </div>
                 <div class="appt__summary-row" [class.appt__summary-row--filled]="selectedDate()">
                   <span class="appt__summary-key">Date</span>
@@ -237,7 +255,7 @@
                 <button
                   class="appt__btn appt__btn--primary appt__btn--full"
                   (click)="book()"
-                  [disabled]="bookLoading() || !selectedDate() || !selectedTime() || !selectedService || !paymentMethod"
+                  [disabled]="bookLoading() || !selectedDate() || !selectedTime() || !selectedService() || !paymentMethod"
                 >
                   @if (bookLoading()) {
                     <span class="appt__btn-spinner"></span> Réservation en cours…

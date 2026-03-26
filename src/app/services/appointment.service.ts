@@ -33,7 +33,7 @@ export class AppointmentService {
   constructor(private http: HttpClient) {}
 
   getPublicServices() {
-    return this.http.get<{ _id: string; name: string; price: number; loyaltyPoints: number }[]>(`${API}/appointments/services`);
+    return this.http.get<{ _id: string; name: string; price: number; loyaltyPoints: number; duration: number }[]>(`${API}/appointments/services`);
   }
 
   getSlots(date: string) {

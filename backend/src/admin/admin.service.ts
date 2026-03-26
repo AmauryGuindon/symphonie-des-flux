@@ -12,13 +12,11 @@ import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
 import { LOYALTY_POINTS_PER_VISIT } from '../common/enums/role.enum';
 
 const DEFAULT_SERVICES = [
-  { name: 'Coupe',                        price: 20, loyaltyPoints: 10 },
-  { name: 'Coupe + Barbe',                price: 25, loyaltyPoints: 13 },
-  { name: 'Barbe seule',                  price: 15, loyaltyPoints: 8  },
-  { name: 'Coupe enfant',                 price: 12, loyaltyPoints: 6  },
-  { name: 'Contours (Cheveux ou Barbe)',  price: 8,  loyaltyPoints: 4  },
-  { name: 'Coupe + Dégradé',             price: 22, loyaltyPoints: 12 },
-  { name: 'Dégradé',                      price: 18, loyaltyPoints: 9  },
+  { name: 'Coupe + Taille de Barbe',      price: 25, loyaltyPoints: 13, duration: 55 },
+  { name: 'Coupe adulte',                 price: 20, loyaltyPoints: 10, duration: 40 },
+  { name: 'Taille de barbe',              price: 15, loyaltyPoints: 8,  duration: 30 },
+  { name: 'Coupe enfant (4 à 12ans)',     price: 12, loyaltyPoints: 6,  duration: 30 },
+  { name: 'Contours (Cheveux ou Barbe)',  price: 8,  loyaltyPoints: 4,  duration: 15 },
 ];
 
 @Injectable()
@@ -34,16 +32,14 @@ export class AdminService implements OnModuleInit {
     for (const s of DEFAULT_SERVICES) {
       await this.serviceConfigModel.findOneAndUpdate(
         { name: s.name },
-        { $set: { price: s.price, loyaltyPoints: s.loyaltyPoints }, $setOnInsert: { name: s.name, active: true } },
+        { $set: { price: s.price, loyaltyPoints: s.loyaltyPoints, duration: s.duration }, $setOnInsert: { name: s.name, active: true } },
         { upsert: true },
       );
     }
 
-    // Migration : backfiller active: true sur les services déjà seedés
-    await this.serviceConfigModel.updateMany(
-      { active: { $exists: false } },
-      { $set: { active: true } },
-    );
+    // Supprimer les services qui ne sont plus dans la liste officielle
+    const activeNames = DEFAULT_SERVICES.map(s => s.name);
+    await this.serviceConfigModel.deleteMany({ name: { $nin: activeNames } });
   }
 
   // ── Dashboard ─────────────────────────────────────────────────────────────

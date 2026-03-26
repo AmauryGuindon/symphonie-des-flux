@@ -18,16 +18,20 @@ export class AppointmentBookingComponent implements OnInit {
   userPoints = computed(() => this.auth.user()?.loyaltyPoints ?? 0);
 
   // Services
-  services = signal<{ _id: string; name: string; price: number }[]>([]);
-  selectedService = '';
+  services = signal<{ _id: string; name: string; price: number; duration: number }[]>([]);
+  selectedService = signal('');
 
   selectedServiceObj = computed(() =>
-    this.services().find(s => s.name === this.selectedService) ?? null,
+    this.services().find(s => s.name === this.selectedService()) ?? null,
   );
   requiredPoints = computed(() => (this.selectedServiceObj()?.price ?? 0) * 10);
   pointsNeeded = computed(() => Math.max(0, this.requiredPoints() - this.userPoints()));
   canPayWithPoints = computed(() =>
     this.isAuth() && this.requiredPoints() > 0 && this.userPoints() >= this.requiredPoints(),
+  );
+
+  allSlotsTaken = computed(() =>
+    this.slots().length > 0 && this.slots().every(s => !s.available),
   );
 
   // Schedule config (dynamic from API)
@@ -44,7 +48,7 @@ export class AppointmentBookingComponent implements OnInit {
   currentMonth = signal(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
   selectedDate = signal<string | null>(null);
 
-  calendarDays = computed(() => this.buildCalendar(this.currentMonth()));
+  calendarDays = computed<Date[]>(() => this.buildCalendar(this.currentMonth()));
 
   // Slots
   slots = signal<TimeSlot[]>([]);
@@ -82,7 +86,7 @@ export class AppointmentBookingComponent implements OnInit {
     this.appointmentService.getPublicServices().subscribe({
       next: s => {
         this.services.set(s);
-        if (s.length) this.selectedService = s[0].name;
+        if (s.length) this.selectedService.set(s[0].name);
       },
     });
     this.appointmentService.getPublicSchedule().subscribe({
@@ -95,16 +99,27 @@ export class AppointmentBookingComponent implements OnInit {
 
   // ── Calendar ──────────────────────────────────────────────────────────────
 
-  private buildCalendar(firstOfMonth: Date): (Date | null)[] {
+  private buildCalendar(firstOfMonth: Date): Date[] {
     const year = firstOfMonth.getFullYear();
     const month = firstOfMonth.getMonth();
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const offset = (firstDay + 6) % 7; // lundi = 0
 
-    const offset = (firstDay + 6) % 7;
-    const cells: (Date | null)[] = Array(offset).fill(null);
+    const cells: Date[] = [];
+
+    // Jours du mois précédent pour compléter la première semaine
+    for (let j = 0; j < offset; j++) {
+      cells.push(new Date(year, month, 1 - offset + j));
+    }
+    // Jours du mois courant
     for (let d = 1; d <= daysInMonth; d++) {
       cells.push(new Date(year, month, d));
+    }
+    // Jours du mois suivant pour compléter la dernière semaine
+    const tail = (7 - (cells.length % 7)) % 7;
+    for (let d = 1; d <= tail; d++) {
+      cells.push(new Date(year, month + 1, d));
     }
     return cells;
   }
@@ -173,12 +188,12 @@ export class AppointmentBookingComponent implements OnInit {
     }
     const date = this.selectedDate();
     const time = this.selectedTime();
-    if (!date || !time || !this.selectedService || !this.paymentMethod) return;
+    if (!date || !time || !this.selectedService() || !this.paymentMethod) return;
 
     this.bookLoading.set(true);
     this.bookError.set('');
     this.appointmentService.bookAppointment({
-      serviceType: this.selectedService,
+      serviceType: this.selectedService(),
       date,
       time,
       notes: this.notes || undefined,

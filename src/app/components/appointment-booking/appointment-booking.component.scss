@@ -179,7 +179,8 @@
       border-color: rgba(201,164,74,.45) !important;
       box-shadow: inset 0 0 0 1px rgba(201,164,74,.1);
 
-      .appt__svc-name { color: #e0bb6a; }
+      .appt__svc-name     { color: #e0bb6a; }
+      .appt__svc-duration { color: rgba(201,164,74,.5); }
       .appt__svc-price {
         color: #C9A44A;
         background: rgba(201,164,74,.12);
@@ -196,6 +197,20 @@
     transition: color .18s;
   }
 
+  &__svc-meta {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    flex-shrink: 0;
+  }
+
+  &__svc-duration {
+    font-size: .7rem;
+    color: rgba(255,255,255,.3);
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+
   &__svc-price {
     font-size: .75rem;
     font-weight: 700;
@@ -207,6 +222,101 @@
     padding: .2rem .6rem;
     transition: all .18s;
     letter-spacing: .03em;
+  }
+
+  // ── Datepicker split (calendrier + créneaux côte à côte) ─────────────────
+
+  &__datepick {
+    display: flex;
+    gap: 0;
+
+    &--split {
+      .appt__datepick-cal {
+        flex: 0 0 54%;
+        border-right: 1px solid rgba(255,255,255,.06);
+        padding-right: 1.25rem;
+
+        .appt__cal-cell { font-size: .72rem; }
+        .appt__cal-head { font-size: .6rem; }
+        .appt__cal-nav  { margin-bottom: .75rem; }
+      }
+    }
+
+    @media (max-width: 700px) {
+      flex-direction: column;
+      &--split .appt__datepick-cal {
+        flex: none;
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,.06);
+        padding-right: 0;
+        padding-bottom: 1.25rem;
+      }
+    }
+  }
+
+  &__datepick-cal {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__datepick-slots {
+    flex: 1;
+    min-width: 0;
+    padding-left: 1.25rem;
+    animation: fadeSlots .2s ease;
+
+    .appt__slots { grid-template-columns: repeat(3, 1fr); }
+
+    &--empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .75rem;
+      color: rgba(255,255,255,.15);
+      text-align: center;
+
+      p { font-size: .82rem; line-height: 1.6; margin: 0; }
+    }
+  }
+
+  @keyframes fadeSlots {
+    from { opacity: 0; transform: translateX(6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  &__no-slots {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: .75rem;
+    padding: 1.5rem 0;
+    color: rgba(255,255,255,.3);
+
+    p { font-size: .85rem; margin: 0; }
+  }
+
+  &__next-month-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: rgba(201,164,74,.1);
+    border: 1px solid rgba(201,164,74,.3);
+    color: #C9A44A;
+    font-size: .78rem;
+    font-weight: 700;
+    padding: .5rem 1.1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .03em;
+
+    &:hover {
+      background: rgba(201,164,74,.18);
+      border-color: #C9A44A;
+    }
   }
 
   // ── Calendar ──────────────────────────────────────────────────────────────
@@ -286,7 +396,8 @@
       box-shadow: 0 0 0 3px rgba(201,164,74,.2);
     }
 
-    &--past  { color: rgba(255,255,255,.1); pointer-events: none; }
+    &--past         { color: rgba(255,255,255,.1); pointer-events: none; }
+    &--other-month  { opacity: .55; }
     &--closed {
       color: rgba(255,255,255,.08);
       pointer-events: none;
