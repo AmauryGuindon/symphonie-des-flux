@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { User, UserSchema } from './schemas/user.schema';
 import { Visit, VisitSchema } from '../visits/schemas/visit.schema';
+import { LoyaltyScheduler } from './loyalty-scheduler';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { Visit, VisitSchema } from '../visits/schemas/visit.schema';
       { name: Visit.name, schema: VisitSchema },
     ]),
   ],
-  providers: [UsersService],
+  providers: [UsersService, LoyaltyScheduler],
   controllers: [UsersController],
   exports: [UsersService],
 })

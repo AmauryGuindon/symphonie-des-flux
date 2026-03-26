@@ -97,6 +97,37 @@ export class AccountComponent implements OnInit {
     return `${cfg.next - u.visitCount} visite(s) avant le prochain palier`;
   });
 
+  /** Jours restants avant l'anniversaire d'inscription (reset points + dégradation palier) */
+  daysUntilAnniversary = computed(() => {
+    const u = this.user();
+    if (!u?.createdAt) return null;
+    const created = new Date(u.createdAt);
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let anniversary = new Date(now.getFullYear(), created.getMonth(), created.getDate());
+    if (anniversary < todayStart) {
+      anniversary = new Date(now.getFullYear() + 1, created.getMonth(), created.getDate());
+    }
+    return Math.ceil((anniversary.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+  });
+
+  /** Date de remise à zéro des points (prochain anniversaire d'inscription) */
+  nextResetDate = computed(() => {
+    const u = this.user();
+    if (!u?.createdAt) return null;
+    const created = new Date(u.createdAt);
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let anniversary = new Date(now.getFullYear(), created.getMonth(), created.getDate());
+    if (anniversary < todayStart) {
+      anniversary = new Date(now.getFullYear() + 1, created.getMonth(), created.getDate());
+    }
+    const d = anniversary.getDate().toString().padStart(2, '0');
+    const m = (anniversary.getMonth() + 1).toString().padStart(2, '0');
+    const y = anniversary.getFullYear();
+    return `${d}/${m}/${y}`;
+  });
+
   upcomingAppointments = computed(() =>
     this.appointments().filter(a => a.status !== 'cancelled' && a.date >= this.today()),
   );

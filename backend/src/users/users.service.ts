@@ -15,6 +15,7 @@ import {
   LOYALTY_REFERRAL_BONUS,
   LOYALTY_BIRTHDAY_BONUS,
   LOYALTY_TIER_BONUS,
+  LoyaltyTier,
   computeTier,
 } from '../common/enums/role.enum';
 
@@ -175,6 +176,52 @@ export class UsersService {
     return this.userModel
       .findByIdAndUpdate(userId, { $inc: { loyaltyPoints: -points } }, { new: true })
       .select('-password');
+  }
+
+  async evaluateAnniversaryDegradations(): Promise<number> {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    const year = today.getFullYear();
+
+    // Utilisateurs dont l'anniversaire d'inscription est aujourd'hui (créés une année précédente)
+    const users = await this.userModel
+      .find({
+        $expr: {
+          $and: [
+            { $eq: [{ $month: '$createdAt' }, month] },
+            { $eq: [{ $dayOfMonth: '$createdAt' }, day] },
+            { $lt: [{ $year: '$createdAt' }, year] },
+          ],
+        },
+      })
+      .select('loyaltyTier');
+
+    const tierDowngrade: Partial<Record<LoyaltyTier, LoyaltyTier>> = {
+      [LoyaltyTier.PLATINUM]: LoyaltyTier.GOLD,
+      [LoyaltyTier.GOLD]:     LoyaltyTier.SILVER,
+      [LoyaltyTier.SILVER]:   LoyaltyTier.BRONZE,
+    };
+
+    // Plancher de visitCount pour chaque palier (cohérence après dégradation)
+    const tierFloors: Record<LoyaltyTier, number> = {
+      [LoyaltyTier.BRONZE]:    0,
+      [LoyaltyTier.SILVER]:    5,
+      [LoyaltyTier.GOLD]:     15,
+      [LoyaltyTier.PLATINUM]: 30,
+    };
+
+    for (const user of users) {
+      const newTier = tierDowngrade[user.loyaltyTier] ?? user.loyaltyTier;
+      const update: Record<string, unknown> = { loyaltyPoints: 0 };
+      if (newTier !== user.loyaltyTier) {
+        update.loyaltyTier = newTier;
+        update.visitCount = tierFloors[newTier];
+      }
+      await this.userModel.findByIdAndUpdate(user._id, update);
+    }
+
+    return users.length;
   }
 
   async setResetToken(userId: string, token: string, expiry: Date) {

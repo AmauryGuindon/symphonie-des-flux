@@ -657,6 +657,23 @@
     svg { stroke: var(--gold); opacity: .8; }
   }
 
+  &__expiry-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: .4rem;
+    padding: .45rem .75rem;
+    background: rgba(201,164,74,.05);
+    border: 1px solid rgba(201,164,74,.25);
+    border-radius: 7px;
+    margin-bottom: 1rem;
+    font-size: .68rem;
+    font-family: var(--font-body);
+    color: #c9a44a;
+    line-height: 1.4;
+    svg { flex-shrink: 0; margin-top: .1rem; stroke: #c9a44a; }
+    strong { color: var(--white); }
+  }
+
   // ── Notes ─────────────────────────────────────────────────────────────────
 
   &__notes-field {
