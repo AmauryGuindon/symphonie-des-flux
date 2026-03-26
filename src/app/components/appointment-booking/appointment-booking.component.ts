@@ -127,10 +127,10 @@ export class AppointmentBookingComponent implements OnInit {
     this.slots.set([]);
   }
 
-  // Bloque le jour même et tous les jours passés
+  // Bloque uniquement les jours strictement passés (aujourd'hui reste sélectionnable)
   isPast(d: Date): boolean {
     const today = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
-    return d <= today;
+    return d < today;
   }
 
   isClosedDay(d: Date): boolean {
