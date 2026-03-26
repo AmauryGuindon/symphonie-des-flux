@@ -103,6 +103,8 @@ export class AccountComponent implements OnInit {
     if (!u?.createdAt) return null;
     const created = new Date(u.createdAt);
     const now = new Date();
+    // Pas d'avertissement si compte créé cette année (pas encore de 1er anniversaire)
+    if (created.getFullYear() === now.getFullYear()) return null;
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let anniversary = new Date(now.getFullYear(), created.getMonth(), created.getDate());
     if (anniversary < todayStart) {
@@ -117,6 +119,7 @@ export class AccountComponent implements OnInit {
     if (!u?.createdAt) return null;
     const created = new Date(u.createdAt);
     const now = new Date();
+    if (created.getFullYear() === now.getFullYear()) return null;
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let anniversary = new Date(now.getFullYear(), created.getMonth(), created.getDate());
     if (anniversary < todayStart) {

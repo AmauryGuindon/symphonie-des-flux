@@ -22,6 +22,7 @@ export class AppointmentBookingComponent implements OnInit {
     if (!u?.createdAt) return null;
     const created = new Date(u.createdAt);
     const now = new Date();
+    if (created.getFullYear() === now.getFullYear()) return null;
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let anniversary = new Date(now.getFullYear(), created.getMonth(), created.getDate());
     if (anniversary < todayStart) {
@@ -35,6 +36,7 @@ export class AppointmentBookingComponent implements OnInit {
     if (!u?.createdAt) return null;
     const created = new Date(u.createdAt);
     const now = new Date();
+    if (created.getFullYear() === now.getFullYear()) return null;
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     let anniversary = new Date(now.getFullYear(), created.getMonth(), created.getDate());
     if (anniversary < todayStart) {
