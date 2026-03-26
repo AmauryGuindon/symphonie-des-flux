@@ -22,6 +22,9 @@ import { AdminAccountingComponent } from './components/admin/accounting/accounti
 import { AdminServicesComponent } from './components/admin/services/services.component';
 import { AdminGalleryComponent } from './components/admin/gallery/gallery.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { MentionsLegalesComponent } from './components/legal/mentions-legales/mentions-legales.component';
+import { CguComponent } from './components/legal/cgu/cgu.component';
+import { CgvComponent } from './components/legal/cgv/cgv.component';
 import { authGuard, adminGuard, guestGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -54,5 +57,8 @@ export const routes: Routes = [
       { path: 'gallery', component: AdminGalleryComponent },
     ],
   },
+  { path: 'mentions-legales', component: MentionsLegalesComponent },
+  { path: 'cgu', component: CguComponent },
+  { path: 'cgv', component: CgvComponent },
   { path: '**', component: NotFoundComponent },
 ];

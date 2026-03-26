@@ -203,6 +203,28 @@
     color: rgba(245, 240, 232, 0.2);
   }
 
+  &__legal {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .68rem;
+    letter-spacing: .08em;
+
+    a {
+      color: rgba(245, 240, 232, .25);
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: color .2s;
+      &:hover { color: var(--gold); }
+    }
+
+    span {
+      color: rgba(245, 240, 232, .1);
+    }
+
+    @media (max-width: 480px) { display: none; }
+  }
+
   &__back-top {
     width: 36px;
     height: 36px;
