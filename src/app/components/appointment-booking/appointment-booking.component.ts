@@ -180,6 +180,12 @@ export class AppointmentBookingComponent implements OnInit {
     return d < today;
   }
 
+  isToday(d: Date): boolean {
+    return d.getFullYear() === this.today.getFullYear()
+      && d.getMonth() === this.today.getMonth()
+      && d.getDate() === this.today.getDate();
+  }
+
   isClosedDay(d: Date): boolean {
     const weekday = d.getDay();
     const ds = this.toDateString(d);

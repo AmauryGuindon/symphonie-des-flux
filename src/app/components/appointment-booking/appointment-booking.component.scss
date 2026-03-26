@@ -396,6 +396,12 @@
       box-shadow: 0 0 0 3px rgba(201,164,74,.2);
     }
 
+    &--today {
+      box-shadow: 0 0 0 1.5px #C9A44A;
+      color: #C9A44A;
+      font-weight: 700;
+    }
+
     &--past         { color: rgba(255,255,255,.1); pointer-events: none; }
     &--other-month  { opacity: .55; }
     &--closed {

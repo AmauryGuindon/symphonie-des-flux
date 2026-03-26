@@ -80,10 +80,21 @@ export class AppointmentsService {
       }),
     );
 
+    // Pour aujourd'hui : calcul des minutes actuelles pour bloquer les créneaux passés
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const isToday = date === todayStr;
+    const currentMinutes = isToday ? now.getHours() * 60 + now.getMinutes() : -1;
+
     const slots = allSlots.map(time => {
       const [h, m] = time.split(':').map(Number);
       const slotStart = h * 60 + m;
       const slotEnd = slotStart + serviceDuration;
+
+      // Créneau passé (aujourd'hui seulement)
+      if (isToday && slotStart <= currentMinutes) {
+        return { time, available: false };
+      }
 
       // Service window must not overlap with the break
       if (breakStartMin >= 0 && slotStart < breakEndMin && slotEnd > breakStartMin) {

@@ -91,6 +91,7 @@
                     [class.appt__cal-cell--other-month]="d.getMonth() !== currentMonth().getMonth()"
                     [class.appt__cal-cell--past]="isPast(d)"
                     [class.appt__cal-cell--closed]="isClosedDay(d)"
+                    [class.appt__cal-cell--today]="isToday(d)"
                     [class.appt__cal-cell--selected]="selectedDate() === toDateString(d)"
                     [class.appt__cal-cell--selectable]="!isPast(d) && !isClosedDay(d)"
                     (click)="selectDate(d)"
