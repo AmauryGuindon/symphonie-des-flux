@@ -21,257 +21,248 @@
     </div>
 
     @if (period() === 'month') {
-      <input type="month" class="acct__date-input" [value]="selectedDate()"
-        (change)="selectedDate.set($any($event.target).value); load()" />
+    <input type="month" class="acct__date-input" [value]="selectedDate()"
+      (change)="selectedDate.set($any($event.target).value); load()" />
     }
     @if (period() === 'quarter') {
-      <select class="acct__date-input" [value]="selectedDate()"
-        (change)="selectedDate.set($any($event.target).value); load()">
-        @for (q of quarterOptions(); track q) {
-          <option [value]="q">{{ q.replace('Q','T') }}</option>
-        }
-      </select>
+    <select class="acct__date-input" [value]="selectedDate()"
+      (change)="selectedDate.set($any($event.target).value); load()">
+      @for (q of quarterOptions(); track q) {
+      <option [value]="q">{{ q.replace('Q','T') }}</option>
+      }
+    </select>
     }
     @if (period() === 'year') {
-      <select class="acct__date-input" [value]="selectedDate()"
-        (change)="selectedDate.set($any($event.target).value); load()">
-        @for (y of yearOptions; track y) {
-          <option [value]="y">{{ y }}</option>
-        }
-      </select>
+    <select class="acct__date-input" [value]="selectedDate()"
+      (change)="selectedDate.set($any($event.target).value); load()">
+      @for (y of yearOptions; track y) {
+      <option [value]="y">{{ y }}</option>
+      }
+    </select>
     }
   </div>
 
   @if (loading()) {
-    <div class="acct__loading">Chargement...</div>
+  <div class="acct__loading">Chargement...</div>
   } @else if (data()) {
 
-    <!-- KPIs -->
-    <div class="acct__kpis">
-      <div class="acct__kpi">
-        <span class="acct__kpi-label">{{ period() === 'month' ? 'Ce mois' : period() === 'quarter' ? 'Ce trimestre' : 'Cette année' }}</span>
-        <span class="acct__kpi-value">{{ data()!.kpis.revenue | number:'1.0-0' }} €</span>
-        <span class="acct__kpi-sub">{{ data()!.kpis.visits }} visite{{ data()!.kpis.visits > 1 ? 's' : '' }}</span>
-      </div>
-      <div class="acct__kpi">
-        <span class="acct__kpi-label">Trimestre en cours</span>
-        <span class="acct__kpi-value">{{ data()!.kpis.quarter | number:'1.0-0' }} €</span>
-      </div>
-      <div class="acct__kpi">
-        <span class="acct__kpi-label">Année en cours</span>
-        <span class="acct__kpi-value">{{ data()!.kpis.year | number:'1.0-0' }} €</span>
-      </div>
-      <div class="acct__kpi">
-        <span class="acct__kpi-label">Nb visites</span>
-        <span class="acct__kpi-value">{{ data()!.kpis.visits }}</span>
-      </div>
+  <!-- KPIs -->
+  <div class="acct__kpis">
+    <div class="acct__kpi">
+      <span class="acct__kpi-label">{{ period() === 'month' ? 'Ce mois' : period() === 'quarter' ? 'Ce trimestre' :
+        'Cette année' }}</span>
+      <span class="acct__kpi-value">{{ data()!.kpis.revenue | number:'1.0-0' }} €</span>
+      <span class="acct__kpi-sub">{{ data()!.kpis.visits }} visite{{ data()!.kpis.visits > 1 ? 's' : '' }}</span>
     </div>
-
-    <!-- Breakdowns -->
-    <div class="acct__breakdowns">
-
-      <!-- Par prestation -->
-      <div class="acct__card">
-        <div class="acct__card-title">Revenus par prestation</div>
-        @for (s of data()!.byService; track s._id) {
-          <div class="acct__service-row">
-            <div class="acct__service-info">
-              <span class="acct__service-name-wrap">
-                <span class="acct__service-dot" [style.background]="serviceColor(s._id)"></span>
-                <span class="acct__service-name" [style.color]="serviceColor(s._id)">{{ s._id }}</span>
-              </span>
-              <span class="acct__service-amount" [style.color]="serviceColor(s._id)">{{ s.total | number:'1.0-0' }} €</span>
-            </div>
-            <div class="acct__bar-track">
-              <div class="acct__bar-fill" [style.width]="barWidth(s.total)" [style.background]="serviceColor(s._id)"></div>
-            </div>
-          </div>
-        }
-        @if (!data()!.byService.length) {
-          <p class="acct__empty">Aucune visite sur cette période.</p>
-        }
-      </div>
-
-      <!-- Par paiement -->
-      <div class="acct__card">
-        <div class="acct__card-title">Par mode de paiement</div>
-        @for (p of data()!.byPayment; track p._id) {
-          <div class="acct__payment-row">
-            <div class="acct__payment-dot" [style.background]="paymentColor(p._id)"></div>
-            <span class="acct__payment-label" [style.color]="paymentColor(p._id)">{{ paymentLabel(p._id) }}</span>
-            <span class="acct__payment-amount" [style.color]="paymentColor(p._id)">{{ p.total | number:'1.0-0' }} €</span>
-            <span class="acct__payment-pct">{{ totalPayments() > 0 ? ((p.total / totalPayments()) * 100 | number:'1.0-0') : 0 }}%</span>
-          </div>
-        }
-      </div>
+    <div class="acct__kpi">
+      <span class="acct__kpi-label">Trimestre en cours</span>
+      <span class="acct__kpi-value">{{ data()!.kpis.quarter | number:'1.0-0' }} €</span>
     </div>
+    <div class="acct__kpi">
+      <span class="acct__kpi-label">Année en cours</span>
+      <span class="acct__kpi-value">{{ data()!.kpis.year | number:'1.0-0' }} €</span>
+    </div>
+    <div class="acct__kpi">
+      <span class="acct__kpi-label">Nb visites</span>
+      <span class="acct__kpi-value">{{ data()!.kpis.visits }}</span>
+    </div>
+  </div>
 
-    <!-- CA journalier -->
-    @if (revenueByDay().length > 0) {
-      <div class="acct__card acct__daily-card">
-        <div class="acct__card-title">CA journalier <span class="acct__card-title-sub">7 derniers jours</span></div>
-        <div class="acct__daily-list">
-          @for (row of revenueByDay(); track row.date) {
-            <div class="acct__daily-entry">
-              <div class="acct__daily-row"
-                [class.acct__daily-row--today]="row.date === todayStr"
-                [class.acct__daily-row--open]="expandedDay() === row.date"
-                (click)="toggleDay(row.date)">
-                <span class="acct__daily-date">{{ formatDayLabel(row.date) }}</span>
-                <span class="acct__daily-bar-wrap">
-                  <span class="acct__daily-bar" [style.width.%]="row.total / maxDayRevenue() * 100"></span>
-                </span>
-                <span class="acct__daily-count">{{ row.visits.length }} client{{ row.visits.length > 1 ? 's' : '' }}</span>
-                <span class="acct__daily-amount">{{ row.total }} €</span>
-                <span class="acct__daily-chevron">{{ expandedDay() === row.date ? '▲' : '▼' }}</span>
-              </div>
-              @if (expandedDay() === row.date) {
-                <div class="acct__daily-detail">
-                  @for (v of row.visits; track v._id) {
-                    <div class="acct__daily-visit">
-                      <span class="acct__daily-visit-name">{{ clientLabel(v) }}</span>
-                      <span class="acct__daily-visit-service">{{ v.serviceType }}</span>
-                      <span class="acct__daily-visit-price">{{ v.price }} €</span>
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          }
-        </div>
-      </div>
-    }
-
-    <!-- Historique visites -->
-    <div class="acct__card acct__visits-card">
-      <div class="acct__visits-header">
-        <div class="acct__card-title">Historique des visites</div>
-        <button class="acct__btn-add no-print" (click)="openAddModal()">+ Ajouter une visite</button>
-      </div>
-
-      <table class="acct__table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Client</th>
-            <th>Prestation</th>
-            <th>Paiement</th>
-            <th class="acct__col-amount">Montant</th>
-            <th class="no-print"></th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (v of pagedVisits(); track v._id) {
-            <tr>
-              <td>{{ formatDate(v) }}</td>
-              <td>{{ v.clientName ?? (v.clientId === 'walk-in' ? 'Client anonyme' : v.clientId) }}</td>
-              <td>
-                <span class="acct__badge acct__badge--service" [ngStyle]="serviceBadgeStyles(v.serviceType)">
-                  {{ v.serviceType }}
-                </span>
-              </td>
-              <td>
-                <span class="acct__badge acct__badge--payment" [ngStyle]="paymentBadgeStyles(v.paymentMethod ?? 'especes')">
-                  {{ paymentLabel(v.paymentMethod ?? 'especes') }}
-                </span>
-              </td>
-              <td class="acct__col-amount acct__amount">{{ v.price }} €</td>
-              <td class="no-print">
-                <button class="acct__btn-delete" (click)="deleteVisit(v._id)">Supprimer</button>
-              </td>
-            </tr>
-          }
-          @if (!visits().length) {
-            <tr><td colspan="6" class="acct__empty">Aucune visite.</td></tr>
-          }
-        </tbody>
-      </table>
-
-      @if (visitsTotalPages() > 1) {
-        <div class="acct__pagination no-print">
-          <button
-            class="acct__page-btn acct__page-btn--nav"
-            [disabled]="visitsPage() === 1"
-            (click)="goToVisitsPage(visitsPage() - 1)"
-          >
-            &larr;
-          </button>
-
-          @for (p of visitsPageNumbers(); track p) {
-            <button
-              class="acct__page-btn"
-              [class.acct__page-btn--active]="p === visitsPage()"
-              (click)="goToVisitsPage(p)"
-            >
-              {{ p }}
-            </button>
-          }
-
-          <button
-            class="acct__page-btn acct__page-btn--nav"
-            [disabled]="visitsPage() === visitsTotalPages()"
-            (click)="goToVisitsPage(visitsPage() + 1)"
-          >
-            &rarr;
-          </button>
-
-          <span class="acct__page-info">
-            {{ visitsPageStart() }}-{{ visitsPageEnd() }} sur {{ visits().length }}
+  <!-- CA journalier -->
+  @if (revenueByDay().length > 0) {
+  <div class="acct__card acct__daily-card">
+    <div class="acct__card-title">CA journalier <span class="acct__card-title-sub">7 derniers jours</span></div>
+    <div class="acct__daily-list">
+      @for (row of revenueByDay(); track row.date) {
+      <div class="acct__daily-entry">
+        <div class="acct__daily-row" [class.acct__daily-row--today]="row.date === todayStr"
+          [class.acct__daily-row--open]="expandedDay() === row.date" (click)="toggleDay(row.date)">
+          <span class="acct__daily-date">{{ formatDayLabel(row.date) }}</span>
+          <span class="acct__daily-bar-wrap">
+            <span class="acct__daily-bar" [style.width.%]="row.total / maxDayRevenue() * 100"></span>
           </span>
+          <span class="acct__daily-count">{{ row.visits.length }} client{{ row.visits.length > 1 ? 's' : '' }}</span>
+          <span class="acct__daily-amount">{{ row.total }} €</span>
+          <span class="acct__daily-chevron">{{ expandedDay() === row.date ? '▲' : '▼' }}</span>
         </div>
+        @if (expandedDay() === row.date) {
+        <div class="acct__daily-detail">
+          @for (v of row.visits; track v._id) {
+          <div class="acct__daily-visit">
+            <span class="acct__daily-visit-name">{{ clientLabel(v) }}</span>
+            <span class="acct__daily-visit-service">{{ v.serviceType }}</span>
+            <span class="acct__daily-visit-price">{{ v.price }} €</span>
+          </div>
+          }
+        </div>
+        }
+      </div>
       }
     </div>
+  </div>
+  }
+
+  <!-- Breakdowns -->
+  <div class="acct__breakdowns">
+
+    <!-- Par prestation -->
+    <div class="acct__card">
+      <div class="acct__card-title">Revenus par prestation</div>
+      @for (s of data()!.byService; track s._id) {
+      <div class="acct__service-row">
+        <div class="acct__service-info">
+          <span class="acct__service-name-wrap">
+            <span class="acct__service-dot" [style.background]="serviceColor(s._id)"></span>
+            <span class="acct__service-name" [style.color]="serviceColor(s._id)">{{ s._id }}</span>
+          </span>
+          <span class="acct__service-amount" [style.color]="serviceColor(s._id)">{{ s.total | number:'1.0-0' }} €</span>
+        </div>
+        <div class="acct__bar-track">
+          <div class="acct__bar-fill" [style.width]="barWidth(s.total)" [style.background]="serviceColor(s._id)"></div>
+        </div>
+      </div>
+      }
+      @if (!data()!.byService.length) {
+      <p class="acct__empty">Aucune visite sur cette période.</p>
+      }
+    </div>
+
+    <!-- Par paiement -->
+    <div class="acct__card">
+      <div class="acct__card-title">Par mode de paiement</div>
+      @for (p of data()!.byPayment; track p._id) {
+      <div class="acct__payment-row">
+        <div class="acct__payment-dot" [style.background]="paymentColor(p._id)"></div>
+        <span class="acct__payment-label" [style.color]="paymentColor(p._id)">{{ paymentLabel(p._id) }}</span>
+        <span class="acct__payment-amount" [style.color]="paymentColor(p._id)">{{ p.total | number:'1.0-0' }} €</span>
+        <span class="acct__payment-pct">{{ totalPayments() > 0 ? ((p.total / totalPayments()) * 100 | number:'1.0-0') :
+          0 }}%</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Historique visites -->
+  <div class="acct__card acct__visits-card">
+    <div class="acct__visits-header">
+      <div class="acct__card-title">Historique des visites</div>
+      <button class="acct__btn-add no-print" (click)="openAddModal()">+ Ajouter une visite</button>
+    </div>
+
+    <table class="acct__table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Client</th>
+          <th>Prestation</th>
+          <th>Paiement</th>
+          <th class="acct__col-amount">Montant</th>
+          <th class="no-print"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (v of pagedVisits(); track v._id) {
+        <tr>
+          <td>{{ formatDate(v) }}</td>
+          <td>{{ v.clientName ?? (v.clientId === 'walk-in' ? 'Client anonyme' : v.clientId) }}</td>
+          <td>
+            <span class="acct__badge acct__badge--service" [ngStyle]="serviceBadgeStyles(v.serviceType)">
+              {{ v.serviceType }}
+            </span>
+          </td>
+          <td>
+            <span class="acct__badge acct__badge--payment" [ngStyle]="paymentBadgeStyles(v.paymentMethod ?? 'especes')">
+              {{ paymentLabel(v.paymentMethod ?? 'especes') }}
+            </span>
+          </td>
+          <td class="acct__col-amount acct__amount">{{ v.price }} €</td>
+          <td class="no-print">
+            <button class="acct__btn-delete" (click)="deleteVisit(v._id)">Supprimer</button>
+          </td>
+        </tr>
+        }
+        @if (!visits().length) {
+        <tr>
+          <td colspan="6" class="acct__empty">Aucune visite.</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (visitsTotalPages() > 1) {
+    <div class="acct__pagination no-print">
+      <button class="acct__page-btn acct__page-btn--nav" [disabled]="visitsPage() === 1"
+        (click)="goToVisitsPage(visitsPage() - 1)">
+        &larr;
+      </button>
+
+      @for (p of visitsPageNumbers(); track p) {
+      <button class="acct__page-btn" [class.acct__page-btn--active]="p === visitsPage()" (click)="goToVisitsPage(p)">
+        {{ p }}
+      </button>
+      }
+
+      <button class="acct__page-btn acct__page-btn--nav" [disabled]="visitsPage() === visitsTotalPages()"
+        (click)="goToVisitsPage(visitsPage() + 1)">
+        &rarr;
+      </button>
+
+      <span class="acct__page-info">
+        {{ visitsPageStart() }}-{{ visitsPageEnd() }} sur {{ visits().length }}
+      </span>
+    </div>
+    }
+  </div>
 
   }
 
   <!-- Modal ajout visite -->
   @if (showAddModal()) {
-    <div class="acct__modal-overlay no-print" (click)="showAddModal.set(false)">
-      <div class="acct__modal" (click)="$event.stopPropagation()">
-        <div class="acct__modal-title">Ajouter une visite</div>
+  <div class="acct__modal-overlay no-print" (click)="showAddModal.set(false)">
+    <div class="acct__modal" (click)="$event.stopPropagation()">
+      <div class="acct__modal-title">Ajouter une visite</div>
 
-        <label class="acct__label">
-          Prestation
-          <select class="acct__input" [(ngModel)]="addForm.serviceType"
-            (change)="onServiceChange()">
-            <option value="">— Choisir —</option>
-            @for (s of services(); track s._id) {
-              <option [value]="s.name">{{ s.name }} ({{ s.price }} €)</option>
-            }
-          </select>
-        </label>
+      <label class="acct__label">
+        Prestation
+        <select class="acct__input" [(ngModel)]="addForm.serviceType" (change)="onServiceChange()">
+          <option value="">— Choisir —</option>
+          @for (s of services(); track s._id) {
+          <option [value]="s.name">{{ s.name }} ({{ s.price }} €)</option>
+          }
+        </select>
+      </label>
 
-        <label class="acct__label">
-          Prix (€)
-          <input type="number" class="acct__input" [(ngModel)]="addForm.price" min="0" step="0.5" />
-        </label>
+      <label class="acct__label">
+        Prix (€)
+        <input type="number" class="acct__input" [(ngModel)]="addForm.price" min="0" step="0.5" />
+      </label>
 
-        <label class="acct__label">
-          Mode de paiement
-          <select class="acct__input" [(ngModel)]="addForm.paymentMethod">
-            <option value="especes">Espèces</option>
-            <option value="virement">Virement</option>
-          </select>
-        </label>
+      <label class="acct__label">
+        Mode de paiement
+        <select class="acct__input" [(ngModel)]="addForm.paymentMethod">
+          <option value="especes">Espèces</option>
+          <option value="virement">Virement</option>
+        </select>
+      </label>
 
-        <label class="acct__label">
-          Nom du client (optionnel)
-          <input type="text" class="acct__input" [(ngModel)]="addForm.clientName" placeholder="ex : Karim B." />
-        </label>
+      <label class="acct__label">
+        Nom du client (optionnel)
+        <input type="text" class="acct__input" [(ngModel)]="addForm.clientName" placeholder="ex : Karim B." />
+      </label>
 
-        <label class="acct__label">
-          Date (optionnel — défaut : aujourd'hui)
-          <input type="date" class="acct__input" [(ngModel)]="addForm.visitDate" />
-        </label>
+      <label class="acct__label">
+        Date (optionnel — défaut : aujourd'hui)
+        <input type="date" class="acct__input" [(ngModel)]="addForm.visitDate" />
+      </label>
 
-        <div class="acct__modal-actions">
-          <button class="acct__btn-save" (click)="saveVisit()" [disabled]="saving()">
-            {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
-          </button>
-          <button class="acct__btn-cancel" (click)="showAddModal.set(false)">Annuler</button>
-        </div>
+      <div class="acct__modal-actions">
+        <button class="acct__btn-save" (click)="saveVisit()" [disabled]="saving()">
+          {{ saving() ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+        <button class="acct__btn-cancel" (click)="showAddModal.set(false)">Annuler</button>
       </div>
     </div>
+  </div>
   }
 
 </div>
