@@ -86,6 +86,17 @@
           </div>
         </div>
 
+        <div class="dash__kpi" [class.dash__kpi--cancelled]="s.lostSlotsToday > 0">
+          <div class="dash__kpi-icon dash__kpi-icon--cancelled">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          </div>
+          <div class="dash__kpi-body">
+            <span class="dash__kpi-value">{{ s.lostSlotsToday }}</span>
+            <span class="dash__kpi-label">Créneau(x) perdu(s) aujourd'hui</span>
+            <span class="dash__kpi-sub">{{ s.lostSlotsToday === 0 ? 'Aucune annulation non remplacée' : 'Annulé(s) et non repris' }}</span>
+          </div>
+        </div>
+
       </div>
 
       <!-- Revenus -->

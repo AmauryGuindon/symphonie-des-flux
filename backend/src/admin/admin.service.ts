@@ -5,6 +5,7 @@ import * as nodemailer from 'nodemailer';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
+import { Appointment, AppointmentDocument } from '../appointments/schemas/appointment.schema';
 import { UsersService } from '../users/users.service';
 import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { RecordVisitDto } from './dto/record-visit.dto';
@@ -29,6 +30,7 @@ export class AdminService implements OnModuleInit {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Visit.name) private visitModel: Model<VisitDocument>,
     @InjectModel(ServiceConfig.name) private serviceConfigModel: Model<ServiceConfigDocument>,
+    @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
     private usersService: UsersService,
   ) {
     this.transporter = nodemailer.createTransport({
@@ -119,6 +121,18 @@ export class AdminService implements OnModuleInit {
     const inactiveClients = totalClients - activeThisMonth - neverVisited;
     const monthlyActivity = await this.getMonthlyActivity(6);
 
+    // Créneaux perdus aujourd'hui : annulés dont aucun RDV actif n'a pris la même heure
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const cancelledToday = await this.appointmentModel
+      .find({ date: todayStr, status: 'cancelled' })
+      .select('time');
+    const activeToday = await this.appointmentModel
+      .find({ date: todayStr, status: { $ne: 'cancelled' } })
+      .select('time');
+    const activeTimes = new Set(activeToday.map(a => a.time));
+    const uniqueCancelledTimes = [...new Set(cancelledToday.map(a => a.time))];
+    const lostSlotsToday = uniqueCancelledTimes.filter(t => !activeTimes.has(t)).length;
+
     const retentionRate = activeLastMonth > 0
       ? Math.round((activeThisMonth / activeLastMonth) * 100)
       : null;
@@ -148,6 +162,7 @@ export class AdminService implements OnModuleInit {
         month: revMonth[0]?.total ?? 0,
         year:  revYear[0]?.total ?? 0,
       },
+      lostSlotsToday,
     };
   }
 

@@ -35,7 +35,7 @@
 
   &__kpis {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(7, 1fr);
     gap: .875rem;
     margin-bottom: 1.5rem;
 
@@ -57,6 +57,12 @@
       .dash__kpi-icon { background: rgba(231,76,60,.1); color: #e74c3c; }
     }
 
+    &--cancelled {
+      border-color: rgba(231,76,60,.35);
+      .dash__kpi-value { color: #e74c3c; }
+      .dash__kpi-icon { background: rgba(231,76,60,.1) !important; color: #e74c3c !important; }
+    }
+
     &-icon {
       width: 36px;
       height: 36px;
@@ -73,7 +79,8 @@
       &--active   { background: rgba(52,152,219,.1);  color: #3498db; }
       &--retention{ background: rgba(155,89,182,.1);  color: #9b59b6; }
       &--points   { background: rgba(201,164,74,.12); color: #C9A44A; }
-      &--inactive { background: rgba(231,76,60,.1);   color: #e74c3c; }
+      &--inactive  { background: rgba(231,76,60,.1);   color: #e74c3c; }
+      &--cancelled { background: rgba(255,255,255,.06); color: rgba(255,255,255,.4); }
     }
 
     &-body {
