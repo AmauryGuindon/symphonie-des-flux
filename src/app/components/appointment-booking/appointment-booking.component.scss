@@ -967,6 +967,16 @@
     color: rgba(255,255,255,.35);
   }
 
+  &__mine-payment {
+    font-size: .72rem;
+    color: rgba(255,255,255,.3);
+  }
+
+  &__mine-payment-pts {
+    color: #e74c3c;
+    font-weight: 600;
+  }
+
   &__mine-right {
     display: flex;
     align-items: center;

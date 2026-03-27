@@ -285,4 +285,8 @@ export class AppointmentBookingComponent implements OnInit {
   statusClass(s: string): string {
     return { pending: 'appt__status--pending', confirmed: 'appt__status--confirmed', cancelled: 'appt__status--cancelled' }[s] ?? '';
   }
+
+  paymentLabel(m?: string): string {
+    return { especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne', points: 'Points fidélité' }[m ?? ''] ?? '';
+  }
 }

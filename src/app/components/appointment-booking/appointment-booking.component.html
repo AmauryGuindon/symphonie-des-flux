@@ -355,6 +355,14 @@
               </svg>
               {{ formatDate(a.date) }} · {{ a.time }}
             </span>
+            @if (a.paymentMethod) {
+            <span class="appt__mine-payment">
+              {{ paymentLabel(a.paymentMethod) }}
+              @if (a.paymentMethod === 'points' && a.price) {
+              <span class="appt__mine-payment-pts">— {{ a.price * 10 }} pts</span>
+              }
+            </span>
+            }
           </div>
           <div class="appt__mine-right">
             <span class="appt__status" [ngClass]="statusClass(a.status)">{{ statusLabel(a.status) }}</span>
