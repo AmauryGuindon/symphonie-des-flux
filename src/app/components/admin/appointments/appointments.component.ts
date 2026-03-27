@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppointmentService, Appointment } from '../../../services/appointment.service';
@@ -122,7 +122,26 @@ export class AdminAppointmentsComponent implements OnInit {
     this.dateTo.set('');
   }
 
-  constructor(private appointmentService: AppointmentService) {}
+  @ViewChild('calEl') calEl?: ElementRef<HTMLElement>;
+
+  constructor(private appointmentService: AppointmentService) {
+    effect(() => {
+      if (this.viewMode() === 'week' && !this.loading()) {
+        setTimeout(() => this.scrollToToday(), 0);
+      }
+    });
+  }
+
+  private scrollToToday() {
+    const el = this.calEl?.nativeElement;
+    if (!el || window.innerWidth > 900) return;
+    const todayIndex = this.weekDays().findIndex(d => this.isToday(d));
+    if (todayIndex < 0) return;
+    const gutterWidth = 56;
+    const colWidth = (el.scrollWidth - gutterWidth) / 7;
+    const targetScroll = gutterWidth + todayIndex * colWidth - (el.clientWidth - colWidth) / 2;
+    el.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
+  }
 
   ngOnInit() {
     this.load();
