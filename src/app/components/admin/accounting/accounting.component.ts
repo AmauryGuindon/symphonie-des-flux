@@ -34,6 +34,7 @@ export class AdminAccountingComponent implements OnInit {
     virement: '#4BA3C7',
     en_ligne: '#73C97B',
     carte: '#C97BB5',
+    points: '#9B59B6',
   };
 
   private readonly serviceColorMap: Record<string, string> = {
@@ -174,7 +175,7 @@ export class AdminAccountingComponent implements OnInit {
   });
 
   paymentLabel(id: string): string {
-    return ({ especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne' } as Record<string, string>)[id] ?? id;
+    return ({ especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne', points: 'Points' } as Record<string, string>)[id] ?? id;
   }
 
   paymentColor(id: string | null | undefined): string {
