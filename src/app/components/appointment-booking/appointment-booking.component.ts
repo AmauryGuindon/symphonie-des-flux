@@ -298,6 +298,6 @@ export class AppointmentBookingComponent implements OnInit {
   }
 
   paymentLabel(m?: string): string {
-    return { especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne', points: 'Points' }[m ?? ''] ?? '';
+    return { especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne', points: 'Points fidélité' }[m ?? ''] ?? '';
   }
 }
