@@ -178,6 +178,10 @@ export class UsersService {
       .select('-password');
   }
 
+  async refundPoints(userId: string, points: number): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { $inc: { loyaltyPoints: points } });
+  }
+
   async evaluateAnniversaryDegradations(): Promise<number> {
     const today = new Date();
     const month = today.getMonth() + 1;

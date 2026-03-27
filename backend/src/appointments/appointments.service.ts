@@ -180,6 +180,10 @@ export class AppointmentsService {
   }
 
   async cancelMyAppointment(id: string, clientId: string) {
+    const appt = await this.appointmentModel.findOne({ _id: id, clientId });
+    if (appt && appt.paymentMethod === 'points' && appt.price > 0) {
+      await this.usersService.refundPoints(clientId, appt.price * 10);
+    }
     return this.appointmentModel.findOneAndUpdate(
       { _id: id, clientId },
       { status: 'cancelled' },
@@ -214,6 +218,12 @@ export class AppointmentsService {
   }
 
   async updateAppointment(id: string, dto: UpdateAppointmentDto) {
+    if (dto.status === 'cancelled') {
+      const appt = await this.appointmentModel.findById(id);
+      if (appt && appt.paymentMethod === 'points' && appt.price > 0) {
+        await this.usersService.refundPoints(appt.clientId, appt.price * 10);
+      }
+    }
     return this.appointmentModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
