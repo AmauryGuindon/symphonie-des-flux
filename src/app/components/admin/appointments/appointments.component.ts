@@ -29,9 +29,10 @@ export class AdminAppointmentsComponent implements OnInit {
   // Detail popup (mobile tap)
   detailAppt = signal<Appointment | null>(null);
   validateLoading = signal(false);
+  confirmDelete = signal(false);
 
   openDetail(a: Appointment) { this.detailAppt.set(a); }
-  closeDetail() { this.detailAppt.set(null); }
+  closeDetail() { this.detailAppt.set(null); this.confirmDelete.set(false); }
 
   confirmFromDetail(a: Appointment) { this.confirm(a); this.closeDetail(); }
   cancelFromDetail(a: Appointment)  { this.cancel(a);  this.closeDetail(); }

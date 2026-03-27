@@ -69,19 +69,6 @@
                     <span class="cal__event-time">{{ a.time }}</span>
                     <span class="cal__event-service">{{ a.serviceType }}</span>
                     <span class="cal__event-client">{{ a.clientName }}</span>
-                    <div class="cal__event-actions">
-                      @if (a.status === 'pending') {
-                        <button class="cal__event-btn cal__event-btn--confirm" (click)="confirm(a)" title="Confirmer">
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>
-                        </button>
-                      }
-                      <button class="cal__event-btn cal__event-btn--edit" (click)="startEdit(a)" title="Modifier">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                      </button>
-                      <button class="cal__event-btn cal__event-btn--del" (click)="delete(a._id)" title="Supprimer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                      </button>
-                    </div>
                   </div>
                 }
               }
@@ -307,10 +294,18 @@
               Annuler
             </button>
           }
-          <button class="detail-sheet__btn detail-sheet__btn--del" (click)="deleteFromDetail(detailAppt()!._id)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
-            Supprimer
-          </button>
+          @if (confirmDelete()) {
+            <div class="detail-sheet__del-confirm">
+              <span>Supprimer définitivement ?</span>
+              <button class="detail-sheet__del-confirm-yes" (click)="deleteFromDetail(detailAppt()!._id)">Oui</button>
+              <button class="detail-sheet__del-confirm-no" (click)="confirmDelete.set(false)">Non</button>
+            </div>
+          } @else {
+            <button class="detail-sheet__btn detail-sheet__btn--del" (click)="confirmDelete.set(true)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+              Supprimer
+            </button>
+          }
         </div>
       </div>
     </div>
