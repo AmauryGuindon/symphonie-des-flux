@@ -496,6 +496,13 @@
       &:hover { background: rgba(201,164,74,.14); }
     }
 
+    &--cancel {
+      background: rgba(255,255,255,.04);
+      border-color: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.5);
+      &:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.8); }
+    }
+
     &--del {
       background: rgba(231,76,60,.05);
       border-color: rgba(231,76,60,.18);
