@@ -285,4 +285,49 @@
   &__visit-service { font-weight: 600; color: #fff !important; }
   &__visit-price   { color: #C9A44A !important; font-weight: 700; }
   &__visit-notes   { color: rgba(255,255,255,.4) !important; font-size: .8rem !important; font-style: italic; }
+
+  &__stat-val--revenue { color: #C9A44A; }
+
+  &__revenue {
+    margin-bottom: 1.5rem;
+
+    &-list { display: flex; flex-direction: column; gap: .6rem; }
+
+    &-row {
+      display: grid;
+      grid-template-columns: 3.5rem 1fr 4rem;
+      align-items: center;
+      gap: .75rem;
+
+      &--current &-year { color: #C9A44A; font-weight: 700; }
+    }
+
+    &-year {
+      font-size: .85rem;
+      color: rgba(255,255,255,.5);
+      font-weight: 600;
+    }
+
+    &-bar-wrap {
+      height: 6px;
+      background: rgba(255,255,255,.06);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    &-bar {
+      display: block;
+      height: 100%;
+      background: #C9A44A;
+      border-radius: 3px;
+      transition: width .4s ease;
+    }
+
+    &-total {
+      font-size: .85rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: right;
+    }
+  }
 }

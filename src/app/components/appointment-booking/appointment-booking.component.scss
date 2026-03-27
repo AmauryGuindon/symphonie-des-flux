@@ -987,6 +987,13 @@
     &--cancelled { color: rgba(255,255,255,.25); border-color: rgba(255,255,255,.08); }
   }
 
+  &__points-earn {
+    color: #2ecc71;
+    font-weight: 700;
+    font-size: .8em;
+    margin-left: .2rem;
+  }
+
   &__btn-cancel-mine {
     background: none;
     border: 1px solid rgba(231,76,60,.25);

@@ -70,6 +70,45 @@ export class AdminAccountingComponent implements OnInit {
 
   visits = computed(() => this.data()?.visits ?? []);
 
+  revenueByDay = computed(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 6);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+
+    const map: Record<string, { total: number; visits: any[] }> = {};
+    for (const v of this.visits()) {
+      const key = (v.visitDate ?? v.createdAt?.slice(0, 10)) as string;
+      if (!key || key < cutoffStr) continue;
+      if (!map[key]) map[key] = { total: 0, visits: [] };
+      map[key].total += v.price;
+      map[key].visits.push(v);
+    }
+    return Object.entries(map)
+      .map(([date, { total, visits }]) => ({ date, total, visits }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  });
+
+  maxDayRevenue = computed(() => {
+    const rows = this.revenueByDay();
+    return rows.length ? Math.max(...rows.map(r => r.total)) : 1;
+  });
+
+  expandedDay = signal<string | null>(null);
+
+  toggleDay(date: string) {
+    this.expandedDay.set(this.expandedDay() === date ? null : date);
+  }
+
+  todayStr = new Date().toISOString().slice(0, 10);
+
+  formatDayLabel(date: string): string {
+    return new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  clientLabel(v: any): string {
+    return v.clientName ?? (v.clientId === 'walk-in' ? 'Client anonyme' : null) ?? '—';
+  }
+
   pagedVisits = computed(() => {
     const start = (this.visitsPage() - 1) * VISITS_PAGE_SIZE;
     const end = start + VISITS_PAGE_SIZE;

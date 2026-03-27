@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
@@ -40,6 +40,23 @@ export class AdminClientDetailComponent implements OnInit {
   pointsSuccess = signal('');
 
   deleteConfirm = signal(false);
+  currentYear = new Date().getFullYear();
+
+  revenueByYear = computed(() => {
+    const map: Record<number, number> = {};
+    for (const v of this.visits()) {
+      const year = new Date((v.visitDate ?? v.createdAt).slice(0, 10)).getFullYear();
+      map[year] = (map[year] ?? 0) + v.price;
+    }
+    return Object.entries(map)
+      .map(([year, total]) => ({ year: +year, total }))
+      .sort((a, b) => b.year - a.year);
+  });
+
+  currentYearRevenue = computed(() => {
+    const currentYear = new Date().getFullYear();
+    return this.revenueByYear().find(r => r.year === currentYear)?.total ?? 0;
+  });
 
   constructor(
     private route: ActivatedRoute,

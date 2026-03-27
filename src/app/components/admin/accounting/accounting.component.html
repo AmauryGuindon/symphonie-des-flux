@@ -106,6 +106,42 @@
       </div>
     </div>
 
+    <!-- CA journalier -->
+    @if (revenueByDay().length > 0) {
+      <div class="acct__card acct__daily-card">
+        <div class="acct__card-title">CA journalier <span class="acct__card-title-sub">7 derniers jours</span></div>
+        <div class="acct__daily-list">
+          @for (row of revenueByDay(); track row.date) {
+            <div class="acct__daily-entry">
+              <div class="acct__daily-row"
+                [class.acct__daily-row--today]="row.date === todayStr"
+                [class.acct__daily-row--open]="expandedDay() === row.date"
+                (click)="toggleDay(row.date)">
+                <span class="acct__daily-date">{{ formatDayLabel(row.date) }}</span>
+                <span class="acct__daily-bar-wrap">
+                  <span class="acct__daily-bar" [style.width.%]="row.total / maxDayRevenue() * 100"></span>
+                </span>
+                <span class="acct__daily-count">{{ row.visits.length }} client{{ row.visits.length > 1 ? 's' : '' }}</span>
+                <span class="acct__daily-amount">{{ row.total }} €</span>
+                <span class="acct__daily-chevron">{{ expandedDay() === row.date ? '▲' : '▼' }}</span>
+              </div>
+              @if (expandedDay() === row.date) {
+                <div class="acct__daily-detail">
+                  @for (v of row.visits; track v._id) {
+                    <div class="acct__daily-visit">
+                      <span class="acct__daily-visit-name">{{ clientLabel(v) }}</span>
+                      <span class="acct__daily-visit-service">{{ v.serviceType }}</span>
+                      <span class="acct__daily-visit-price">{{ v.price }} €</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
     <!-- Historique visites -->
     <div class="acct__card acct__visits-card">
       <div class="acct__visits-header">

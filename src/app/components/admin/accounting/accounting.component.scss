@@ -350,6 +350,99 @@
   &__btn-save   { @include btn-primary; padding: .5rem 1.2rem; }
   &__btn-cancel { @include btn-ghost; }
 
+  &__card-title-sub {
+    font-size: .7rem;
+    font-weight: 400;
+    color: rgba(255,255,255,.3);
+    margin-left: .4rem;
+  }
+
+  &__daily-card { margin-bottom: 1.5rem; }
+
+  &__daily-list { display: flex; flex-direction: column; gap: .3rem; }
+
+  &__daily-entry { display: flex; flex-direction: column; }
+
+  &__daily-row {
+    display: grid;
+    grid-template-columns: 10rem 1fr 5.5rem 4.5rem 1.2rem;
+    align-items: center;
+    gap: .75rem;
+    cursor: pointer;
+    padding: .35rem .5rem;
+    border-radius: 6px;
+    transition: background .15s;
+
+    &:hover { background: rgba(255,255,255,.04); }
+    &--open { background: rgba(255,255,255,.04); }
+
+    &--today &-date   { color: #C9A44A; font-weight: 700; }
+    &--today &-bar    { background: #C9A44A; }
+    &--today &-amount { color: #C9A44A; font-weight: 700; }
+  }
+
+  &__daily-date {
+    font-size: .8rem;
+    color: rgba(255,255,255,.45);
+    white-space: nowrap;
+  }
+
+  &__daily-bar-wrap {
+    height: 6px;
+    background: rgba(255,255,255,.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  &__daily-bar {
+    display: block;
+    height: 100%;
+    background: rgba(201,164,74,.55);
+    border-radius: 3px;
+    transition: width .35s ease;
+  }
+
+  &__daily-count {
+    font-size: .75rem;
+    color: rgba(255,255,255,.35);
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  &__daily-amount {
+    font-size: .82rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.8);
+    text-align: right;
+  }
+
+  &__daily-chevron {
+    font-size: .55rem;
+    color: rgba(255,255,255,.25);
+    text-align: center;
+  }
+
+  &__daily-detail {
+    display: flex;
+    flex-direction: column;
+    gap: .2rem;
+    margin: .2rem 0 .4rem 10.75rem;
+    padding-left: .75rem;
+    border-left: 2px solid rgba(201,164,74,.2);
+  }
+
+  &__daily-visit {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: .5rem;
+    font-size: .78rem;
+    padding: .2rem 0;
+
+    &-name    { color: rgba(255,255,255,.7); font-weight: 600; }
+    &-service { color: rgba(255,255,255,.35); }
+    &-price   { color: #C9A44A; font-weight: 700; text-align: right; }
+  }
+
   @media print {
     .no-print { display: none !important; }
   }

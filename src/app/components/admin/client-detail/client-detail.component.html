@@ -76,6 +76,10 @@
             <span class="cd__stat-val">{{ c.lastVisitAt ? (c.lastVisitAt | date:'dd/MM/yy') : '—' }}</span>
             <span class="cd__stat-lbl">Dernière visite</span>
           </div>
+          <div class="cd__stat">
+            <span class="cd__stat-val cd__stat-val--revenue">{{ currentYearRevenue() }} €</span>
+            <span class="cd__stat-lbl">CA {{ currentYear }}</span>
+          </div>
         </div>
 
         <!-- Profil -->
@@ -163,6 +167,26 @@
         </div>
 
       </div>
+
+      <!-- CA par année -->
+      @if (revenueByYear().length > 1) {
+        <div class="cd__card cd__revenue">
+          <div class="cd__card-header">
+            <h3>Chiffre d'affaires par année</h3>
+          </div>
+          <div class="cd__revenue-list">
+            @for (r of revenueByYear(); track r.year) {
+              <div class="cd__revenue-row" [class.cd__revenue-row--current]="r.year === currentYear">
+                <span class="cd__revenue-year">{{ r.year }}</span>
+                <span class="cd__revenue-bar-wrap">
+                  <span class="cd__revenue-bar" [style.width.%]="r.total / revenueByYear()[0].total * 100"></span>
+                </span>
+                <span class="cd__revenue-total">{{ r.total }} €</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
 
       <!-- Historique des prestations -->
       <div class="cd__card cd__history">
