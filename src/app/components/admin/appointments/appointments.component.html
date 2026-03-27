@@ -17,7 +17,12 @@
     @if (viewMode() === 'week') {
       <div class="appt-admin__week-nav">
         <button class="appt-admin__nav-btn" (click)="prevWeek()">‹ Semaine préc.</button>
-        <span class="appt-admin__week-label">{{ weekLabel() }}</span>
+        <div class="appt-admin__week-center">
+          <span class="appt-admin__week-label">{{ weekLabel() }}</span>
+          @if (!isCurrentWeek()) {
+            <button class="appt-admin__today-btn" (click)="goToToday()">Aujourd'hui</button>
+          }
+        </div>
         <button class="appt-admin__nav-btn" (click)="nextWeek()">Semaine suiv. ›</button>
       </div>
       <div class="appt-admin__week-toggle-row">

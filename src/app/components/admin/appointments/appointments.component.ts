@@ -180,6 +180,15 @@ export class AdminAppointmentsComponent implements OnInit {
     this.weekStart.set(s);
   }
 
+  goToToday() {
+    this.weekStart.set(this.getWeekStart(new Date()));
+  }
+
+  isCurrentWeek(): boolean {
+    const todayStart = this.getWeekStart(new Date()).getTime();
+    return this.weekStart().getTime() === todayStart;
+  }
+
   toDateString(d: Date): string {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }

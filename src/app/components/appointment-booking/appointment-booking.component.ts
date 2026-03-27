@@ -174,6 +174,17 @@ export class AppointmentBookingComponent implements OnInit {
     this.slots.set([]);
   }
 
+  isCurrentMonth(): boolean {
+    const m = this.currentMonth();
+    return m.getFullYear() === this.today.getFullYear() && m.getMonth() === this.today.getMonth();
+  }
+
+  goToToday() {
+    this.currentMonth.set(new Date(this.today.getFullYear(), this.today.getMonth(), 1));
+    this.selectedDate.set(null);
+    this.slots.set([]);
+  }
+
   // Bloque uniquement les jours strictement passés (aujourd'hui reste sélectionnable)
   isPast(d: Date): boolean {
     const today = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());

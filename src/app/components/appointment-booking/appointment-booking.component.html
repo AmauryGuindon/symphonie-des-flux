@@ -90,7 +90,12 @@
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>
-              <span class="appt__cal-month">{{ monthLabel }}</span>
+              <div class="appt__cal-center">
+                <span class="appt__cal-month">{{ monthLabel }}</span>
+                @if (!isCurrentMonth()) {
+                  <button class="appt__cal-today-btn" (click)="goToToday()">Aujourd'hui</button>
+                }
+              </div>
               <button class="appt__cal-arrow" (click)="nextMonth()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                   <polyline points="9 18 15 12 9 6" />
