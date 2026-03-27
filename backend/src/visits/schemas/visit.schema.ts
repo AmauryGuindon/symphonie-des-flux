@@ -20,7 +20,7 @@ export class Visit {
   @Prop({ trim: true })
   notes?: string;
 
-  @Prop({ enum: ['especes', 'virement', 'en_ligne'], default: 'especes' })
+  @Prop({ enum: ['especes', 'virement', 'en_ligne', 'points'], default: 'especes' })
   paymentMethod?: string;
 
   @Prop({ trim: true })
