@@ -168,6 +168,10 @@ export class AccountComponent implements OnInit {
     return s === 'confirmed' ? 'Confirmé' : s === 'pending' ? 'En attente' : 'Annulé';
   }
 
+  paymentLabel(m?: string): string {
+    return { especes: 'Espèces', virement: 'Virement', en_ligne: 'En ligne', points: 'Points fidélité' }[m ?? ''] ?? '';
+  }
+
   // ── Profil ────────────────────────────────────────────────────────────────
   startEdit() {
     const u = this.user();

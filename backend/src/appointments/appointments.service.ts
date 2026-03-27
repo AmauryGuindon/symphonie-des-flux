@@ -162,6 +162,7 @@ export class AppointmentsService {
       time: dto.time,
       notes: dto.notes,
       paymentMethod: dto.paymentMethod ?? 'especes',
+      price: svcCfg?.price ?? 0,
       status: 'pending',
       duration: serviceDuration,
     });

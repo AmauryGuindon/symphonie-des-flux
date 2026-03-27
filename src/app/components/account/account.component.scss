@@ -470,6 +470,21 @@
 
   &__appt-dot { opacity: .4; }
 
+  &__appt-payment {
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    font-family: var(--font-body);
+    font-size: .7rem;
+    color: rgba(255,255,255,.35);
+    margin-top: .15rem;
+  }
+
+  &__appt-payment-pts {
+    color: #e74c3c;
+    font-weight: 600;
+  }
+
   &__appt-right {
     display: flex;
     align-items: center;

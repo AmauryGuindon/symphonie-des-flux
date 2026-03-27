@@ -19,6 +19,7 @@ export class Appointment {
   status: string;
   @Prop({ trim: true }) notes?: string;
   @Prop({ enum: ['especes', 'virement', 'en_ligne', 'points'], default: 'especes' }) paymentMethod: string;
+  @Prop({ default: 0 }) price: number;
   @Prop({ default: 0 }) duration: number;
   @Prop({ default: false }) visitRecorded: boolean;
 }

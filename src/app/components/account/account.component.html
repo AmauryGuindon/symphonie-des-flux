@@ -95,6 +95,14 @@
                   <span class="account__appt-dot">·</span>
                   <span>{{ a.time }}</span>
                 </div>
+                @if (a.paymentMethod) {
+                <div class="account__appt-payment">
+                  <span>{{ paymentLabel(a.paymentMethod) }}</span>
+                  @if (a.paymentMethod === 'points' && a.price) {
+                  <span class="account__appt-payment-pts">— {{ a.price * 10 }} pts</span>
+                  }
+                </div>
+                }
               </div>
               <div class="account__appt-right">
                 <span class="account__appt-status account__appt-status--{{ a.status }}">

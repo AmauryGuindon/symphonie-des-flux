@@ -25,6 +25,7 @@ export interface Appointment {
   status: 'pending' | 'confirmed' | 'cancelled';
   notes?: string;
   paymentMethod?: string;
+  price?: number;
   visitRecorded?: boolean;
   createdAt: string;
 }
