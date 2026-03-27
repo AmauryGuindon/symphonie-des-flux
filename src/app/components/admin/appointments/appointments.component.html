@@ -20,6 +20,16 @@
         <span class="appt-admin__week-label">{{ weekLabel() }}</span>
         <button class="appt-admin__nav-btn" (click)="nextWeek()">Semaine suiv. ›</button>
       </div>
+      <div class="appt-admin__week-toggle-row">
+        <button
+          class="appt-admin__cancelled-toggle"
+          [class.appt-admin__cancelled-toggle--active]="showCancelled()"
+          (click)="showCancelled.set(!showCancelled())"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+          Rendez-vous annulés
+        </button>
+      </div>
 
       <div class="cal" #calEl>
         <!-- Header row -->

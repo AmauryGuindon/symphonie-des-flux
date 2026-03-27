@@ -25,6 +25,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
   // Week navigation
   weekStart = signal(this.getWeekStart(new Date()));
+  showCancelled = signal(false);
 
   // Detail popup (mobile tap)
   detailAppt = signal<Appointment | null>(null);
@@ -185,7 +186,10 @@ export class AdminAppointmentsComponent implements OnInit {
 
   appointmentsForDay(d: Date): Appointment[] {
     const ds = this.toDateString(d);
-    return this.appointments().filter(a => a.date === ds);
+    const cancelled = this.showCancelled();
+    return this.appointments().filter(a =>
+      a.date === ds && (cancelled ? a.status === 'cancelled' : a.status !== 'cancelled')
+    );
   }
 
   dayLabel(d: Date): string {

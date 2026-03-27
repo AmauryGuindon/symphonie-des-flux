@@ -58,6 +58,37 @@
 
   &__nav-btn { @include btn-ghost; font-size: .78rem; padding: .35rem .875rem; }
 
+  &__week-toggle-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: .5rem;
+  }
+
+  &__cancelled-toggle {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    padding: .3rem .75rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: transparent;
+    color: rgba(255,255,255,.35);
+    font-size: .75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+
+    &:hover { border-color: rgba(255,255,255,.2); color: rgba(255,255,255,.6); }
+
+    &--active {
+      border-color: rgba(231,76,60,.35);
+      background: rgba(231,76,60,.08);
+      color: rgba(231,76,60,.8);
+
+      svg { stroke: rgba(231,76,60,.8); }
+    }
+  }
+
   &__week-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
