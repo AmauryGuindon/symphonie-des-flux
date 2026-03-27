@@ -185,7 +185,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
   appointmentsForDay(d: Date): Appointment[] {
     const ds = this.toDateString(d);
-    return this.appointments().filter(a => a.date === ds && a.status !== 'cancelled');
+    return this.appointments().filter(a => a.date === ds);
   }
 
   dayLabel(d: Date): string {

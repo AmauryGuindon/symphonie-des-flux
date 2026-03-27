@@ -60,6 +60,7 @@
                     class="cal__event"
                     [class.cal__event--confirmed]="a.status === 'confirmed'"
                     [class.cal__event--pending]="a.status === 'pending'"
+                    [class.cal__event--cancelled]="a.status === 'cancelled'"
                     [style.top.px]="getEventTop(a.time)"
                     [style.height.px]="HOUR_HEIGHT - 4"
                     [style.left]="getEventPosition(a, appointmentsForDay(day)).left"
