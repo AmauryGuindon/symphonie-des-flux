@@ -237,8 +237,9 @@ export class AppointmentsService {
     if (appt.status !== 'confirmed') throw new BadRequestException('Le rendez-vous doit être confirmé');
     if (appt.visitRecorded) throw new BadRequestException('Visite déjà enregistrée');
 
-    const apptDateTime = new Date(`${appt.date}T${appt.time}:00`);
-    if (apptDateTime > new Date()) throw new BadRequestException('Le rendez-vous n\'est pas encore passé');
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    if (appt.date > todayStr) throw new BadRequestException('Le rendez-vous n\'est pas encore passé');
 
     const config = await this.serviceConfigModel.findOne({ name: appt.serviceType });
     const points = config?.loyaltyPoints ?? 0;
