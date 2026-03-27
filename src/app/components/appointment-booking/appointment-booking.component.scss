@@ -356,16 +356,20 @@
   }
 
   &__cal-today-btn {
-    font-size: .68rem;
-    font-weight: 600;
-    color: #C9A44A;
-    background: rgba(201,164,74,.1);
-    border: 1px solid rgba(201,164,74,.3);
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .7rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    background: #C9A44A;
+    border: none;
     border-radius: 20px;
-    padding: .15rem .65rem;
+    padding: .3rem .85rem;
     cursor: pointer;
     transition: all .15s;
-    &:hover { background: rgba(201,164,74,.2); }
+    letter-spacing: .02em;
+    &:hover { background: #e8c870; }
   }
 
   &__cal-arrow {

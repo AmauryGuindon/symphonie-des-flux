@@ -93,7 +93,10 @@
               <div class="appt__cal-center">
                 <span class="appt__cal-month">{{ monthLabel }}</span>
                 @if (!isCurrentMonth()) {
-                  <button class="appt__cal-today-btn" (click)="goToToday()">Aujourd'hui</button>
+                  <button class="appt__cal-today-btn" (click)="goToToday()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="10" height="10"><polyline points="15 18 9 12 15 6"/></svg>
+                    Revenir à aujourd'hui
+                  </button>
                 }
               </div>
               <button class="appt__cal-arrow" (click)="nextMonth()">

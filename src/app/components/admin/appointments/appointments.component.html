@@ -20,7 +20,10 @@
         <div class="appt-admin__week-center">
           <span class="appt-admin__week-label">{{ weekLabel() }}</span>
           @if (!isCurrentWeek()) {
-            <button class="appt-admin__today-btn" (click)="goToToday()">Aujourd'hui</button>
+            <button class="appt-admin__today-btn" (click)="goToToday()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="15 18 9 12 15 6"/></svg>
+              Revenir à aujourd'hui
+            </button>
           }
         </div>
         <button class="appt-admin__nav-btn" (click)="nextWeek()">Semaine suiv. ›</button>
