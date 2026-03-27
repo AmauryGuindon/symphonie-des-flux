@@ -17,6 +17,7 @@ import { ScheduleService } from '../schedule/schedule.service';
 import { UpdateBusinessConfigDto } from '../schedule/dto/update-business-config.dto';
 import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
 import { CreateServiceDto } from './dto/create-service.dto';
+import { SendNewsletterDto } from './dto/send-newsletter.dto';
 
 @Controller('admin')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -163,5 +164,17 @@ export class AdminController {
   @Patch('services/:id/toggle')
   toggleService(@Param('id') id: string) {
     return this.adminService.toggleService(id);
+  }
+
+  // ── Newsletter ─────────────────────────────────────────────────────────────
+
+  @Get('newsletter/count')
+  getNewsletterCount(@Query('filter') filter: string = 'all') {
+    return this.adminService.getNewsletterCount(filter).then(count => ({ count }));
+  }
+
+  @Post('newsletter')
+  sendNewsletter(@Body() dto: SendNewsletterDto) {
+    return this.adminService.sendNewsletter(dto);
   }
 }

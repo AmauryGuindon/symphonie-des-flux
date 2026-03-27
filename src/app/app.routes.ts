@@ -21,6 +21,7 @@ import { AdminScheduleComponent } from './components/admin/schedule/schedule.com
 import { AdminAccountingComponent } from './components/admin/accounting/accounting.component';
 import { AdminServicesComponent } from './components/admin/services/services.component';
 import { AdminGalleryComponent } from './components/admin/gallery/gallery.component';
+import { AdminNewsletterComponent } from './components/admin/newsletter/newsletter.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { MentionsLegalesComponent } from './components/legal/mentions-legales/mentions-legales.component';
 import { CguComponent } from './components/legal/cgu/cgu.component';
@@ -55,6 +56,7 @@ export const routes: Routes = [
       { path: 'comptabilite', component: AdminAccountingComponent },
       { path: 'prestations', component: AdminServicesComponent },
       { path: 'gallery', component: AdminGalleryComponent },
+      { path: 'newsletter', component: AdminNewsletterComponent },
     ],
   },
   { path: 'mentions-legales', component: MentionsLegalesComponent },

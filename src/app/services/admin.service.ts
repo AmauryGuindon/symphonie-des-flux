@@ -121,4 +121,21 @@ export class AdminService {
   getReferralStats(): Observable<ReferralStats> {
     return this.http.get<ReferralStats>(`${API}/referrals`);
   }
+
+  // Newsletter
+  getNewsletterCount(filter: string): Observable<{ count: number }> {
+    return this.http.get<{ count: number }>(`${API}/newsletter/count`, { params: { filter } });
+  }
+
+  sendNewsletter(dto: {
+    subject: string;
+    message: string;
+    filter: string;
+    bannerUrl?: string;
+    ctaLabel?: string;
+    ctaUrl?: string;
+    clientIds?: string[];
+  }): Observable<{ sent: number; skipped: number }> {
+    return this.http.post<{ sent: number; skipped: number }>(`${API}/newsletter`, dto);
+  }
 }

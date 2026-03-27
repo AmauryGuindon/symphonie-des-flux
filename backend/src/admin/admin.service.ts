@@ -1,6 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as nodemailer from 'nodemailer';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
@@ -9,6 +10,7 @@ import { UpdateUserDto } from '../users/dto/update-user.dto';
 import { RecordVisitDto } from './dto/record-visit.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
 import { CreateManualVisitDto } from './dto/create-manual-visit.dto';
+import { SendNewsletterDto } from './dto/send-newsletter.dto';
 import { LOYALTY_POINTS_PER_VISIT, LOYALTY_TIER_BONUS, computeTier } from '../common/enums/role.enum';
 
 const DEFAULT_SERVICES = [
@@ -21,12 +23,21 @@ const DEFAULT_SERVICES = [
 
 @Injectable()
 export class AdminService implements OnModuleInit {
+  private transporter: nodemailer.Transporter;
+
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Visit.name) private visitModel: Model<VisitDocument>,
     @InjectModel(ServiceConfig.name) private serviceConfigModel: Model<ServiceConfigDocument>,
     private usersService: UsersService,
-  ) {}
+  ) {
+    this.transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT ?? 587),
+      secure: false,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    });
+  }
 
   async onModuleInit() {
     for (const s of DEFAULT_SERVICES) {
@@ -454,5 +465,89 @@ export class AdminService implements OnModuleInit {
 
   async getAllServiceConfigs() {
     return this.serviceConfigModel.find().sort({ name: 1 });
+  }
+
+  // ── Newsletter ─────────────────────────────────────────────────────────────
+
+  private buildNewsletterQuery(filter: string) {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
+    const base: any = { role: 'client', email: { $exists: true, $nin: ['', null] } };
+
+    switch (filter) {
+      case 'active':
+        return { ...base, visitCount: { $gt: 0 }, lastVisitAt: { $gte: threeMonthsAgo } };
+      case 'inactive':
+        return { ...base, visitCount: { $gt: 0 }, lastVisitAt: { $lt: threeMonthsAgo } };
+      case 'never':
+        return { ...base, $or: [{ visitCount: 0 }, { visitCount: { $exists: false } }] };
+      case 'tier_bronze':   return { ...base, loyaltyTier: 'bronze' };
+      case 'tier_silver':   return { ...base, loyaltyTier: 'silver' };
+      case 'tier_gold':     return { ...base, loyaltyTier: 'gold' };
+      case 'tier_platinum': return { ...base, loyaltyTier: 'platinum' };
+      default:              return base; // 'all'
+    }
+  }
+
+  async getNewsletterCount(filter: string): Promise<number> {
+    return this.userModel.countDocuments(this.buildNewsletterQuery(filter));
+  }
+
+  async sendNewsletter(dto: SendNewsletterDto): Promise<{ sent: number; skipped: number }> {
+    if (!process.env.SMTP_USER) throw new BadRequestException('SMTP non configuré');
+
+    const query = dto.clientIds?.length
+      ? { _id: { $in: dto.clientIds }, email: { $exists: true, $nin: ['', null] } }
+      : this.buildNewsletterQuery(dto.filter);
+
+    const clients = await this.userModel.find(query).select('firstName email');
+
+    const bannerBlock = dto.bannerUrl
+      ? `<img src="${dto.bannerUrl}" alt="" style="width:100%;border-radius:8px;display:block;margin-bottom:24px">`
+      : '';
+
+    const ctaBlock = dto.ctaUrl && dto.ctaLabel
+      ? `<div style="margin:28px 0;text-align:center">
+           <a href="${dto.ctaUrl}" style="background:#C9A44A;color:#000;padding:13px 32px;border-radius:6px;text-decoration:none;font-weight:700;font-size:15px;display:inline-block">${dto.ctaLabel}</a>
+         </div>`
+      : '';
+
+    const messageHtml = dto.message.replace(/\n/g, '<br>');
+
+    let sent = 0;
+    let skipped = 0;
+
+    for (const client of clients) {
+      if (!client.email) { skipped++; continue; }
+      try {
+        await this.transporter.sendMail({
+          from: `"Dany1st Barber" <${process.env.SMTP_USER}>`,
+          to: client.email,
+          subject: dto.subject,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:520px;margin:auto;background:#111111;color:#ffffff;padding:36px;border-radius:12px;border:1px solid #2a2a2a">
+              ${bannerBlock}
+              <div style="margin-bottom:24px">
+                <span style="font-family:Georgia,serif;font-size:22px;color:#C9A44A;font-weight:400;letter-spacing:.04em">DANY<span style="font-weight:700">1ST</span></span>
+                <span style="font-size:12px;color:rgba(255,255,255,.35);margin-left:8px">Barber Shop</span>
+              </div>
+              <hr style="border:none;border-top:1px solid #2a2a2a;margin:0 0 24px">
+              ${client.firstName ? `<p style="margin:0 0 18px;font-size:15px;color:rgba(255,255,255,.85)">Bonjour <strong>${client.firstName}</strong>,</p>` : ''}
+              <div style="font-size:15px;line-height:1.75;color:rgba(255,255,255,.8)">${messageHtml}</div>
+              ${ctaBlock}
+              <hr style="border:none;border-top:1px solid #2a2a2a;margin:28px 0 20px">
+              <p style="color:rgba(255,255,255,.3);font-size:12px;margin:0;line-height:1.6">
+                Dany1st Barber · Paris<br>
+                Vous recevez ce message car vous êtes inscrit(e) chez Dany1st Barber.
+              </p>
+            </div>`,
+        });
+        sent++;
+      } catch {
+        skipped++;
+      }
+    }
+
+    return { sent, skipped };
   }
 }

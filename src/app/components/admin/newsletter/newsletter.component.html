@@ -1,0 +1,234 @@
+<div class="nl">
+
+  <!-- En-tête -->
+  <div class="nl__header">
+    <div>
+      <h1 class="nl__title">Newsletter</h1>
+      <p class="nl__subtitle">Envoyer un email à vos clients</p>
+    </div>
+  </div>
+
+  <!-- Résultat envoi -->
+  @if (result()) {
+  <div class="nl__result">
+    <div class="nl__result-icon">✓</div>
+    <div class="nl__result-text">
+      <strong>{{ result()!.sent }} email{{ result()!.sent > 1 ? 's' : '' }} envoyé{{ result()!.sent > 1 ? 's' : '' }}</strong>
+      @if (result()!.skipped > 0) {
+      <span class="nl__result-skipped">· {{ result()!.skipped }} ignoré{{ result()!.skipped > 1 ? 's' : '' }}</span>
+      }
+    </div>
+    <button class="nl__btn-ghost" (click)="reset()">Nouveau message</button>
+  </div>
+  } @else {
+
+  <div class="nl__layout">
+
+    <!-- Colonne gauche : formulaire -->
+    <div class="nl__form-col">
+
+      <!-- ── Destinataires ── -->
+      <div class="nl__card">
+        <div class="nl__card-title">Destinataires</div>
+
+        <!-- Tabs mode -->
+        <div class="nl__mode-tabs">
+          <button class="nl__mode-tab" [class.nl__mode-tab--active]="recipientMode() === 'filter'"
+            (click)="setMode('filter')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+            </svg>
+            Filtres rapides
+          </button>
+          <button class="nl__mode-tab" [class.nl__mode-tab--active]="recipientMode() === 'manual'"
+            (click)="setMode('manual')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <polyline points="16 11 18 13 22 9"/>
+            </svg>
+            Sélection manuelle
+          </button>
+        </div>
+
+        <!-- Mode filtre -->
+        @if (recipientMode() === 'filter') {
+        <div class="nl__filter-list">
+          @for (f of FILTERS; track f.value) {
+          <button class="nl__filter-row" [class.nl__filter-row--active]="filter() === f.value"
+            (click)="filter.set(f.value)">
+            <div class="nl__filter-row-radio">
+              @if (filter() === f.value) { <span class="nl__filter-row-dot"></span> }
+            </div>
+            <div class="nl__filter-row-text">
+              <span class="nl__filter-row-label">{{ f.label }}</span>
+              @if (f.sub) { <span class="nl__filter-row-sub">{{ f.sub }}</span> }
+            </div>
+            @if (filter() === f.value) {
+            <span class="nl__filter-row-count">
+              @if (loadingCount()) { <span class="nl__filter-row-count-dot"></span> }
+              @else { {{ recipientCount() ?? '…' }} }
+            </span>
+            }
+          </button>
+          }
+        </div>
+        }
+
+        <!-- Mode manuel -->
+        @if (recipientMode() === 'manual') {
+        @if (loadingClients()) {
+        <div class="nl__clients-loading">Chargement des clients…</div>
+        } @else {
+        <div class="nl__clients-search">
+          <svg class="nl__clients-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input class="nl__clients-search-input" type="text" [ngModel]="clientSearch()"
+            (ngModelChange)="clientSearch.set($event)" placeholder="Rechercher par nom ou email…" />
+        </div>
+
+        <div class="nl__clients-bar">
+          <span class="nl__clients-selected">
+            {{ selectedIds().size }} sélectionné{{ selectedIds().size > 1 ? 's' : '' }}
+          </span>
+          <div class="nl__clients-bar-actions">
+            <button class="nl__clients-action" (click)="selectAll()">Tout sélectionner</button>
+            <button class="nl__clients-action" (click)="deselectAll()">Effacer</button>
+          </div>
+        </div>
+
+        <div class="nl__clients-list">
+          @for (c of filteredClients(); track c._id) {
+          <div class="nl__client-row" [class.nl__client-row--selected]="isSelected(c._id!)"
+            (click)="toggleClient(c._id!)">
+            <div class="nl__client-check">
+              @if (isSelected(c._id!)) {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              }
+            </div>
+            <div class="nl__client-info">
+              <span class="nl__client-name">{{ c.firstName }} {{ c.lastName }}</span>
+              <span class="nl__client-email">{{ c.email }}</span>
+            </div>
+            @if (c.loyaltyTier) {
+            <span class="nl__client-tier" [style.color]="tierColor(c.loyaltyTier)">{{ tierLabel(c.loyaltyTier) }}</span>
+            }
+          </div>
+          }
+          @if (!filteredClients().length) {
+          <p class="nl__clients-empty">Aucun client trouvé.</p>
+          }
+        </div>
+        }
+        }
+
+      </div>
+
+      <!-- ── Contenu ── -->
+      <div class="nl__card">
+        <div class="nl__card-title">Contenu</div>
+
+        <label class="nl__label">
+          Image bannière <span class="nl__label-opt">optionnel</span>
+          <input class="nl__input" type="url" [(ngModel)]="bannerUrl"
+            placeholder="https://… (lien Canva, Imgur, etc.)" />
+          <span class="nl__field-hint">Créez votre visuel sur Canva → Télécharger → Héberger l'image → Copier l'URL</span>
+        </label>
+
+        <label class="nl__label">
+          Objet
+          <input class="nl__input" type="text" [(ngModel)]="subject"
+            placeholder="ex : Offre spéciale printemps" maxlength="120" />
+        </label>
+
+        <label class="nl__label">
+          Message
+          <textarea class="nl__textarea" [(ngModel)]="message" rows="7"
+            placeholder="Bonjour,&#10;&#10;Nous avons une offre exclusive pour vous…"></textarea>
+        </label>
+
+        <!-- CTA -->
+        <div class="nl__cta-toggle">
+          <label class="nl__switch">
+            <input type="checkbox" [(ngModel)]="hasCta" />
+            <span class="nl__switch-track"></span>
+          </label>
+          <span class="nl__cta-toggle-label">Ajouter un bouton (CTA)</span>
+        </div>
+
+        @if (hasCta) {
+        <div class="nl__cta-fields">
+          <label class="nl__label">
+            Texte du bouton
+            <input class="nl__input" type="text" [(ngModel)]="ctaLabel"
+              placeholder="ex : Réserver maintenant" />
+          </label>
+          <label class="nl__label">
+            Lien URL
+            <input class="nl__input" type="url" [(ngModel)]="ctaUrl" placeholder="https://…" />
+          </label>
+        </div>
+        }
+      </div>
+
+      <!-- Bouton envoi -->
+      <button class="nl__btn-send" [disabled]="!canSend() || sending()" (click)="confirmSend()">
+        @if (sending()) {
+        Envoi en cours…
+        } @else {
+        Envoyer à {{ finalCount() }} client{{ finalCount() > 1 ? 's' : '' }}
+        }
+      </button>
+    </div>
+
+    <!-- Colonne droite : aperçu -->
+    <div class="nl__preview-col">
+      <div class="nl__card nl__card--preview">
+        <div class="nl__card-title">Aperçu</div>
+        <div class="nl__preview">
+          @if (bannerUrl) {
+          <img [src]="bannerUrl" alt="" class="nl__preview-banner" />
+          }
+          <div class="nl__preview-brand">DANY<span>1ST</span> <span class="nl__preview-brand-sub">Barber Shop</span>
+          </div>
+          <hr class="nl__preview-divider" />
+          <p class="nl__preview-greeting">Bonjour <strong>Prénom</strong>,</p>
+          <div class="nl__preview-message">{{ message || 'Votre message apparaîtra ici…' }}</div>
+          @if (hasCta && ctaLabel) {
+          <div class="nl__preview-cta-wrap">
+            <span class="nl__preview-cta">{{ ctaLabel }}</span>
+          </div>
+          }
+          <hr class="nl__preview-divider" />
+          <p class="nl__preview-footer">Dany1st Barber · Paris</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  }
+
+  <!-- Modale confirmation -->
+  @if (showConfirm()) {
+  <div class="nl__overlay" (click)="showConfirm.set(false)">
+    <div class="nl__modal" (click)="$event.stopPropagation()">
+      <div class="nl__modal-title">Confirmer l'envoi</div>
+      <p class="nl__modal-body">
+        Vous êtes sur le point d'envoyer <strong>« {{ subject }} »</strong> à
+        <strong>{{ finalCount() }} client{{ finalCount() > 1 ? 's' : '' }}</strong>
+        @if (recipientMode() === 'filter') { ({{ filterLabel() }}) }
+        @else { (sélection manuelle) }
+        .
+      </p>
+      <div class="nl__modal-actions">
+        <button class="nl__btn-send nl__btn-send--sm" (click)="send()">Envoyer</button>
+        <button class="nl__btn-ghost" (click)="showConfirm.set(false)">Annuler</button>
+      </div>
+    </div>
+  </div>
+  }
+
+</div>
