@@ -23,7 +23,7 @@
 
 ### Gestion clients
 - [X] Fiche client enrichie : notes internes (ex. "préfère les tempes rasées")
-- [ ] Recherche et filtres clients : par palier, dernière visite, points
+- [X] Recherche et filtres clients : par palier, dernière visite, points
 - [ ] Export CSV de la base clients
 
 ### Comptabilité
@@ -32,7 +32,7 @@
 - [X] Suivi des RDV annulés et leur impact sur le CA
 
 ### Planning
-- [ ] Vue agenda semaine (vision d'ensemble des RDV)
+- [X] Vue agenda semaine (vision d'ensemble des RDV)
 - [X] Blocage de plages horaires ponctuelles depuis l'UI (congés, fermeture exceptionnelle)
 
 ### Galerie
@@ -50,4 +50,6 @@
 | ✅ Fait | Notifications in-app | Meilleure expérience client |
 | ✅ Fait | Graphiques CA par prestation + comparatif + annulés | Aide à décider quoi promouvoir |
 | ✅ Fait | Drag & drop galerie + catégories | Confort d'utilisation |
+| ✅ Fait | Recherche & filtres clients | Meilleur suivi par palier |
+| ✅ Fait | Vue agenda semaine | Vision globale des RDV |
 | 🟡 Basse | Récurrence RDV | Fidélisation |

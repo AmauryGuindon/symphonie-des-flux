@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../services/admin.service';
-import { User, TIER_CONFIG } from '../../../models/user.model';
+import { User, TIER_CONFIG, LoyaltyTier } from '../../../models/user.model';
 
 const PAGE_SIZE = 15;
+
+type SortKey = 'lastVisit' | 'points' | 'visits' | '';
 
 @Component({
   selector: 'app-admin-clients',
@@ -21,18 +23,40 @@ export class AdminClientsComponent implements OnInit {
   page = signal(1);
   tierConfig = TIER_CONFIG;
 
+  tierFilter = signal<LoyaltyTier | ''>('');
+  sortBy = signal<SortKey>('');
+
+  readonly tiers: { value: LoyaltyTier | ''; label: string }[] = [
+    { value: '', label: 'Tous' },
+    { value: 'bronze', label: 'Bronze' },
+    { value: 'silver', label: 'Argent' },
+    { value: 'gold', label: 'Or' },
+    { value: 'platinum', label: 'Platine' },
+  ];
+
+  filteredClients = computed(() => {
+    let list = this.clients();
+    const tier = this.tierFilter();
+    if (tier) list = list.filter(c => c.loyaltyTier === tier);
+    const sort = this.sortBy();
+    if (sort === 'lastVisit') list = [...list].sort((a, b) => (b.lastVisitAt ?? '').localeCompare(a.lastVisitAt ?? ''));
+    if (sort === 'points')    list = [...list].sort((a, b) => b.loyaltyPoints - a.loyaltyPoints);
+    if (sort === 'visits')    list = [...list].sort((a, b) => b.visitCount - a.visitCount);
+    return list;
+  });
+
   pagedClients = computed(() =>
-    this.clients().slice((this.page() - 1) * PAGE_SIZE, this.page() * PAGE_SIZE)
+    this.filteredClients().slice((this.page() - 1) * PAGE_SIZE, this.page() * PAGE_SIZE)
   );
 
-  totalPages = computed(() => Math.max(1, Math.ceil(this.clients().length / PAGE_SIZE)));
+  totalPages = computed(() => Math.max(1, Math.ceil(this.filteredClients().length / PAGE_SIZE)));
 
   pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_, i) => i + 1)
   );
 
-  pageStart = computed(() => (this.page() - 1) * PAGE_SIZE + 1);
-  pageEnd   = computed(() => Math.min(this.page() * PAGE_SIZE, this.clients().length));
+  pageStart = computed(() => this.filteredClients().length === 0 ? 0 : (this.page() - 1) * PAGE_SIZE + 1);
+  pageEnd   = computed(() => Math.min(this.page() * PAGE_SIZE, this.filteredClients().length));
 
   constructor(private adminService: AdminService) {}
 
@@ -51,6 +75,16 @@ export class AdminClientsComponent implements OnInit {
 
   onSearch() {
     this.loadClients();
+  }
+
+  setTierFilter(tier: LoyaltyTier | '') {
+    this.tierFilter.set(tier);
+    this.page.set(1);
+  }
+
+  setSortBy(sort: SortKey) {
+    this.sortBy.set(sort);
+    this.page.set(1);
   }
 
   goTo(p: number) {
