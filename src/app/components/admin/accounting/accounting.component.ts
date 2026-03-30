@@ -81,7 +81,7 @@ export class AdminAccountingComponent implements OnInit {
       const key = (v.visitDate ?? v.createdAt?.slice(0, 10)) as string;
       if (!key || key < cutoffStr) continue;
       if (!map[key]) map[key] = { total: 0, visits: [] };
-      map[key].total += v.price;
+      map[key].total += v.paymentMethod !== 'points' ? v.price : 0;
       map[key].visits.push(v);
     }
     return Object.entries(map)
@@ -171,7 +171,7 @@ export class AdminAccountingComponent implements OnInit {
   totalPayments = computed(() => {
     const d = this.data();
     if (!d) return 0;
-    return d.byPayment.reduce((s, p) => s + p.total, 0);
+    return d.byPayment.filter(p => p._id !== 'points').reduce((s, p) => s + p.total, 0);
   });
 
   paymentLabel(id: string): string {

@@ -70,7 +70,7 @@ export class AdminService implements OnModuleInit {
 
     const revenueAgg = (from: Date) =>
       this.visitModel.aggregate([
-        { $match: { createdAt: { $gte: from } } },
+        { $match: { createdAt: { $gte: from }, paymentMethod: { $ne: 'points' } } },
         { $group: { _id: null, total: { $sum: '$price' } } },
       ]);
 
@@ -181,7 +181,7 @@ export class AdminService implements OnModuleInit {
           this.userModel.countDocuments({ role: 'client', createdAt: { $gte: start, $lte: end } }),
           this.userModel.countDocuments({ role: 'client', lastVisitAt: { $gte: start, $lte: end } }),
           this.visitModel.aggregate([
-            { $match: { createdAt: { $gte: start, $lte: end } } },
+            { $match: { createdAt: { $gte: start, $lte: end }, paymentMethod: { $ne: 'points' } } },
             { $group: { _id: null, total: { $sum: '$price' } } },
           ]),
         ]);
@@ -330,10 +330,12 @@ export class AdminService implements OnModuleInit {
       ],
     };
 
+    const cashFilter = { ...dateFilter, paymentMethod: { $ne: 'points' } };
+
     const [rawVisits, byService, byPayment, totalVisits] = await Promise.all([
       this.visitModel.find(dateFilter).sort({ createdAt: -1 }).limit(500),
       this.visitModel.aggregate([
-        { $match: dateFilter },
+        { $match: cashFilter },
         { $group: { _id: '$serviceType', total: { $sum: '$price' }, count: { $sum: 1 } } },
         { $sort: { total: -1 } },
       ]),
@@ -364,7 +366,7 @@ export class AdminService implements OnModuleInit {
       clientName: v.clientName || userMap.get(v.clientId) || null,
     }));
 
-    const totalRevenue = visits.reduce((sum, v) => sum + v.price, 0);
+    const totalRevenue = visits.filter(v => v.paymentMethod !== 'points').reduce((sum, v) => sum + v.price, 0);
 
     const now = new Date();
     const qStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3, 1);
@@ -375,9 +377,12 @@ export class AdminService implements OnModuleInit {
     const qFilter = { $or: [{ visitDate: { $gte: qStartStr } }, { visitDate: null, createdAt: { $gte: qStart } }] };
     const yFilter = { $or: [{ visitDate: { $gte: yStartStr } }, { visitDate: null, createdAt: { $gte: yStart } }] };
 
+    const qCashFilter = { ...qFilter, paymentMethod: { $ne: 'points' } };
+    const yCashFilter = { ...yFilter, paymentMethod: { $ne: 'points' } };
+
     const [revQuarter, revYear] = await Promise.all([
-      this.visitModel.aggregate([{ $match: qFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
-      this.visitModel.aggregate([{ $match: yFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+      this.visitModel.aggregate([{ $match: qCashFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+      this.visitModel.aggregate([{ $match: yCashFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
     ]);
 
     return {

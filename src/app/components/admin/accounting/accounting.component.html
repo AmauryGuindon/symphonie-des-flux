@@ -134,9 +134,13 @@
       <div class="acct__payment-row">
         <div class="acct__payment-dot" [style.background]="paymentColor(p._id)"></div>
         <span class="acct__payment-label" [style.color]="paymentColor(p._id)">{{ paymentLabel(p._id) }}</span>
-        <span class="acct__payment-amount" [style.color]="paymentColor(p._id)">{{ p.total | number:'1.0-0' }} €</span>
-        <span class="acct__payment-pct">{{ totalPayments() > 0 ? ((p.total / totalPayments()) * 100 | number:'1.0-0') :
-          0 }}%</span>
+        @if (p._id === 'points') {
+          <span class="acct__payment-amount" [style.color]="paymentColor(p._id)">{{ p.total * 10 | number:'1.0-0' }} pts</span>
+          <span class="acct__payment-pct">{{ p.count }} presta.</span>
+        } @else {
+          <span class="acct__payment-amount" [style.color]="paymentColor(p._id)">{{ p.total | number:'1.0-0' }} €</span>
+          <span class="acct__payment-pct">{{ totalPayments() > 0 ? ((p.total / totalPayments()) * 100 | number:'1.0-0') : 0 }}%</span>
+        }
       </div>
       }
     </div>
