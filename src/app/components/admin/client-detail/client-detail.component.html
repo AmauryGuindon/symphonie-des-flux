@@ -150,6 +150,28 @@
           }
         </div>
 
+        <!-- Notes internes -->
+        <div class="cd__card cd__card--notes">
+          <div class="cd__card-header">
+            <h3>Notes internes</h3>
+            <span class="cd__notes-hint">Visible uniquement par vous</span>
+          </div>
+          <textarea
+            class="cd__notes-textarea"
+            [(ngModel)]="internalNotes"
+            rows="5"
+            placeholder="Ex: préfère les tempes rasées, allergique aux parfums, coupe XL habituelle…"
+          ></textarea>
+          <div class="cd__notes-actions">
+            <button class="cd__btn-save" (click)="saveNotes()" [disabled]="notesLoading()">
+              {{ notesLoading() ? '…' : 'Sauvegarder' }}
+            </button>
+            @if (notesSuccess()) {
+              <span class="cd__success">✓ Notes enregistrées</span>
+            }
+          </div>
+        </div>
+
         <!-- Zone danger -->
         <div class="cd__card cd__card--danger">
           <div class="cd__card-header"><h3>Zone danger</h3></div>

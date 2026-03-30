@@ -22,6 +22,7 @@ export class Appointment {
   @Prop({ default: 0 }) price: number;
   @Prop({ default: 0 }) duration: number;
   @Prop({ default: false }) visitRecorded: boolean;
+  @Prop({ default: false }) reminderSent: boolean;
 }
 
 export const AppointmentSchema = SchemaFactory.createForClass(Appointment);

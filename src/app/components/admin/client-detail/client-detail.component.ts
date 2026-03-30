@@ -39,6 +39,10 @@ export class AdminClientDetailComponent implements OnInit {
   pointsLoading = signal(false);
   pointsSuccess = signal('');
 
+  internalNotes = '';
+  notesLoading = signal(false);
+  notesSuccess = signal(false);
+
   deleteConfirm = signal(false);
   currentYear = new Date().getFullYear();
 
@@ -79,7 +83,7 @@ export class AdminClientDetailComponent implements OnInit {
   private loadClient(id: string) {
     this.loading.set(true);
     this.adminService.getClient(id).subscribe({
-      next: c => { this.client.set(c); this.loading.set(false); },
+      next: c => { this.client.set(c); this.internalNotes = c.internalNotes ?? ''; this.loading.set(false); },
       error: () => this.loading.set(false),
     });
   }
@@ -166,6 +170,21 @@ export class AdminClientDetailComponent implements OnInit {
         setTimeout(() => this.pointsSuccess.set(''), 3000);
       },
       error: () => this.pointsLoading.set(false),
+    });
+  }
+
+  saveNotes() {
+    const c = this.client();
+    if (!c) return;
+    this.notesLoading.set(true);
+    this.adminService.updateClient(c._id!, { internalNotes: this.internalNotes || undefined }).subscribe({
+      next: updated => {
+        this.client.set(updated);
+        this.notesLoading.set(false);
+        this.notesSuccess.set(true);
+        setTimeout(() => this.notesSuccess.set(false), 3000);
+      },
+      error: () => this.notesLoading.set(false),
     });
   }
 

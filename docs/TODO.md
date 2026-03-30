@@ -4,11 +4,11 @@
 
 ### Fidélité & récompenses
 - [ ] Historique détaillé des points (raison du gain, date, montant)
-- [ ] Afficher les points qu'on gagnerait avec chaque prestation avant de réserver
+- [X] Afficher les points qu'on gagnerait avec chaque prestation avant de réserver
 - [ ] Email automatique lors d'un changement de palier (Bronze → Argent, etc.)
 
 ### Réservation
-- [ ] Rappel SMS/email 24h avant le RDV *(la table `reminders` existe déjà en backend)*
+- [X] Rappel SMS/email 24h avant le RDV *(envoi automatique à 9h, anti-doublon `reminderSent`)*
 - [ ] Liste d'attente si tous les créneaux d'une journée sont pris
 - [ ] Récurrence : "reprendre le même RDV chaque mois"
 
@@ -21,7 +21,7 @@
 ## Côté backoffice
 
 ### Gestion clients
-- [ ] Fiche client enrichie : notes internes (ex. "préfère les tempes rasées"), tags personnalisés
+- [X] Fiche client enrichie : notes internes (ex. "préfère les tempes rasées")
 - [ ] Recherche et filtres clients : par palier, dernière visite, points
 - [ ] Export CSV de la base clients
 
@@ -32,7 +32,7 @@
 
 ### Planning
 - [ ] Vue agenda semaine (vision d'ensemble des RDV)
-- [ ] Blocage de plages horaires ponctuelles depuis l'UI (congés, fermeture exceptionnelle) *(le champ `closedDates` existe déjà en backend)*
+- [X] Blocage de plages horaires ponctuelles depuis l'UI (congés, fermeture exceptionnelle)
 
 ### Galerie
 - [ ] Réorganisation des photos par drag & drop

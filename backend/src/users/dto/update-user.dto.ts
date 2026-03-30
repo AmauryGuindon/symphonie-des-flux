@@ -26,4 +26,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   preferences?: string;
+
+  @IsOptional()
+  @IsString()
+  internalNotes?: string;
 }

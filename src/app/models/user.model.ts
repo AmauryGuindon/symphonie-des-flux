@@ -20,6 +20,7 @@ export interface User {
   referralCount: number;
   lastVisitAt?: string;
   createdAt?: string;
+  internalNotes?: string;
 }
 
 export interface AuthResponse {

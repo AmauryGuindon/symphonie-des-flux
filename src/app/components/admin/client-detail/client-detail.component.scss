@@ -104,6 +104,10 @@
       @media (max-width: 700px) { grid-template-columns: repeat(2, 1fr); }
     }
 
+    &--notes {
+      grid-column: 1 / -1;
+    }
+
     &--danger {
       border-color: rgba(231,76,60,.2);
     }
@@ -203,6 +207,36 @@
       &:focus { border-color: rgba(201,164,74,.5); }
     }
     textarea { resize: vertical; font-family: inherit; }
+  }
+
+  &__notes-hint {
+    font-size: .72rem;
+    color: rgba(255,255,255,.25);
+    font-style: italic;
+  }
+
+  &__notes-textarea {
+    width: 100%;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 6px;
+    padding: .75rem 1rem;
+    color: #fff;
+    font-size: .875rem;
+    font-family: inherit;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color .2s;
+    &:focus { border-color: rgba(201,164,74,.5); }
+    &::placeholder { color: rgba(255,255,255,.2); }
+  }
+
+  &__notes-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: .875rem;
   }
 
   &__edit-actions { display: flex; gap: .75rem; margin-top: .25rem; }

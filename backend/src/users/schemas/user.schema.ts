@@ -66,6 +66,10 @@ export class User {
   @Prop()
   lastVisitAt?: Date;
 
+  // --- Notes internes (admin uniquement) ---
+  @Prop({ trim: true })
+  internalNotes?: string;
+
   // --- Réinitialisation mot de passe ---
   @Prop({ select: false })
   resetToken?: string;

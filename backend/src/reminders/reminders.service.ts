@@ -31,7 +31,8 @@ export class RemindersService {
 
     const appointments = await this.appointmentModel.find({
       date: tomorrowStr,
-      status: 'confirmed',
+      status: { $in: ['confirmed', 'pending'] },
+      reminderSent: { $ne: true },
     });
 
     this.logger.log(`Envoi de ${appointments.length} rappel(s) pour le ${tomorrowStr}`);
@@ -56,6 +57,7 @@ export class RemindersService {
               <p>À demain,<br><strong>Dany1st Barber</strong></p>
             </div>`,
         });
+        await this.appointmentModel.findByIdAndUpdate(appt._id, { reminderSent: true });
       } catch (err) {
         this.logger.error(`Échec rappel pour ${appt.clientEmail}`, err);
       }

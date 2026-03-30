@@ -75,7 +75,7 @@ export class AdminNewsletterComponent {
         this.filter(); // dépendance réactive
         this.loadCount();
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   // ── Mode ──────────────────────────────────────────────────────────────────
