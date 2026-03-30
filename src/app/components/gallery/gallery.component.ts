@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
@@ -10,6 +10,7 @@ interface GalleryItem {
   url: string;
   alt?: string;
   span?: string;
+  category?: string;
   active: boolean;
 }
 
@@ -21,10 +22,27 @@ interface GalleryItem {
   styleUrl: './gallery.component.scss',
 })
 export class GalleryComponent implements OnInit {
-  items = signal<GalleryItem[]>([]);
+  private allItems = signal<GalleryItem[]>([]);
+  activeCategory = signal('');
 
-  // Fallback items shown when API returns empty or fails
-  private readonly fallbackItems = [
+  categories: { value: string; label: string }[] = [
+    { value: '', label: 'Tout' },
+    { value: 'coupe', label: 'Coupe' },
+    { value: 'barbe', label: 'Barbe' },
+    { value: 'degrade', label: 'Dégradé' },
+  ];
+
+  items = computed(() => {
+    const cat = this.activeCategory();
+    if (!cat) return this.allItems();
+    return this.allItems().filter(item => item.category === cat);
+  });
+
+  hasCategories = computed(() =>
+    this.allItems().some(item => item.category && item.category !== '')
+  );
+
+  private readonly fallbackItems: GalleryItem[] = [
     { _id: '1', url: 'assets/taper1.png', alt: 'Dégradé signature Dany1st', span: 'tall', active: true },
     { _id: '2', url: 'assets/burstfade1.png', alt: 'Burst fade', span: '', active: true },
     { _id: '3', url: 'assets/burstfade2.png', alt: 'Burst fade 2', span: '', active: true },
@@ -36,10 +54,10 @@ export class GalleryComponent implements OnInit {
   ngOnInit() {
     this.http.get<GalleryItem[]>(`${API}/gallery`).subscribe({
       next: items => {
-        const normalizedItems = items.map(item => this.withAbsoluteUrl(item));
-        this.items.set(normalizedItems.length > 0 ? normalizedItems : this.fallbackItems);
+        const normalized = items.map(item => this.withAbsoluteUrl(item));
+        this.allItems.set(normalized.length > 0 ? normalized : this.fallbackItems);
       },
-      error: () => this.items.set(this.fallbackItems),
+      error: () => this.allItems.set(this.fallbackItems),
     });
   }
 

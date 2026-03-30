@@ -5,11 +5,25 @@ import { Visit } from './admin.service';
 
 const API = 'http://localhost:3000/api/admin';
 
+export interface CancelledAppointment {
+  _id: string;
+  clientName: string;
+  serviceType: string;
+  date: string;
+  time: string;
+  price: number;
+}
+
 export interface AccountingData {
-  kpis: { revenue: number; visits: number; quarter: number; year: number };
+  kpis: {
+    revenue: number; visits: number; quarter: number; year: number;
+    prevRevenue: number; prevVisits: number;
+    cancelledCount: number; cancelledRevenue: number;
+  };
   byService: { _id: string; total: number; count: number }[];
   byPayment: { _id: string; total: number; count: number }[];
   visits: Visit[];
+  cancelledAppointments: CancelledAppointment[];
 }
 
 export interface ManualVisitDto {

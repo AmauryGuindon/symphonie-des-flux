@@ -15,13 +15,17 @@ export class GalleryService {
     return this.model.find({ active: true }).sort({ order: 1, createdAt: -1 });
   }
 
-  async create(filename: string, url: string, alt?: string, span?: string) {
+  async create(filename: string, url: string, alt?: string, span?: string, category?: string) {
     const count = await this.model.countDocuments();
-    return this.model.create({ filename, url, alt, span: span ?? '', order: count });
+    return this.model.create({ filename, url, alt, span: span ?? '', category: category ?? '', order: count });
   }
 
-  update(id: string, dto: { alt?: string; span?: string; active?: boolean; order?: number }) {
+  update(id: string, dto: { alt?: string; span?: string; category?: string; active?: boolean; order?: number }) {
     return this.model.findByIdAndUpdate(id, dto, { new: true });
+  }
+
+  async reorder(items: { id: string; order: number }[]) {
+    await Promise.all(items.map(({ id, order }) => this.model.findByIdAndUpdate(id, { order })));
   }
 
   async delete(id: string, uploadsPath: string) {

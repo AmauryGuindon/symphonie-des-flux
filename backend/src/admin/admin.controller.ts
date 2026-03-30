@@ -129,8 +129,16 @@ export class AdminController {
   }
 
   @Patch('schedule')
-  updateSchedule(@Body() dto: UpdateBusinessConfigDto) {
-    return this.scheduleService.updateConfig(dto);
+  async updateSchedule(@Body() dto: UpdateBusinessConfigDto) {
+    const current = await this.scheduleService.getConfig();
+    const result = await this.scheduleService.updateConfig(dto);
+    if (dto.closedDates) {
+      const newDates = dto.closedDates.filter(d => !current.closedDates.includes(d));
+      if (newDates.length > 0) {
+        await this.appointmentsService.cancelDueToClosure(newDates);
+      }
+    }
+    return result;
   }
 
   // ── Comptabilité ─────────────────────────────────────────────────────────────

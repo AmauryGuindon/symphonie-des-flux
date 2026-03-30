@@ -332,7 +332,19 @@ export class AdminService implements OnModuleInit {
 
     const cashFilter = { ...dateFilter, paymentMethod: { $ne: 'points' } };
 
-    const [rawVisits, byService, byPayment, totalVisits] = await Promise.all([
+    // Période précédente (comparatif)
+    const prev = this.parsePrevPeriod(period, date);
+    const prevStartStr = prev.start.toISOString().slice(0, 10);
+    const prevEndStr   = prev.end.toISOString().slice(0, 10);
+    const prevDateFilter = {
+      $or: [
+        { visitDate: { $gte: prevStartStr, $lte: prevEndStr } },
+        { visitDate: null, createdAt: { $gte: prev.start, $lte: prev.end } },
+      ],
+    };
+    const prevCashFilter = { ...prevDateFilter, paymentMethod: { $ne: 'points' } };
+
+    const [rawVisits, byService, byPayment, totalVisits, prevRevenueAgg, prevVisits, cancelledApts] = await Promise.all([
       this.visitModel.find(dateFilter).sort({ createdAt: -1 }).limit(500),
       this.visitModel.aggregate([
         { $match: cashFilter },
@@ -344,6 +356,9 @@ export class AdminService implements OnModuleInit {
         { $group: { _id: { $ifNull: ['$paymentMethod', 'especes'] }, total: { $sum: '$price' }, count: { $sum: 1 } } },
       ]),
       this.visitModel.countDocuments(dateFilter),
+      this.visitModel.aggregate([{ $match: prevCashFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
+      this.visitModel.countDocuments(prevDateFilter),
+      this.appointmentModel.find({ date: { $gte: startStr, $lte: endStr }, status: 'cancelled' }).sort({ date: -1 }).limit(200),
     ]);
 
     // Enrichir les visites avec le nom des clients enregistrés
@@ -385,16 +400,31 @@ export class AdminService implements OnModuleInit {
       this.visitModel.aggregate([{ $match: yCashFilter }, { $group: { _id: null, t: { $sum: '$price' } } }]),
     ]);
 
+    const cancelledCount   = cancelledApts.length;
+    const cancelledRevenue = cancelledApts.reduce((s, a) => s + (a.price ?? 0), 0);
+
     return {
       kpis: {
         revenue: totalRevenue,
         visits: totalVisits,
         quarter: revQuarter[0]?.t ?? 0,
         year: revYear[0]?.t ?? 0,
+        prevRevenue: prevRevenueAgg[0]?.t ?? 0,
+        prevVisits,
+        cancelledCount,
+        cancelledRevenue,
       },
       byService,
       byPayment,
       visits,
+      cancelledAppointments: cancelledApts.map(a => ({
+        _id: a._id.toString(),
+        clientName: a.clientName,
+        serviceType: a.serviceType,
+        date: a.date,
+        time: a.time,
+        price: a.price,
+      })),
     };
   }
 
@@ -458,6 +488,28 @@ export class AdminService implements OnModuleInit {
       };
     }
     throw new BadRequestException(`Période invalide : ${period}`);
+  }
+
+  private parsePrevPeriod(period: string, date: string): { start: Date; end: Date } {
+    if (period === 'month') {
+      const [y, m] = date.split('-').map(Number);
+      const prevM = m === 1 ? 12 : m - 1;
+      const prevY = m === 1 ? y - 1 : y;
+      return { start: new Date(prevY, prevM - 1, 1), end: new Date(prevY, prevM, 0, 23, 59, 59) };
+    }
+    if (period === 'quarter') {
+      const [y, q] = date.split('-');
+      const qNum = parseInt(q.replace('Q', '')) - 1;
+      const prevQ = qNum === 0 ? 3 : qNum - 1;
+      const prevY = qNum === 0 ? parseInt(y) - 1 : parseInt(y);
+      const startMonth = prevQ * 3;
+      return { start: new Date(prevY, startMonth, 1), end: new Date(prevY, startMonth + 3, 0, 23, 59, 59) };
+    }
+    if (period === 'year') {
+      const y = parseInt(date) - 1;
+      return { start: new Date(y, 0, 1), end: new Date(y, 11, 31, 23, 59, 59) };
+    }
+    return { start: new Date(0), end: new Date(0) };
   }
 
   // ── Gestion des prestations ───────────────────────────────────────────────────

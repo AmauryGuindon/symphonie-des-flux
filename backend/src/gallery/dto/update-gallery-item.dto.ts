@@ -11,6 +11,10 @@ export class UpdateGalleryItemDto {
   span?: string;
 
   @IsOptional()
+  @IsIn(['', 'coupe', 'barbe', 'degrade'])
+  category?: string;
+
+  @IsOptional()
   @Transform(({ value }) => {
     if (value === undefined || value === null || value === '') return undefined;
     if (value === 'true') return true;

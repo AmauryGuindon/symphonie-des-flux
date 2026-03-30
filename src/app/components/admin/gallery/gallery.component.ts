@@ -11,6 +11,7 @@ interface GalleryItem {
   url: string;
   alt?: string;
   span?: string;
+  category?: string;
   order: number;
   active: boolean;
 }
@@ -28,8 +29,19 @@ export class AdminGalleryComponent implements OnInit {
   uploading = signal(false);
   dragOver = signal(false);
   savingId = signal<string | null>(null);
+  toast = signal<{ message: string; type: 'ok' | 'err' } | null>(null);
+  savingOrder = signal(false);
+  orderDirty = signal(false);
+  draggedIndex = signal<number | null>(null);
+  dragOverIndex = signal<number | null>(null);
 
   spanOptions = ['', 'wide', 'tall', 'large'];
+  categoryOptions: { value: string; label: string }[] = [
+    { value: '', label: 'Non catégorisé' },
+    { value: 'coupe', label: 'Coupe' },
+    { value: 'barbe', label: 'Barbe' },
+    { value: 'degrade', label: 'Dégradé' },
+  ];
 
   constructor(private http: HttpClient) {}
 
@@ -72,18 +84,78 @@ export class AdminGalleryComponent implements OnInit {
     this.uploadFile(file);
   }
 
+  // --- Drag & drop reorder ---
+
+  onItemDragStart(index: number) {
+    this.draggedIndex.set(index);
+  }
+
+  onItemDragOver(event: DragEvent, index: number) {
+    event.preventDefault();
+    this.dragOverIndex.set(index);
+  }
+
+  onItemDragLeave() {
+    this.dragOverIndex.set(null);
+  }
+
+  onItemDrop(targetIndex: number) {
+    const from = this.draggedIndex();
+    if (from === null || from === targetIndex) {
+      this.draggedIndex.set(null);
+      this.dragOverIndex.set(null);
+      return;
+    }
+    const arr = [...this.items()];
+    const [moved] = arr.splice(from, 1);
+    arr.splice(targetIndex, 0, moved);
+    this.items.set(arr.map((item, i) => ({ ...item, order: i })));
+    this.draggedIndex.set(null);
+    this.dragOverIndex.set(null);
+    this.orderDirty.set(true);
+  }
+
+  onItemDragEnd() {
+    this.draggedIndex.set(null);
+    this.dragOverIndex.set(null);
+  }
+
+  saveOrder() {
+    this.savingOrder.set(true);
+    const payload = { items: this.items().map((item, i) => ({ id: item._id, order: i })) };
+    this.http.patch(`${API}/admin/gallery/reorder`, payload).subscribe({
+      next: () => {
+        this.savingOrder.set(false);
+        this.orderDirty.set(false);
+        this.showToast('Ordre sauvegardé', 'ok');
+      },
+      error: () => {
+        this.savingOrder.set(false);
+        this.showToast('Erreur lors de la sauvegarde', 'err');
+      },
+    });
+  }
+
+  // --- Item save / delete ---
+
   save(item: GalleryItem) {
     this.savingId.set(item._id);
     this.http
       .patch(`${API}/admin/gallery/${item._id}`, {
         alt: item.alt,
         span: item.span,
+        category: item.category,
         active: item.active,
-        order: item.order,
       })
       .subscribe({
-        next: () => this.savingId.set(null),
-        error: () => this.savingId.set(null),
+        next: () => {
+          this.savingId.set(null);
+          this.showToast('Photo sauvegardée', 'ok');
+        },
+        error: () => {
+          this.savingId.set(null);
+          this.showToast('Erreur lors de la sauvegarde', 'err');
+        },
       });
   }
 
@@ -93,6 +165,11 @@ export class AdminGalleryComponent implements OnInit {
       next: () => this.items.update(list => list.filter(i => i._id !== item._id)),
       error: () => {},
     });
+  }
+
+  private showToast(message: string, type: 'ok' | 'err') {
+    this.toast.set({ message, type });
+    setTimeout(() => this.toast.set(null), 3000);
   }
 
   imageUrl(item: GalleryItem): string {

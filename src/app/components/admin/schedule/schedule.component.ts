@@ -25,9 +25,11 @@ export class AdminScheduleComponent implements OnInit {
   breakEnd = '14:00';
   closedDates: string[] = [];
   newClosedDate = '';
+  rangeStart = '';
+  rangeEnd = '';
 
+  readonly today = new Date().toISOString().split('T')[0];
   readonly DAY_LABELS = DAY_LABELS;
-
   readonly SLOT_OPTIONS = [15, 30, 45, 60];
 
   constructor(private appointmentService: AppointmentService) {}
@@ -41,7 +43,8 @@ export class AdminScheduleComponent implements OnInit {
         this.slotDuration = cfg.slotDuration;
         this.breakStart = cfg.breakStart ?? '13:00';
         this.breakEnd = cfg.breakEnd ?? '14:00';
-        this.closedDates = [...cfg.closedDates].sort();
+        // Supprimer automatiquement les dates passées
+        this.closedDates = cfg.closedDates.filter(d => d >= this.today).sort();
         this.loading.set(false);
       },
       error: () => this.loading.set(false),
@@ -54,9 +57,24 @@ export class AdminScheduleComponent implements OnInit {
 
   addClosedDate() {
     const d = this.newClosedDate.trim();
-    if (!d || this.closedDates.includes(d)) return;
+    if (!d || d < this.today || this.closedDates.includes(d)) return;
     this.closedDates = [...this.closedDates, d].sort();
     this.newClosedDate = '';
+  }
+
+  addDateRange() {
+    if (!this.rangeStart || !this.rangeEnd || this.rangeStart > this.rangeEnd) return;
+    const added: string[] = [];
+    const current = new Date(this.rangeStart + 'T12:00:00');
+    const end = new Date(this.rangeEnd + 'T12:00:00');
+    while (current <= end) {
+      const ds = current.toISOString().split('T')[0];
+      if (!this.closedDates.includes(ds)) added.push(ds);
+      current.setDate(current.getDate() + 1);
+    }
+    this.closedDates = [...this.closedDates, ...added].sort();
+    this.rangeStart = '';
+    this.rangeEnd = '';
   }
 
   removeClosedDate(d: string) {

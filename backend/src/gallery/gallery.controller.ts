@@ -67,7 +67,15 @@ export class GalleryController {
   ) {
     if (!file) throw new BadRequestException('Fichier requis');
     const url = `/uploads/gallery/${file.filename}`;
-    return this.galleryService.create(file.filename, url, body.alt, body.span);
+    return this.galleryService.create(file.filename, url, body.alt, body.span, body.category);
+  }
+
+  @Patch('admin/gallery/reorder')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async reorder(@Body() body: { items: { id: string; order: number }[] }) {
+    await this.galleryService.reorder(body.items);
+    return { ok: true };
   }
 
   @Patch('admin/gallery/:id')

@@ -1,3 +1,35 @@
+@use '../admin-shared' as *;
+
+.agallery__toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  background: #1e3a2e;
+  border: 1px solid #4caf82;
+  color: #4caf82;
+  font-family: var(--font-body);
+  font-size: .82rem;
+  letter-spacing: .06em;
+  padding: .75rem 2rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, .5);
+  animation: toast-in .25s ease;
+  white-space: nowrap;
+
+  &--err {
+    background: #3a1e1e;
+    border-color: #e74c3c;
+    color: #e74c3c;
+  }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .agallery {
   padding: 1.5rem;
 
@@ -9,12 +41,14 @@
     margin-bottom: 1.5rem;
   }
 
+  &__header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   &__title {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: var(--white);
-    letter-spacing: .06em;
-    margin: 0;
+    @include page-title;
   }
 
   &__upload-zone {
@@ -76,6 +110,25 @@
     gap: 1.25rem;
   }
 
+  &__btn-order {
+    background: rgba(201,164,74,.15);
+    border: 1px solid rgba(201,164,74,.45);
+    color: var(--gold);
+    font-family: var(--font-body);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: .35rem .9rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background .2s;
+    white-space: nowrap;
+
+    &:hover { background: rgba(201,164,74,.25); }
+    &:disabled { opacity: .5; cursor: not-allowed; }
+  }
+
   &__item {
     background: rgba(255,255,255,.03);
     border: 1px solid rgba(255,255,255,.07);
@@ -83,6 +136,30 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    cursor: grab;
+    transition: opacity .2s, box-shadow .2s, border-color .2s;
+
+    &--dragging {
+      opacity: .4;
+      cursor: grabbing;
+    }
+
+    &--dragover {
+      border-color: rgba(201,164,74,.6);
+      box-shadow: 0 0 0 2px rgba(201,164,74,.2);
+    }
+  }
+
+  &__drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: .35rem;
+    color: rgba(255,255,255,.2);
+    background: rgba(255,255,255,.02);
+    cursor: grab;
+
+    &:hover { color: rgba(255,255,255,.4); }
   }
 
   &__preview {

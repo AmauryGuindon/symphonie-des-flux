@@ -1,7 +1,7 @@
 import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AccountingService, AccountingData, ManualVisitDto } from '../../../services/accounting.service';
+import { AccountingService, AccountingData, ManualVisitDto, CancelledAppointment } from '../../../services/accounting.service';
 import { AdminService, ServiceConfig } from '../../../services/admin.service';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -95,6 +95,61 @@ export class AdminAccountingComponent implements OnInit {
   });
 
   expandedDay = signal<string | null>(null);
+  showCancelled = signal(false);
+
+  readonly donutR = 40;
+  readonly donutCircumference = 2 * Math.PI * this.donutR;
+
+  serviceDonutSegments = computed(() => {
+    const services = this.data()?.byService ?? [];
+    const total = services.reduce((s, v) => s + v.total, 0);
+    if (!total) return [];
+    const C = this.donutCircumference;
+    let acc = 0;
+    return services.map(s => {
+      const length = (s.total / total) * C;
+      const seg = {
+        dasharray: `${length} ${C - length}`,
+        dashoffset: -acc,
+        color: this.serviceColor(s._id),
+        label: s._id,
+        pct: Math.round((s.total / total) * 100),
+        total: s.total,
+      };
+      acc += length;
+      return seg;
+    });
+  });
+
+  revTrend = computed(() => {
+    const d = this.data();
+    if (!d) return null;
+    const prev = d.kpis.prevRevenue;
+    if (!prev) return null;
+    return Math.round(((d.kpis.revenue - prev) / prev) * 100);
+  });
+
+  visitsTrend = computed(() => {
+    const d = this.data();
+    if (!d || !d.kpis.prevVisits) return null;
+    return Math.round(((d.kpis.visits - d.kpis.prevVisits) / d.kpis.prevVisits) * 100);
+  });
+
+  prevPeriodLabel = computed(() => {
+    const d = this.selectedDate();
+    if (this.period() === 'month') {
+      const [y, m] = d.split('-').map(Number);
+      const prevM = m === 1 ? 12 : m - 1;
+      const prevY = m === 1 ? y - 1 : y;
+      return new Date(prevY, prevM - 1, 1).toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+    }
+    if (this.period() === 'quarter') {
+      const [y, q] = d.split('-');
+      const qNum = parseInt(q.replace('Q', ''));
+      return qNum === 1 ? `T4 ${parseInt(y) - 1}` : `T${qNum - 1} ${y}`;
+    }
+    return (parseInt(d) - 1).toString();
+  });
 
   toggleDay(date: string) {
     this.expandedDay.set(this.expandedDay() === date ? null : date);
@@ -311,6 +366,10 @@ export class AdminAccountingComponent implements OnInit {
     });
 
     doc.save(`revenus-${period}.pdf`);
+  }
+
+  formatCancelDate(ds: string): string {
+    return new Date(ds + 'T12:00:00').toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
   }
 
   private normalizeKey(value: string): string {

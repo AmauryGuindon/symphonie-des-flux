@@ -12,13 +12,28 @@
     </div>
   </div>
 
+  @if (hasCategories()) {
+    <div class="container">
+      <div class="gallery__filters reveal">
+        @for (cat of categories; track cat.value) {
+          <button
+            class="gallery__filter-btn"
+            [class.gallery__filter-btn--active]="activeCategory() === cat.value"
+            (click)="activeCategory.set(cat.value)"
+          >
+            {{ cat.label }}
+          </button>
+        }
+      </div>
+    </div>
+  }
+
   <div class="gallery__grid">
     @for (item of items(); track item._id) {
       <div
-        class="gallery__item reveal"
+        class="gallery__item"
         [class.gallery__item--tall]="item.span === 'tall'"
         [class.gallery__item--wide]="item.span === 'wide'"
-        [class]="'reveal-delay-' + (($index % 4) + 1)"
       >
         @if (item.url) {
           <img [src]="item.url" [alt]="item.alt" loading="lazy" />

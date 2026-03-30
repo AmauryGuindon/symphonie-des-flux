@@ -34,6 +34,38 @@
     }
   }
 
+  &__filters {
+    display: flex;
+    gap: .6rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  &__filter-btn {
+    background: none;
+    border: 1px solid rgba(201, 164, 74, .25);
+    color: rgba(245, 240, 232, .5);
+    font-family: var(--font-body);
+    font-size: .72rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .45rem 1.1rem;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: border-color .25s, color .25s, background .25s;
+
+    &:hover {
+      color: var(--gold);
+      border-color: rgba(201, 164, 74, .5);
+    }
+
+    &--active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 164, 74, .08);
+    }
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

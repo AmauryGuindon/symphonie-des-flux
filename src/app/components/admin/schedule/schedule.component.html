@@ -72,10 +72,22 @@
     <!-- Fermetures exceptionnelles -->
     <section class="sched__card">
       <h2 class="sched__card-title">Fermetures exceptionnelles</h2>
-      <div class="sched__add-date">
-        <input class="sched__input" type="date" [(ngModel)]="newClosedDate" />
-        <button class="sched__btn-add" (click)="addClosedDate()" type="button">Ajouter</button>
+
+      <div class="sched__closure-inputs">
+        <div class="sched__add-date">
+          <span class="sched__closure-label">Jour unique</span>
+          <input class="sched__input" type="date" [(ngModel)]="newClosedDate" [min]="today" />
+          <button class="sched__btn-add" (click)="addClosedDate()" type="button">Ajouter</button>
+        </div>
+        <div class="sched__add-range">
+          <span class="sched__closure-label">Plage</span>
+          <input class="sched__input" type="date" [(ngModel)]="rangeStart" [min]="today" />
+          <span class="sched__sep">→</span>
+          <input class="sched__input" type="date" [(ngModel)]="rangeEnd" [min]="rangeStart || today" />
+          <button class="sched__btn-add" (click)="addDateRange()" type="button">Ajouter</button>
+        </div>
       </div>
+
       @if (closedDates.length === 0) {
         <p class="sched__empty">Aucune fermeture exceptionnelle.</p>
       } @else {

@@ -121,12 +121,28 @@
   }
 
   // Fermetures exceptionnelles
-  &__add-date {
+  &__closure-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: .65rem;
+    margin-bottom: 1rem;
+  }
+
+  &__add-date,
+  &__add-range {
     display: flex;
     gap: .75rem;
     align-items: center;
-    margin-bottom: 1rem;
     flex-wrap: wrap;
+  }
+
+  &__closure-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: .65rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.3);
+    min-width: 70px;
   }
 
   &__btn-add {

@@ -1,6 +1,19 @@
+@if (toast()) {
+  <div class="agallery__toast" [class.agallery__toast--err]="toast()!.type === 'err'">
+    {{ toast()!.message }}
+  </div>
+}
+
 <div class="agallery">
   <div class="agallery__header">
-    <h2 class="agallery__title">Galerie</h2>
+    <div class="agallery__header-left">
+      <h2 class="agallery__title">Galerie</h2>
+      @if (orderDirty()) {
+        <button class="agallery__btn-order" (click)="saveOrder()" [disabled]="savingOrder()">
+          {{ savingOrder() ? '...' : 'Sauvegarder l\'ordre' }}
+        </button>
+      }
+    </div>
     <div
       class="agallery__upload-zone"
       [class.agallery__upload-zone--dragover]="dragOver()"
@@ -23,8 +36,24 @@
     <p class="agallery__empty">Aucune photo. Ajoutez-en une ci-dessus.</p>
   } @else {
     <div class="agallery__grid">
-      @for (item of items(); track item._id) {
-        <div class="agallery__item">
+      @for (item of items(); track item._id; let i = $index) {
+        <div
+          class="agallery__item"
+          [class.agallery__item--dragging]="draggedIndex() === i"
+          [class.agallery__item--dragover]="dragOverIndex() === i && draggedIndex() !== i"
+          draggable="true"
+          (dragstart)="onItemDragStart(i)"
+          (dragover)="onItemDragOver($event, i)"
+          (dragleave)="onItemDragLeave()"
+          (drop)="onItemDrop(i)"
+          (dragend)="onItemDragEnd()"
+        >
+          <div class="agallery__drag-handle" title="Glisser pour réordonner">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+              <path d="M8 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm7-12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+            </svg>
+          </div>
+
           <div class="agallery__preview">
             @if (item.url) {
               <img [src]="imageUrl(item)" [alt]="item.alt || item.filename" />
@@ -51,8 +80,12 @@
                 </select>
               </div>
               <div class="agallery__field">
-                <label>Ordre</label>
-                <input type="number" [(ngModel)]="item.order" min="0" />
+                <label>Catégorie</label>
+                <select [(ngModel)]="item.category">
+                  @for (c of categoryOptions; track c.value) {
+                    <option [value]="c.value">{{ c.label }}</option>
+                  }
+                </select>
               </div>
               <label class="agallery__toggle">
                 <input type="checkbox" [(ngModel)]="item.active" />

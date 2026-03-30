@@ -2,6 +2,7 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,14 +14,20 @@ import { AuthService } from '../../services/auth.service';
 export class NavbarComponent implements OnInit {
   scrolled = false;
   menuOpen = false;
+  notifOpen = false;
 
-  constructor(public auth: AuthService) {}
+  constructor(public auth: AuthService, public notif: NotificationService) {}
 
   ngOnInit() {}
 
   @HostListener('window:scroll')
   onScroll() {
     this.scrolled = window.scrollY > 60;
+  }
+
+  @HostListener('document:click')
+  onDocClick() {
+    this.notifOpen = false;
   }
 
   toggleMenu() {
@@ -31,5 +38,15 @@ export class NavbarComponent implements OnInit {
   closeMenu() {
     this.menuOpen = false;
     document.body.style.overflow = '';
+  }
+
+  toggleNotif(e: Event) {
+    e.stopPropagation();
+    this.notifOpen = !this.notifOpen;
+  }
+
+  markAllRead(e: Event) {
+    e.stopPropagation();
+    this.notif.markAllRead().subscribe();
   }
 }

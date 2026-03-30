@@ -8,4 +8,8 @@ export class UploadGalleryItemDto {
   @IsOptional()
   @IsIn(['', 'wide', 'tall', 'large'])
   span?: string;
+
+  @IsOptional()
+  @IsIn(['', 'coupe', 'barbe', 'degrade'])
+  category?: string;
 }

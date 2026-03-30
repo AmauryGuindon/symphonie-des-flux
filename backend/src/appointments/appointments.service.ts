@@ -9,6 +9,8 @@ import { ScheduleService } from '../schedule/schedule.service';
 import { UsersService } from '../users/users.service';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
 import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
+import { NotificationsService } from '../notifications/notifications.service';
+import { computeTier } from '../common/enums/role.enum';
 
 @Injectable()
 export class AppointmentsService {
@@ -20,6 +22,7 @@ export class AppointmentsService {
     @InjectModel(Visit.name) private visitModel: Model<VisitDocument>,
     private scheduleService: ScheduleService,
     private usersService: UsersService,
+    private notificationsService: NotificationsService,
   ) {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST ?? 'smtp.gmail.com',
@@ -224,6 +227,17 @@ export class AppointmentsService {
         await this.usersService.refundPoints(appt.clientId, appt.price * 10);
       }
     }
+    if (dto.status === 'confirmed') {
+      const appt = await this.appointmentModel.findById(id);
+      if (appt) {
+        const dateFormatted = appt.date.split('-').reverse().join('/');
+        await this.notificationsService.create(
+          appt.clientId,
+          'appointment_confirmed',
+          `Votre RDV du ${dateFormatted} à ${appt.time} est confirmé ✓`,
+        );
+      }
+    }
     return this.appointmentModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
@@ -257,7 +271,121 @@ export class AppointmentsService {
     });
 
     await this.appointmentModel.findByIdAndUpdate(id, { visitRecorded: true });
-    return this.usersService.recordVisit(appt.clientId, points);
+    const updatedUser = await this.usersService.recordVisit(appt.clientId, points);
+
+    // Notification points gagnés
+    if (points > 0) {
+      await this.notificationsService.create(
+        appt.clientId,
+        'points_earned',
+        `+${points} points gagnés pour votre prestation "${appt.serviceType}" !`,
+      );
+    }
+
+    // Notification changement de palier
+    const tierLabels: Record<string, string> = { bronze: 'Bronze', silver: 'Argent', gold: 'Or', platinum: 'Platine' };
+    const tierBefore = computeTier(updatedUser.visitCount - 1);
+    const tierAfter  = computeTier(updatedUser.visitCount);
+    if (tierBefore !== tierAfter) {
+      await this.notificationsService.create(
+        appt.clientId,
+        'tier_up',
+        `Félicitations ! Vous passez au palier ${tierLabels[tierAfter] ?? tierAfter} 🎉`,
+      );
+    }
+
+    return updatedUser;
+  }
+
+  // ── Annulation pour fermeture exceptionnelle ──────────────────────────────
+
+  async cancelDueToClosure(newClosedDates: string[]): Promise<void> {
+    if (!newClosedDates.length) return;
+
+    const affected = await this.appointmentModel.find({
+      date: { $in: newClosedDates },
+      status: { $in: ['pending', 'confirmed'] },
+    });
+
+    for (const appt of affected) {
+      await this.appointmentModel.findByIdAndUpdate(appt._id, { status: 'cancelled' });
+
+      const dateStr = appt.date.split('-').reverse().join('/');
+
+      // Notification in-app
+      await this.notificationsService.create(
+        appt.clientId,
+        'appointment_cancelled',
+        `Votre RDV du ${dateStr} (${appt.serviceType}) a été annulé — le salon sera fermé ce jour-là. Reprogrammez en cliquant ici.`,
+      );
+
+      // Email
+      await this.sendCancellationEmail(appt.clientEmail, appt.clientName, appt.date, appt.time, appt.serviceType);
+    }
+  }
+
+  private async sendCancellationEmail(
+    to: string,
+    name: string,
+    date: string,
+    time: string,
+    serviceType: string,
+  ) {
+    if (!process.env.SMTP_USER) return;
+    const dateStr = date.split('-').reverse().join('/');
+    const accountUrl = `${process.env.APP_URL ?? 'http://localhost:4200'}/appointment`;
+
+    try {
+      await this.transporter.sendMail({
+        from: `"Dany1st Barber" <${process.env.SMTP_USER}>`,
+        to,
+        subject: `Annulation de votre RDV du ${dateStr} — Dany1st Barber`,
+        html: `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+    <div style="background:#1a1a1a;padding:24px 32px;text-align:center">
+      <img src="${process.env.APP_URL ?? 'http://localhost:4200'}/assets/logo/logo_dany1st.webp" alt="Dany1st Barber" width="120" style="display:block;margin:0 auto 10px;width:120px;height:auto" />
+      <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
+    </div>
+    <div style="height:3px;background:linear-gradient(90deg,#C9A44A,#e8c870,#C9A44A)"></div>
+    <div style="padding:32px">
+      <p style="margin:0 0 8px;font-size:16px;color:#1a1a1a">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
+        Nous sommes désolés de vous informer que votre rendez-vous a dû être annulé en raison d'une <strong>fermeture exceptionnelle</strong> du salon ce jour-là.
+      </p>
+      <div style="background:#fafafa;border:1px solid #ebebeb;border-radius:6px;overflow:hidden;margin-bottom:24px">
+        <div style="background:#e74c3c;padding:10px 16px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:#fff;text-transform:uppercase">Rendez-vous annulé</span>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <tr><td style="padding:12px 16px;color:#666;font-size:14px;border-bottom:1px solid #f0f0f0">Prestation</td><td style="padding:12px 16px;font-size:14px;font-weight:600;color:#1a1a1a;border-bottom:1px solid #f0f0f0">${serviceType}</td></tr>
+          <tr><td style="padding:12px 16px;color:#666;font-size:14px;border-bottom:1px solid #f0f0f0">Date</td><td style="padding:12px 16px;font-size:14px;font-weight:600;color:#1a1a1a;border-bottom:1px solid #f0f0f0">${dateStr}</td></tr>
+          <tr><td style="padding:12px 16px;color:#666;font-size:14px">Heure</td><td style="padding:12px 16px;font-size:14px;font-weight:600;color:#1a1a1a">${time}</td></tr>
+        </table>
+      </div>
+      <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
+        Nous vous invitons à reprogrammer votre rendez-vous à une date qui vous convient.
+      </p>
+      <div style="text-align:center;margin-bottom:24px">
+        <a href="${accountUrl}" style="display:inline-block;background:#C9A44A;color:#1a1a1a;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1px;padding:12px 28px;border-radius:4px;text-transform:uppercase">
+          Reprogrammer mon RDV
+        </a>
+      </div>
+      <p style="margin:0;font-size:12px;color:#aaa;line-height:1.6;text-align:center">
+        Toutes nos excuses pour la gêne occasionnée.
+      </p>
+    </div>
+    <div style="background:#f8f8f8;border-top:1px solid #ebebeb;padding:16px 32px;text-align:center">
+      <p style="margin:0;font-size:11px;color:#bbb;letter-spacing:0.5px">© Dany1st Barber · Tournan-en-Brie</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      });
+    } catch (_) {}
   }
 
   // ── Email confirmation ─────────────────────────────────────────────────────

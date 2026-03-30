@@ -7,6 +7,7 @@ import { ServiceConfig, ServiceConfigSchema } from '../services/schemas/service-
 import { Visit, VisitSchema } from '../visits/schemas/visit.schema';
 import { UsersModule } from '../users/users.module';
 import { ScheduleModule } from '../schedule/schedule.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ScheduleModule } from '../schedule/schedule.module';
     ]),
     UsersModule,
     ScheduleModule,
+    NotificationsModule,
   ],
   controllers: [AppointmentsController],
   providers: [AppointmentsService],
