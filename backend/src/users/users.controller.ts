@@ -73,7 +73,12 @@ export class UsersController {
       this.storageService.delete(currentUser.profilePictureUrl);
     }
     const url = this.storageService.save(file);
-    return this.usersService.updateProfilePicture(req.user.userId, url);
+    try {
+      return await this.usersService.updateProfilePicture(req.user.userId, url);
+    } catch (err) {
+      this.storageService.delete(url);
+      throw err;
+    }
   }
 
   // Supprimer photo de profil
