@@ -20,10 +20,12 @@
   }
 
   &__tier-badge {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     padding: 0.3rem 0.9rem;
+    align-self: stretch;
     border: 1px solid var(--tier-color, var(--gold));
     font-family: var(--font-body);
     font-size: 0.7rem;
