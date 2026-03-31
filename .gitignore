@@ -6,8 +6,10 @@ dist/
 .angular/
 out-tsc/
 
-# Uploads (fichiers binaires générés)
-backend/uploads/
+# Uploads (fichiers binaires générés — sauf .gitkeep pour conserver la structure)
+backend/uploads/**
+!backend/uploads/profile/
+!backend/uploads/profile/.gitkeep
 
 # Fichiers système
 .DS_Store
