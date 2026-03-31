@@ -72,6 +72,7 @@ export class AppointmentBookingComponent implements OnInit {
     slotDuration: 30,
     breakStart: '13:00',
     breakEnd: '14:00',
+    bufferMinutes: 5,
     closedDates: [],
   };
 
