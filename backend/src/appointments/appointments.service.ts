@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as path from 'path';
 import * as nodemailer from 'nodemailer';
 import { Appointment, AppointmentDocument } from './schemas/appointment.schema';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
@@ -11,6 +12,8 @@ import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/servic
 import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
 import { NotificationsService } from '../notifications/notifications.service';
 import { computeTier } from '../common/enums/role.enum';
+
+const LOGO_PATH = path.join(process.cwd(), '..', 'src', 'assets', 'logo', 'logo_dany1st.png');
 
 @Injectable()
 export class AppointmentsService {
@@ -355,7 +358,7 @@ export class AppointmentsService {
 <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif">
   <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
     <div style="background:#1a1a1a;padding:24px 32px;text-align:center">
-      <img src="${process.env.APP_URL ?? 'http://localhost:4200'}/assets/logo/logo_dany1st.webp" alt="Dany1st Barber" width="120" style="display:block;margin:0 auto 10px;width:120px;height:auto" />
+      <img src="cid:logo" alt="Dany1st Barber" width="120" style="display:block;margin:0 auto 10px;width:120px;height:auto" />
       <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
     </div>
     <div style="height:3px;background:linear-gradient(90deg,${tierColor},${tierColor}aa,${tierColor})"></div>
@@ -393,6 +396,7 @@ export class AppointmentsService {
   </div>
 </body>
 </html>`,
+        attachments: [{ filename: 'logo.png', path: LOGO_PATH, cid: 'logo' }],
       });
     } catch (_) {}
   }
@@ -420,7 +424,7 @@ export class AppointmentsService {
 <body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif">
   <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
     <div style="background:#1a1a1a;padding:24px 32px;text-align:center">
-      <img src="${process.env.APP_URL ?? 'http://localhost:4200'}/assets/logo/logo_dany1st.webp" alt="Dany1st Barber" width="120" style="display:block;margin:0 auto 10px;width:120px;height:auto" />
+      <img src="cid:logo" alt="Dany1st Barber" width="120" style="display:block;margin:0 auto 10px;width:120px;height:auto" />
       <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
     </div>
     <div style="height:3px;background:linear-gradient(90deg,#C9A44A,#e8c870,#C9A44A)"></div>
@@ -457,6 +461,7 @@ export class AppointmentsService {
   </div>
 </body>
 </html>`,
+        attachments: [{ filename: 'logo.png', path: LOGO_PATH, cid: 'logo' }],
       });
     } catch (_) {}
   }
@@ -508,7 +513,7 @@ export class AppointmentsService {
     <!-- Header -->
     <div style="background:#1a1a1a;padding:24px 32px;text-align:center">
       <img
-        src="${process.env.APP_URL ?? 'http://localhost:4200'}/assets/logo/logo_dany1st.webp"
+        src="cid:logo"
         alt="Dany1st Barber"
         width="120"
         style="display:block;margin:0 auto 10px;width:120px;height:auto"
@@ -563,6 +568,7 @@ export class AppointmentsService {
 </body>
 </html>
       `,
+      attachments: [{ filename: 'logo.png', path: LOGO_PATH, cid: 'logo' }],
     });
   }
 }

@@ -44,9 +44,15 @@ export class NotificationService {
     });
   }
 
-  markAllRead() {
-    return this.http.patch(`${API}/read`, {}).pipe(
-      tap(() => this._notifications.update(ns => ns.map(n => ({ ...n, read: true })))),
+  deleteOne(id: string) {
+    return this.http.delete(`${API}/${id}`).pipe(
+      tap(() => this._notifications.update(ns => ns.filter(n => n._id !== id))),
+    );
+  }
+
+  deleteAll() {
+    return this.http.delete(`${API}/all`).pipe(
+      tap(() => this._notifications.set([])),
     );
   }
 }

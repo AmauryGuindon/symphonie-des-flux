@@ -27,8 +27,8 @@
             <div class="navbar__notif-dropdown" (click)="$event.stopPropagation()">
               <div class="navbar__notif-header">
                 <span>Notifications</span>
-                @if (notif.unreadCount() > 0) {
-                  <button class="navbar__notif-read-btn" (click)="markAllRead($event)">Tout marquer lu</button>
+                @if (notif.notifications().length > 0) {
+                  <button class="navbar__notif-read-btn" (click)="deleteAll($event)">Tout supprimer</button>
                 }
               </div>
               @if (notif.notifications().length === 0) {
@@ -46,6 +46,7 @@
                           </a>
                         }
                       </span>
+                      <button class="navbar__notif-delete-btn" (click)="deleteOne(n._id, $event)" aria-label="Supprimer">×</button>
                     </li>
                   }
                 </ul>

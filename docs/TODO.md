@@ -42,6 +42,12 @@
 
 ---
 
+## Technique / Infrastructure
+
+- [ ] **Logo dans les emails** : remplacer `cid:logo` par une URL hébergée (`https://ton-domaine.com/assets/logo/logo_dany1st.png`) une fois le site en prod — évite que le logo apparaisse aussi en pièce jointe dans Gmail
+
+---
+
 ## Priorités suggérées
 
 | Priorité | Tâche | Impact |

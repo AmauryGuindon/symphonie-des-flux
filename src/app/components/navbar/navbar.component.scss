@@ -269,6 +269,21 @@
     gap: 0.3rem;
   }
 
+  &__notif-delete-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: rgba(245, 240, 232, 0.25);
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0 0 0 0.4rem;
+    transition: color 0.2s;
+    align-self: flex-start;
+
+    &:hover { color: #e74c3c; }
+  }
+
   &__notif-cta {
     font-size: 0.72rem;
     font-weight: 600;

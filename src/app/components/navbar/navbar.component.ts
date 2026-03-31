@@ -45,8 +45,13 @@ export class NavbarComponent implements OnInit {
     this.notifOpen = !this.notifOpen;
   }
 
-  markAllRead(e: Event) {
+  deleteOne(id: string, e: Event) {
     e.stopPropagation();
-    this.notif.markAllRead().subscribe();
+    this.notif.deleteOne(id).subscribe();
+  }
+
+  deleteAll(e: Event) {
+    e.stopPropagation();
+    this.notif.deleteAll().subscribe();
   }
 }
