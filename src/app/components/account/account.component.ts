@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -80,6 +80,18 @@ export class AccountComponent implements OnInit {
   pwdLoading = signal(false);
   pwdError = signal('');
   pwdSuccess = signal(false);
+
+  // ── Avatar ────────────────────────────────────────────────────────────────
+  avatarLoading = signal(false);
+  avatarError = signal('');
+
+  initials = computed(() => {
+    const u = this.user();
+    if (!u) return '';
+    return (u.firstName[0] + u.lastName[0]).toUpperCase();
+  });
+
+  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
   // ── Computed ──────────────────────────────────────────────────────────────
   tierProgress = computed(() => {
@@ -314,5 +326,42 @@ export class AccountComponent implements OnInit {
 
   getTierColor(tier: LoyaltyTier): string {
     return TIER_CONFIG[tier]?.color ?? '#C9A44A';
+  }
+
+  // ── Avatar ────────────────────────────────────────────────────────────────
+  triggerFileInput(): void {
+    this.fileInputRef.nativeElement.click();
+  }
+
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      this.avatarError.set('Fichier trop lourd (max 5 Mo)');
+      return;
+    }
+    this.avatarLoading.set(true);
+    this.avatarError.set('');
+    this.auth.uploadProfilePicture(file).subscribe({
+      next: () => this.avatarLoading.set(false),
+      error: () => {
+        this.avatarLoading.set(false);
+        this.avatarError.set('Erreur lors de l\'upload');
+      },
+    });
+    input.value = '';
+  }
+
+  deletePhoto(): void {
+    this.avatarLoading.set(true);
+    this.avatarError.set('');
+    this.auth.deleteProfilePicture().subscribe({
+      next: () => this.avatarLoading.set(false),
+      error: () => {
+        this.avatarLoading.set(false);
+        this.avatarError.set('Erreur lors de la suppression');
+      },
+    });
   }
 }
