@@ -4,32 +4,31 @@
 
     <!-- Header -->
     <div class="account__header reveal">
-      <div class="account__avatar-wrap">
-        <div class="account__avatar" (click)="triggerFileInput()">
-          @if (avatarLoading()) {
-            <div class="account__avatar-spinner"></div>
-          } @else if (u.profilePictureUrl) {
-            <img [src]="u.profilePictureUrl" alt="Photo de profil" class="account__avatar-img" />
-          } @else {
-            <span class="account__avatar-initials">{{ initials() }}</span>
-          }
-          <div class="account__avatar-overlay">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-          </div>
-        </div>
-        @if (u.profilePictureUrl) {
-          <button class="account__avatar-delete" (click)="deletePhoto()">Supprimer la photo</button>
-        }
-        @if (avatarError()) {
-          <span class="account__avatar-error">{{ avatarError() }}</span>
-        }
-        <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileChange($event)" />
-      </div>
-
       <div class="account__header-left">
+        <div class="account__avatar-wrap">
+          <div class="account__avatar" (click)="triggerFileInput()">
+            @if (avatarLoading()) {
+              <div class="account__avatar-spinner"></div>
+            } @else if (u.profilePictureUrl) {
+              <img [src]="u.profilePictureUrl" alt="Photo de profil" class="account__avatar-img" />
+            } @else {
+              <span class="account__avatar-initials">{{ initials() }}</span>
+            }
+            <div class="account__avatar-overlay">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </div>
+          </div>
+          @if (u.profilePictureUrl) {
+            <button class="account__avatar-delete" (click)="deletePhoto()">Supprimer la photo</button>
+          }
+          @if (avatarError()) {
+            <span class="account__avatar-error">{{ avatarError() }}</span>
+          }
+          <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileChange($event)" />
+        </div>
         <span class="section-label">Espace Client</span>
         <h1 class="account__name">{{ u.firstName }} {{ u.lastName }}</h1>
         <div class="account__tier-badge" [style.--tier-color]="getTierColor(u.loyaltyTier)">

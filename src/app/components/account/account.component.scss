@@ -47,6 +47,12 @@
     gap: 1.5rem;
   }
 
+  &__header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   &__avatar-wrap {
     display: flex;
     flex-direction: column;
