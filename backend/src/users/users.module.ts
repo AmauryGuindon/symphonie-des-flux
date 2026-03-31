@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersService } from './users.service';
+import { StorageService } from './storage.service';
 import { UsersController } from './users.controller';
 import { User, UserSchema } from './schemas/user.schema';
 import { Visit, VisitSchema } from '../visits/schemas/visit.schema';
@@ -15,7 +16,7 @@ import { LoyaltyScheduler } from './loyalty-scheduler';
       { name: PointsHistory.name, schema: PointsHistorySchema },
     ]),
   ],
-  providers: [UsersService, LoyaltyScheduler],
+  providers: [UsersService, StorageService, LoyaltyScheduler],
   controllers: [UsersController],
   exports: [UsersService, MongooseModule],
 })

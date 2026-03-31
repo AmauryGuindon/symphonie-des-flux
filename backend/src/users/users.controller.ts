@@ -1,18 +1,25 @@
 import {
+  BadRequestException,
   Controller,
+  Delete,
   Get,
   Patch,
-  Delete,
   Param,
   Body,
   UseGuards,
   Request,
   Post,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UsersService } from './users.service';
+import { StorageService } from './storage.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -25,6 +32,7 @@ import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
+    private readonly storageService: StorageService,
     @InjectModel(Visit.name) private visitModel: Model<VisitDocument>,
   ) {}
 
@@ -38,6 +46,44 @@ export class UsersController {
   @Patch('me')
   updateMe(@Request() req, @Body() dto: UpdateUserDto) {
     return this.usersService.update(req.user.userId, dto);
+  }
+
+  // Upload photo de profil
+  @Post('me/profile-picture')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: join(process.cwd(), 'uploads', 'profile'),
+      filename: (_req, file, cb) => {
+        const unique = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        cb(null, unique + extname(file.originalname));
+      },
+    }),
+    fileFilter: (_req, file, cb) => {
+      if (!file.mimetype.startsWith('image/')) {
+        return cb(new BadRequestException('Seules les images sont acceptées'), false);
+      }
+      cb(null, true);
+    },
+    limits: { fileSize: 5 * 1024 * 1024 },
+  }))
+  async uploadProfilePicture(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Fichier requis');
+    const currentUser = await this.usersService.findById(req.user.userId);
+    if (currentUser.profilePictureUrl) {
+      this.storageService.delete(currentUser.profilePictureUrl);
+    }
+    const url = this.storageService.save(file);
+    return this.usersService.updateProfilePicture(req.user.userId, url);
+  }
+
+  // Supprimer photo de profil
+  @Delete('me/profile-picture')
+  async deleteProfilePicture(@Request() req) {
+    const currentUser = await this.usersService.findById(req.user.userId);
+    if (currentUser.profilePictureUrl) {
+      this.storageService.delete(currentUser.profilePictureUrl);
+    }
+    return this.usersService.updateProfilePicture(req.user.userId, null);
   }
 
   // Bonus anniversaire
