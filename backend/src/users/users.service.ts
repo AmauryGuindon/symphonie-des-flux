@@ -286,7 +286,7 @@ export class UsersService {
     const update = url
       ? { profilePictureUrl: url }
       : { $unset: { profilePictureUrl: '' } };
-    const user = await this.userModel.findByIdAndUpdate(userId, update, { new: true });
+    const user = await this.userModel.findByIdAndUpdate(userId, update, { new: true }).select('-password');
     if (!user) throw new NotFoundException('Utilisateur introuvable');
     return user;
   }
