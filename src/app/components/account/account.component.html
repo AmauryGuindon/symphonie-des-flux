@@ -298,6 +298,39 @@
         }
       </div>
 
+      <!-- Historique des points -->
+      <div class="account__card reveal">
+        <div class="account__card-header">
+          <h3>Historique des points</h3>
+        </div>
+        @if (pointsHistoryLoading()) {
+          <p class="account__loading-inline">Chargement…</p>
+        } @else if (pointsHistory().length === 0) {
+          <p class="account__empty-text">Aucune transaction pour le moment.</p>
+        } @else {
+          <div class="account__pts-history">
+            @for (entry of pointsHistory(); track entry._id) {
+              <div class="account__pts-entry">
+                <div class="account__pts-left">
+                  <span class="account__pts-reason" [style.color]="pointsReasonColor(entry.reason)">
+                    {{ pointsReasonLabel(entry.reason) }}
+                  </span>
+                  @if (entry.description) {
+                    <span class="account__pts-desc">{{ entry.description }}</span>
+                  }
+                  <span class="account__pts-date">{{ entry.createdAt | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <span class="account__pts-amount"
+                  [class.account__pts-amount--pos]="entry.amount > 0"
+                  [class.account__pts-amount--neg]="entry.amount < 0">
+                  {{ entry.amount > 0 ? '+' : '' }}{{ entry.amount }} pts
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
       <!-- Parrainage -->
       <div class="account__card reveal">
         <div class="account__card-header">

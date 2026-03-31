@@ -3,9 +3,9 @@
 ## Côté client
 
 ### Fidélité & récompenses
-- [ ] Historique détaillé des points (raison du gain, date, montant)
+- [X] Historique détaillé des points (raison du gain, date, montant)
 - [X] Afficher les points qu'on gagnerait avec chaque prestation avant de réserver
-- [ ] Email automatique lors d'un changement de palier (Bronze → Argent, etc.)
+- [X] Email automatique lors d'un changement de palier (Bronze → Argent, etc.)
 
 ### Réservation
 - [X] Rappel SMS/email 24h avant le RDV *(envoi automatique à 9h, anti-doublon `reminderSent`)*
@@ -38,6 +38,7 @@
 ### Galerie
 - [X] Réorganisation des photos par drag & drop
 - [X] Catégories (Coupe, Barbe, Dégradé…)
+- [ ] Pagination côté public : 12 photos max affichées, bouton "Voir plus" ou pages suivantes
 
 ---
 

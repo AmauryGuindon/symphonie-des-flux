@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PointsHistory, PointsHistoryDocument, PointsHistoryReason } from './schemas/points-history.schema';
 import {
   LOYALTY_POINTS_PER_VISIT,
   LOYALTY_REFERRAL_BONUS,
@@ -21,7 +22,14 @@ import {
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    @InjectModel(PointsHistory.name) private pointsHistoryModel: Model<PointsHistoryDocument>,
+  ) {}
+
+  private logPoints(userId: string, amount: number, reason: PointsHistoryReason, description?: string) {
+    return this.pointsHistoryModel.create({ userId, amount, reason, description });
+  }
 
   async create(dto: CreateUserDto): Promise<UserDocument> {
     const existing = await this.userModel.findOne({ email: dto.email });
@@ -51,6 +59,7 @@ export class UsersService {
             $inc: { loyaltyPoints: LOYALTY_REFERRAL_BONUS, referralCount: 1 },
             $push: { referralDates: new Date() },
           });
+          await this.logPoints(referrer._id.toString(), LOYALTY_REFERRAL_BONUS, 'referral_bonus', `Parrainage de ${dto.firstName} ${dto.lastName}`);
         } else {
           // Parrainage comptabilisé mais sans bonus
           await this.userModel.findByIdAndUpdate(referrer._id, {
@@ -112,7 +121,7 @@ export class UsersService {
 
   // --- Fidélité ---
 
-  async recordVisit(userId: string, basePoints: number = LOYALTY_POINTS_PER_VISIT): Promise<UserDocument> {
+  async recordVisit(userId: string, basePoints: number = LOYALTY_POINTS_PER_VISIT, description?: string): Promise<UserDocument> {
     // Récupérer le visitCount actuel pour calculer le palier avant cette visite
     const current = await this.userModel.findById(userId).select('visitCount');
     if (!current) throw new NotFoundException('Utilisateur non trouvé');
@@ -129,6 +138,10 @@ export class UsersService {
       { new: true },
     ).select('-password');
     if (!user) throw new NotFoundException('Utilisateur non trouvé');
+
+    if (totalPoints > 0) {
+      await this.logPoints(userId, totalPoints, 'visit', description ?? 'Visite enregistrée');
+    }
     return user;
   }
 
@@ -155,7 +168,7 @@ export class UsersService {
       throw new ConflictException('Le bonus n\'est disponible que dans les 7 jours autour de votre anniversaire');
     }
 
-    return this.userModel
+    const updated = await this.userModel
       .findByIdAndUpdate(
         userId,
         {
@@ -165,6 +178,8 @@ export class UsersService {
         { new: true },
       )
       .select('-password');
+    await this.logPoints(userId, LOYALTY_BIRTHDAY_BONUS, 'birthday_bonus', 'Bonus anniversaire');
+    return updated;
   }
 
   async redeemPoints(userId: string, points: number): Promise<UserDocument> {
@@ -173,13 +188,16 @@ export class UsersService {
     if (user.loyaltyPoints < points) {
       throw new ConflictException('Points insuffisants');
     }
-    return this.userModel
+    const updated = await this.userModel
       .findByIdAndUpdate(userId, { $inc: { loyaltyPoints: -points } }, { new: true })
       .select('-password');
+    await this.logPoints(userId, -points, 'redemption', `Paiement par points (${points} pts)`);
+    return updated;
   }
 
   async refundPoints(userId: string, points: number): Promise<void> {
     await this.userModel.findByIdAndUpdate(userId, { $inc: { loyaltyPoints: points } });
+    await this.logPoints(userId, points, 'refund', `Remboursement de points (${points} pts)`);
   }
 
   async evaluateAnniversaryDegradations(): Promise<number> {
@@ -199,7 +217,7 @@ export class UsersService {
           ],
         },
       })
-      .select('loyaltyTier');
+      .select('loyaltyTier loyaltyPoints');
 
     const tierDowngrade: Partial<Record<LoyaltyTier, LoyaltyTier>> = {
       [LoyaltyTier.PLATINUM]: LoyaltyTier.GOLD,
@@ -215,6 +233,8 @@ export class UsersService {
       [LoyaltyTier.PLATINUM]: 30,
     };
 
+    const tierLabels: Record<string, string> = { bronze: 'Bronze', silver: 'Argent', gold: 'Or', platinum: 'Platine' };
+
     for (const user of users) {
       const newTier = tierDowngrade[user.loyaltyTier] ?? user.loyaltyTier;
       const update: Record<string, unknown> = { loyaltyPoints: 0 };
@@ -223,9 +243,25 @@ export class UsersService {
         update.visitCount = tierFloors[newTier];
       }
       await this.userModel.findByIdAndUpdate(user._id, update);
+      if (user.loyaltyPoints > 0) {
+        await this.logPoints(
+          user._id.toString(),
+          -user.loyaltyPoints,
+          'annual_reset',
+          `Remise à zéro annuelle${newTier !== user.loyaltyTier ? ` — passage ${tierLabels[user.loyaltyTier]} → ${tierLabels[newTier]}` : ''}`,
+        );
+      }
     }
 
     return users.length;
+  }
+
+  async getPointsHistory(userId: string, limit = 30) {
+    return this.pointsHistoryModel
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .lean();
   }
 
   async setResetToken(userId: string, token: string, expiry: Date) {

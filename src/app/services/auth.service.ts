@@ -93,6 +93,10 @@ export class AuthService {
     return this.http.get<any[]>(`${this.API}/users/me/visits?limit=${limit}`);
   }
 
+  getMyPointsHistory(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.API}/users/me/points-history`);
+  }
+
   getMyAppointments(): Observable<any[]> {
     return this.http.get<any[]>(`${this.API}/appointments/my`);
   }

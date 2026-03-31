@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import * as nodemailer from 'nodemailer';
 import { User, UserDocument } from '../users/schemas/user.schema';
 import { Visit, VisitDocument } from '../visits/schemas/visit.schema';
+import { PointsHistory, PointsHistoryDocument } from '../users/schemas/points-history.schema';
 import { ServiceConfig, ServiceConfigDocument } from '../services/schemas/service-config.schema';
 import { Appointment, AppointmentDocument } from '../appointments/schemas/appointment.schema';
 import { UsersService } from '../users/users.service';
@@ -29,6 +30,7 @@ export class AdminService implements OnModuleInit {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     @InjectModel(Visit.name) private visitModel: Model<VisitDocument>,
+    @InjectModel(PointsHistory.name) private pointsHistoryModel: Model<PointsHistoryDocument>,
     @InjectModel(ServiceConfig.name) private serviceConfigModel: Model<ServiceConfigDocument>,
     @InjectModel(Appointment.name) private appointmentModel: Model<AppointmentDocument>,
     private usersService: UsersService,
@@ -237,14 +239,29 @@ export class AdminService implements OnModuleInit {
       .limit(50);
   }
 
-  async adjustPoints(clientId: string, delta: number) {
-    return this.userModel
+  async adjustPoints(clientId: string, delta: number, description?: string) {
+    const updated = await this.userModel
       .findByIdAndUpdate(
         clientId,
         { $inc: { loyaltyPoints: delta } },
         { new: true },
       )
       .select('-password');
+    await this.pointsHistoryModel.create({
+      userId: clientId,
+      amount: delta,
+      reason: 'admin_adjustment',
+      description: description ?? (delta > 0 ? `Ajout de ${delta} pts par l'admin` : `Déduction de ${Math.abs(delta)} pts par l'admin`),
+    });
+    return updated;
+  }
+
+  async getClientPointsHistory(clientId: string) {
+    return this.pointsHistoryModel
+      .find({ userId: clientId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
   }
 
   // ── Configuration des prestations ─────────────────────────────────────────

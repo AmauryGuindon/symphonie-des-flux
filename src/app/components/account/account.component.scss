@@ -689,6 +689,64 @@
     &--spent  { color: #e74c3c; }
   }
 
+  // ── Historique des points ────────────────────────────────────────────────
+  &__pts-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  &__pts-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: .65rem 0;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    gap: .75rem;
+
+    &:last-child { border-bottom: none; }
+  }
+
+  &__pts-left {
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    min-width: 0;
+  }
+
+  &__pts-reason {
+    font-family: var(--font-body);
+    font-size: .82rem;
+    font-weight: 600;
+  }
+
+  &__pts-desc {
+    font-family: var(--font-body);
+    font-size: .72rem;
+    color: rgba(255,255,255,.4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__pts-date {
+    font-family: var(--font-body);
+    font-size: .65rem;
+    color: rgba(255,255,255,.3);
+    letter-spacing: .04em;
+  }
+
+  &__pts-amount {
+    font-family: var(--font-body);
+    font-size: .85rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &--pos { color: #4caf82; }
+    &--neg { color: #e74c3c; }
+  }
+
   // Changer mot de passe
   &__pwd-toggle {
     margin-top: 1.25rem;

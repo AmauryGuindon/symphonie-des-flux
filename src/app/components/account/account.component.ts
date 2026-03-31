@@ -68,6 +68,10 @@ export class AccountComponent implements OnInit {
   visits = signal<any[]>([]);
   visitsLoading = signal(true);
 
+  // ── Historique points ─────────────────────────────────────────────────────
+  pointsHistory = signal<any[]>([]);
+  pointsHistoryLoading = signal(true);
+
   // ── Changer mdp ───────────────────────────────────────────────────────────
   showChangePwd = signal(false);
   pwdCurrent = '';
@@ -152,6 +156,10 @@ export class AccountComponent implements OnInit {
     this.auth.getMyVisits(8).subscribe({
       next: v => { this.visits.set(v); this.visitsLoading.set(false); },
       error: () => this.visitsLoading.set(false),
+    });
+    this.auth.getMyPointsHistory().subscribe({
+      next: h => { this.pointsHistory.set(h); this.pointsHistoryLoading.set(false); },
+      error: () => this.pointsHistoryLoading.set(false),
     });
   }
 
@@ -281,6 +289,25 @@ export class AccountComponent implements OnInit {
         this.pwdLoading.set(false);
       },
     });
+  }
+
+  pointsReasonLabel(reason: string): string {
+    const labels: Record<string, string> = {
+      visit:            'Prestation',
+      birthday_bonus:   'Bonus anniversaire',
+      referral_bonus:   'Parrainage',
+      admin_adjustment: 'Ajustement',
+      redemption:       'Paiement par points',
+      refund:           'Remboursement',
+      annual_reset:     'Remise à zéro annuelle',
+    };
+    return labels[reason] ?? reason;
+  }
+
+  pointsReasonColor(reason: string): string {
+    if (['visit', 'birthday_bonus', 'referral_bonus', 'refund'].includes(reason)) return '#4caf82';
+    if (['redemption', 'annual_reset'].includes(reason)) return '#e74c3c';
+    return '#C9A44A';
   }
 
   logout() { this.auth.logout(); }

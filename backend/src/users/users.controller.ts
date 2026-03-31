@@ -46,6 +46,12 @@ export class UsersController {
     return this.usersService.claimBirthdayBonus(req.user.userId);
   }
 
+  // Mon historique de points
+  @Get('me/points-history')
+  getMyPointsHistory(@Request() req) {
+    return this.usersService.getPointsHistory(req.user.userId);
+  }
+
   // Mes visites passées
   @Get('me/visits')
   async getMyVisits(@Request() req, @Query('limit') limit?: string) {

@@ -5,6 +5,7 @@ import { AdminService } from './admin.service';
 import { UsersModule } from '../users/users.module';
 import { User, UserSchema } from '../users/schemas/user.schema';
 import { Visit, VisitSchema } from '../visits/schemas/visit.schema';
+import { PointsHistory, PointsHistorySchema } from '../users/schemas/points-history.schema';
 import { ServiceConfig, ServiceConfigSchema } from '../services/schemas/service-config.schema';
 import { Appointment, AppointmentSchema } from '../appointments/schemas/appointment.schema';
 import { AppointmentsModule } from '../appointments/appointments.module';
@@ -15,6 +16,7 @@ import { ScheduleModule } from '../schedule/schedule.module';
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Visit.name, schema: VisitSchema },
+      { name: PointsHistory.name, schema: PointsHistorySchema },
       { name: ServiceConfig.name, schema: ServiceConfigSchema },
       { name: Appointment.name, schema: AppointmentSchema },
     ]),

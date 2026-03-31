@@ -271,7 +271,7 @@ export class AppointmentsService {
     });
 
     await this.appointmentModel.findByIdAndUpdate(id, { visitRecorded: true });
-    const updatedUser = await this.usersService.recordVisit(appt.clientId, points);
+    const updatedUser = await this.usersService.recordVisit(appt.clientId, points, `Prestation : ${appt.serviceType}`);
 
     // Notification points gagnés
     if (points > 0) {
@@ -282,7 +282,7 @@ export class AppointmentsService {
       );
     }
 
-    // Notification changement de palier
+    // Notification + email changement de palier
     const tierLabels: Record<string, string> = { bronze: 'Bronze', silver: 'Argent', gold: 'Or', platinum: 'Platine' };
     const tierBefore = computeTier(updatedUser.visitCount - 1);
     const tierAfter  = computeTier(updatedUser.visitCount);
@@ -292,6 +292,7 @@ export class AppointmentsService {
         'tier_up',
         `Félicitations ! Vous passez au palier ${tierLabels[tierAfter] ?? tierAfter} 🎉`,
       );
+      await this.sendTierUpEmail(appt.clientEmail, appt.clientName, tierAfter);
     }
 
     return updatedUser;
@@ -322,6 +323,76 @@ export class AppointmentsService {
       // Email
       await this.sendCancellationEmail(appt.clientEmail, appt.clientName, appt.date, appt.time, appt.serviceType);
     }
+  }
+
+  private async sendTierUpEmail(to: string, name: string, tier: string) {
+    if (!process.env.SMTP_USER) return;
+    const accountUrl = `${process.env.APP_URL ?? 'http://localhost:4200'}/account`;
+    const tierLabels: Record<string, string> = { bronze: 'Bronze', silver: 'Argent', gold: 'Or', platinum: 'Platine' };
+    const tierColors: Record<string, string> = { bronze: '#cd7f32', silver: '#c0c0c0', gold: '#C9A44A', platinum: '#e8f4ff' };
+    const tierPerks: Record<string, string[]> = {
+      bronze:   ['Points de prestation + 5 pts bonus/visite', 'Bonus anniversaire (+15 pts)', 'Code de parrainage'],
+      silver:   ['Points de prestation + 10 pts bonus/visite', 'Accès aux offres promotionnelles', 'Bonus anniversaire (+15 pts)'],
+      gold:     ['Points de prestation + 15 pts bonus/visite', 'Priorité sur les créneaux', 'Bonus anniversaire (+15 pts)'],
+      platinum: ['Points de prestation + 20 pts bonus/visite', 'Accès VIP', 'Bonus anniversaire (+15 pts)'],
+    };
+    const tierLabel = tierLabels[tier] ?? tier;
+    const tierColor = tierColors[tier] ?? '#C9A44A';
+    const perks = tierPerks[tier] ?? [];
+    const perksHtml = perks.map(p => `<li style="padding:4px 0;font-size:14px;color:#444">✓ ${p}</li>`).join('');
+
+    try {
+      await this.transporter.sendMail({
+        from: `"Dany1st Barber" <${process.env.SMTP_USER}>`,
+        to,
+        subject: `Félicitations ! Vous êtes maintenant ${tierLabel} — Dany1st Barber`,
+        html: `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif">
+  <div style="max-width:560px;margin:32px auto;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08)">
+    <div style="background:#1a1a1a;padding:24px 32px;text-align:center">
+      <img src="${process.env.APP_URL ?? 'http://localhost:4200'}/assets/logo/logo_dany1st.webp" alt="Dany1st Barber" width="120" style="display:block;margin:0 auto 10px;width:120px;height:auto" />
+      <div style="font-size:11px;letter-spacing:2px;color:#888;text-transform:uppercase">Barber Shop · Tournan-en-Brie</div>
+    </div>
+    <div style="height:3px;background:linear-gradient(90deg,${tierColor},${tierColor}aa,${tierColor})"></div>
+    <div style="padding:32px">
+      <p style="margin:0 0 8px;font-size:16px;color:#1a1a1a">Bonjour <strong>${name}</strong>,</p>
+      <p style="margin:0 0 24px;font-size:14px;color:#555;line-height:1.6">
+        Grâce à votre fidélité, vous venez de franchir un nouveau palier !
+      </p>
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="display:inline-block;background:#1a1a1a;border-radius:8px;padding:20px 40px">
+          <div style="font-size:11px;letter-spacing:3px;color:#888;text-transform:uppercase;margin-bottom:8px">Nouveau palier</div>
+          <div style="font-size:28px;font-weight:700;color:${tierColor};letter-spacing:2px;text-transform:uppercase">${tierLabel}</div>
+        </div>
+      </div>
+      <div style="background:#fafafa;border:1px solid #ebebeb;border-radius:6px;overflow:hidden;margin-bottom:24px">
+        <div style="background:#1a1a1a;padding:10px 16px">
+          <span style="font-size:11px;font-weight:700;letter-spacing:2px;color:${tierColor};text-transform:uppercase">Vos avantages</span>
+        </div>
+        <ul style="margin:0;padding:16px 16px 16px 32px;list-style:none">
+          ${perksHtml}
+        </ul>
+      </div>
+      <div style="text-align:center;margin-bottom:24px">
+        <a href="${accountUrl}" style="display:inline-block;background:${tierColor};color:#1a1a1a;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:1px;padding:12px 28px;border-radius:4px;text-transform:uppercase">
+          Voir mon compte
+        </a>
+      </div>
+      <p style="margin:0;font-size:12px;color:#aaa;line-height:1.6;text-align:center">
+        Merci de votre confiance. À très bientôt !
+      </p>
+    </div>
+    <div style="background:#f8f8f8;border-top:1px solid #ebebeb;padding:16px 32px;text-align:center">
+      <p style="margin:0;font-size:11px;color:#bbb;letter-spacing:0.5px">© Dany1st Barber · Tournan-en-Brie</p>
+    </div>
+  </div>
+</body>
+</html>`,
+      });
+    } catch (_) {}
   }
 
   private async sendCancellationEmail(
