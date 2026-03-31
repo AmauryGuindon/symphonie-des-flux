@@ -789,17 +789,31 @@
 
   &__event-buffer {
     position: absolute;
-    border-radius: 0 0 4px 4px;
-    background: repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,.03),
-      rgba(255,255,255,.03) 2px,
-      transparent 2px,
-      transparent 6px
-    );
-    border: 1px dashed rgba(255,255,255,.08);
-    border-top: none;
+    border-radius: 0 0 5px 5px;
+    background: rgba(255,255,255,.04);
+    border: 1px dashed rgba(255,255,255,.18);
+    border-top: 2px dashed rgba(255,255,255,.22);
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    gap: 4px;
+    overflow: hidden;
+
+    &-label {
+      font-size: .6rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      white-space: nowrap;
+    }
+
+    &-dots {
+      flex: 1;
+      height: 1px;
+      border-top: 1px dotted rgba(255,255,255,.12);
+    }
   }
 
   &__event-time {

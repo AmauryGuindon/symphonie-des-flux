@@ -96,7 +96,10 @@
                       [style.height.px]="getBufferHeight() - 2"
                       [style.left]="getEventPosition(a, appointmentsForDay(day)).left"
                       [style.width]="getEventPosition(a, appointmentsForDay(day)).width"
-                    ></div>
+                    >
+                      <span class="cal__event-buffer-label">{{ bufferMinutes() }} min</span>
+                      <span class="cal__event-buffer-dots"></span>
+                    </div>
                   }
                 }
               }
