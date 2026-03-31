@@ -21,6 +21,7 @@ export interface User {
   lastVisitAt?: string;
   createdAt?: string;
   internalNotes?: string;
+  profilePictureUrl?: string;
 }
 
 export interface AuthResponse {

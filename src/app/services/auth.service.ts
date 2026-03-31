@@ -80,6 +80,26 @@ export class AuthService {
     );
   }
 
+  uploadProfilePicture(file: File): Observable<User> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<User>(`${this.API}/users/me/profile-picture`, formData).pipe(
+      tap(user => {
+        this._user.set(user);
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      }),
+    );
+  }
+
+  deleteProfilePicture(): Observable<User> {
+    return this.http.delete<User>(`${this.API}/users/me/profile-picture`).pipe(
+      tap(user => {
+        this._user.set(user);
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      }),
+    );
+  }
+
   claimBirthdayBonus(): Observable<User> {
     return this.http.post<User>(`${this.API}/users/me/birthday-bonus`, {}).pipe(
       tap(user => {
