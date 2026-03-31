@@ -70,6 +70,10 @@ export class User {
   @Prop({ trim: true })
   internalNotes?: string;
 
+  // --- Photo de profil ---
+  @Prop()
+  profilePictureUrl?: string;
+
   // --- Réinitialisation mot de passe ---
   @Prop({ select: false })
   resetToken?: string;

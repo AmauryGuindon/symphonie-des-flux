@@ -281,4 +281,13 @@ export class UsersService {
       resetTokenExpiry: null,
     });
   }
+
+  async updateProfilePicture(userId: string, url: string | null): Promise<UserDocument> {
+    const update = url
+      ? { profilePictureUrl: url }
+      : { $unset: { profilePictureUrl: '' } };
+    const user = await this.userModel.findByIdAndUpdate(userId, update, { new: true });
+    if (!user) throw new NotFoundException('Utilisateur introuvable');
+    return user;
+  }
 }
