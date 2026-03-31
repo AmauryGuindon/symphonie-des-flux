@@ -5,6 +5,7 @@
     <!-- Header -->
     <div class="account__header reveal">
       <div class="account__header-left">
+        <span class="section-label">Espace Client</span>
         <div class="account__avatar-wrap">
           <div class="account__avatar" (click)="triggerFileInput()">
             @if (avatarLoading()) {
@@ -29,7 +30,6 @@
           }
           <input #fileInput type="file" accept="image/*" style="display:none" (change)="onFileChange($event)" />
         </div>
-        <span class="section-label">Espace Client</span>
         <h1 class="account__name">{{ u.firstName }} {{ u.lastName }}</h1>
         <div class="account__tier-badge" [style.--tier-color]="getTierColor(u.loyaltyTier)">
           <span class="account__tier-dot"></span>
