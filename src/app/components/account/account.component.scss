@@ -20,12 +20,10 @@
   }
 
   &__tier-badge {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 0.5rem;
     padding: 0.3rem 0.9rem;
-    align-self: stretch;
     border: 1px solid var(--tier-color, var(--gold));
     font-family: var(--font-body);
     font-size: 0.7rem;
@@ -52,10 +50,20 @@
   &__header-left {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: flex-start;
+    gap: 1rem;
+  }
 
-    .section-label { align-self: flex-start; }
+  &__header-identity {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  &__header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   &__avatar-wrap {
