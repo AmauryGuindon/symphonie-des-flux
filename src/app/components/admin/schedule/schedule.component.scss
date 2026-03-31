@@ -97,6 +97,13 @@
     flex-wrap: wrap;
   }
 
+  &__hint {
+    margin: .75rem 0 0;
+    font-size: .72rem;
+    color: rgba(255,255,255,.25);
+    line-height: 1.5;
+  }
+
   &__slot-btn {
     padding: .4rem .875rem;
     border-radius: 6px;

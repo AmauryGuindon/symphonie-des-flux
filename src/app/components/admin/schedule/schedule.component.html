@@ -71,8 +71,7 @@
 
     <!-- Temps de pause entre RDV -->
     <section class="sched__card">
-      <h2 class="sched__card-title">Temps de pause entre les RDV</h2>
-      <p class="sched__card-desc">Délai de soufflage ajouté après chaque prestation (les clients ne pourront pas réserver pendant ce créneau).</p>
+      <h2 class="sched__card-title">Pause entre les RDV</h2>
       <div class="sched__slots">
         @for (opt of [0, 5, 10, 15]; track opt) {
           <button
@@ -80,9 +79,10 @@
             [class.sched__slot-btn--active]="bufferMinutes === opt"
             (click)="bufferMinutes = opt"
             type="button"
-          >{{ opt === 0 ? 'Aucun' : opt + ' min' }}</button>
+          >{{ opt === 0 ? 'Aucune' : opt + ' min' }}</button>
         }
       </div>
+      <p class="sched__hint">Créneau bloqué après chaque prestation — les clients ne peuvent pas réserver pendant ce délai.</p>
     </section>
 
     <!-- Fermetures exceptionnelles -->
