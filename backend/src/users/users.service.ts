@@ -128,12 +128,14 @@ export class UsersService {
 
     const tier = computeTier(current.visitCount);
     const totalPoints = basePoints + LOYALTY_TIER_BONUS[tier];
+    const newTier = computeTier(current.visitCount + 1);
 
     const user = await this.userModel.findByIdAndUpdate(
       userId,
       {
         $inc: { loyaltyPoints: totalPoints, visitCount: 1 },
         lastVisitAt: new Date(),
+        loyaltyTier: newTier,
       },
       { new: true },
     ).select('-password');
