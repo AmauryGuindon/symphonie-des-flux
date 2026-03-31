@@ -80,7 +80,7 @@
                     [class.cal__event--pending]="a.status === 'pending'"
                     [class.cal__event--cancelled]="a.status === 'cancelled'"
                     [style.top.px]="getEventTop(a.time)"
-                    [style.height.px]="HOUR_HEIGHT - 4"
+                    [style.height.px]="getEventHeight(a)"
                     [style.left]="getEventPosition(a, appointmentsForDay(day)).left"
                     [style.width]="getEventPosition(a, appointmentsForDay(day)).width"
                     (click)="openDetail(a)"

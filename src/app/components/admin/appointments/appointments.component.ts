@@ -228,13 +228,20 @@ export class AdminAppointmentsComponent implements OnInit {
     return h * 60 + m;
   }
 
+  getEventHeight(a: Appointment): number {
+    const dur = a.duration ?? 60;
+    return Math.max(20, dur / 60 * this.HOUR_HEIGHT - 4);
+  }
+
   getEventPosition(a: Appointment, dayAppts: Appointment[]): { left: string; width: string } {
     const aStart = this.timeToMinutes(a.time);
-    const aEnd = aStart + 60;
+    const aDur = a.duration ?? 60;
+    const aEnd = aStart + aDur;
     const overlapping = dayAppts.filter(b => {
       if (b._id === a._id) return false;
       const bStart = this.timeToMinutes(b.time);
-      return aStart < bStart + 60 && aEnd > bStart;
+      const bEnd = bStart + (b.duration ?? 60);
+      return aStart < bEnd && aEnd > bStart;
     });
     if (overlapping.length === 0) return { left: '3px', width: 'calc(100% - 6px)' };
     const group = [a, ...overlapping].sort((x, y) =>

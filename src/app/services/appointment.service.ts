@@ -27,6 +27,7 @@ export interface Appointment {
   paymentMethod?: string;
   price?: number;
   visitRecorded?: boolean;
+  duration?: number;
   createdAt: string;
 }
 
