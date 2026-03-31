@@ -74,6 +74,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
   readonly HOUR_HEIGHT = 80;
   readonly DAY_START = 9;
+  bufferMinutes = signal(0);
   readonly HOURS = Array.from({ length: 11 }, (_, i) =>
     `${String(9 + i).padStart(2, '0')}:00`
   );
@@ -146,6 +147,10 @@ export class AdminAppointmentsComponent implements OnInit {
 
   ngOnInit() {
     this.load();
+    this.appointmentService.getAdminSchedule().subscribe({
+      next: cfg => this.bufferMinutes.set(cfg.bufferMinutes ?? 0),
+      error: () => {},
+    });
   }
 
   load() {
@@ -230,7 +235,12 @@ export class AdminAppointmentsComponent implements OnInit {
 
   getEventHeight(a: Appointment): number {
     const dur = a.duration ?? 60;
-    return Math.max(20, dur / 60 * this.HOUR_HEIGHT - 4);
+    return Math.max(20, dur / 60 * this.HOUR_HEIGHT - 2);
+  }
+
+  getBufferHeight(): number {
+    const buf = this.bufferMinutes();
+    return buf > 0 ? Math.max(3, buf / 60 * this.HOUR_HEIGHT) : 0;
   }
 
   getEventPosition(a: Appointment, dayAppts: Appointment[]): { left: string; width: string } {

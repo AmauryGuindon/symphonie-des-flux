@@ -27,6 +27,9 @@ export class BusinessConfig {
   /** Lunch break end HH:mm (exclusive) */
   @Prop({ default: '14:00' }) breakEnd: string;
 
+  /** Buffer time between appointments in minutes */
+  @Prop({ default: 5 }) bufferMinutes: number;
+
   /** Exceptional closed dates YYYY-MM-DD */
   @Prop({ type: [String], default: [] }) closedDates: string[];
 }

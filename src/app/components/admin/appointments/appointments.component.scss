@@ -787,6 +787,21 @@
     }
   }
 
+  &__event-buffer {
+    position: absolute;
+    border-radius: 0 0 4px 4px;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,.03),
+      rgba(255,255,255,.03) 2px,
+      transparent 2px,
+      transparent 6px
+    );
+    border: 1px dashed rgba(255,255,255,.08);
+    border-top: none;
+    pointer-events: none;
+  }
+
   &__event-time {
     display: block;
     font-size: .75rem;

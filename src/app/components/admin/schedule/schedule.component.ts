@@ -21,6 +21,7 @@ export class AdminScheduleComponent implements OnInit {
   openTime = '09:00';
   closeTime = '19:00';
   slotDuration = 30;
+  bufferMinutes = 5;
   breakStart = '13:00';
   breakEnd = '14:00';
   closedDates: string[] = [];
@@ -41,6 +42,7 @@ export class AdminScheduleComponent implements OnInit {
         this.openTime = cfg.openTime;
         this.closeTime = cfg.closeTime;
         this.slotDuration = cfg.slotDuration;
+        this.bufferMinutes = cfg.bufferMinutes ?? 5;
         this.breakStart = cfg.breakStart ?? '13:00';
         this.breakEnd = cfg.breakEnd ?? '14:00';
         // Supprimer automatiquement les dates passées
@@ -93,6 +95,7 @@ export class AdminScheduleComponent implements OnInit {
       openTime: this.openTime,
       closeTime: this.closeTime,
       slotDuration: this.slotDuration,
+      bufferMinutes: this.bufferMinutes,
       breakStart: this.breakStart,
       breakEnd: this.breakEnd,
       closedDates: this.closedDates,

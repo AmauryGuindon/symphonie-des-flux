@@ -89,6 +89,15 @@
                     <span class="cal__event-service">{{ a.serviceType }}</span>
                     <span class="cal__event-client">{{ a.clientName }}</span>
                   </div>
+                  @if (getBufferHeight() > 0 && a.status !== 'cancelled') {
+                    <div
+                      class="cal__event-buffer"
+                      [style.top.px]="getEventTop(a.time) + getEventHeight(a) + 2"
+                      [style.height.px]="getBufferHeight() - 2"
+                      [style.left]="getEventPosition(a, appointmentsForDay(day)).left"
+                      [style.width]="getEventPosition(a, appointmentsForDay(day)).width"
+                    ></div>
+                  }
                 }
               }
 

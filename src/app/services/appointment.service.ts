@@ -11,6 +11,7 @@ export interface BusinessConfig {
   slotDuration: number;
   breakStart: string;
   breakEnd: string;
+  bufferMinutes: number;
   closedDates: string[];
 }
 

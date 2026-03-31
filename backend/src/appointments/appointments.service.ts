@@ -69,7 +69,8 @@ export class AppointmentsService {
       .find({ date, status: { $ne: 'cancelled' } })
       .select('time duration serviceType');
 
-    // Resolve each booked appointment to a [start, end) interval in minutes
+    // Resolve each booked appointment to a [start, end+buffer) interval in minutes
+    const buffer = cfg.bufferMinutes ?? 0;
     const blockedIntervals: { start: number; end: number }[] = await Promise.all(
       booked.map(async (a) => {
         let dur: number = (a as any).duration ?? 0;
@@ -79,7 +80,7 @@ export class AppointmentsService {
         }
         const [h, m] = a.time.split(':').map(Number);
         const start = h * 60 + m;
-        return { start, end: start + dur };
+        return { start, end: start + dur + buffer };
       }),
     );
 
@@ -127,6 +128,7 @@ export class AppointmentsService {
 
     // Duration-based conflict check
     const cfg = await this.scheduleService.getConfig();
+    const buffer = cfg.bufferMinutes ?? 0;
     const serviceDuration = svcCfg?.duration ?? cfg.slotDuration;
     const [newH, newM] = dto.time.split(':').map(Number);
     const newStart = newH * 60 + newM;
@@ -144,7 +146,7 @@ export class AppointmentsService {
       }
       const [h, m] = a.time.split(':').map(Number);
       const aStart = h * 60 + m;
-      if (newStart < aStart + dur && newEnd > aStart) {
+      if (newStart < aStart + dur + buffer && newEnd > aStart) {
         throw new Error('Ce créneau n\'est plus disponible.');
       }
     }
