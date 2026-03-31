@@ -157,7 +157,7 @@ export class AccountComponent implements OnInit {
     });
   });
 
-  constructor(private auth: AuthService) {}
+  constructor(public auth: AuthService) {}
 
   ngOnInit() {
     this.auth.refreshUser().subscribe();

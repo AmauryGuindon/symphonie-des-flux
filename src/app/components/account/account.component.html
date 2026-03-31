@@ -12,7 +12,7 @@
               @if (avatarLoading()) {
                 <div class="account__avatar-spinner"></div>
               } @else if (u.profilePictureUrl) {
-                <img [src]="u.profilePictureUrl" alt="Photo de profil" class="account__avatar-img" />
+                <img [src]="auth.backendUrl + u.profilePictureUrl" alt="Photo de profil" class="account__avatar-img" />
               } @else {
                 <span class="account__avatar-initials">{{ initials() }}</span>
               }

@@ -8,6 +8,7 @@ import { User, AuthResponse } from '../models/user.model';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly API = 'http://localhost:3000/api';
+  readonly backendUrl = 'http://localhost:3000';
   private readonly TOKEN_KEY = 'dany1st_token';
   private readonly USER_KEY = 'dany1st_user';
 
