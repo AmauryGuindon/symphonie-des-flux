@@ -151,12 +151,21 @@
     margin-bottom: 1.25rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid rgba(255,255,255,.06);
+
+    @media (max-width: 420px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 
   &__donut {
     width: 110px;
     height: 110px;
     flex-shrink: 0;
+
+    @media (max-width: 420px) {
+      align-self: center;
+    }
   }
 
   &__donut-legend {
@@ -268,8 +277,13 @@
     flex-shrink: 0;
   }
 
-  &__service-name { font-size: .82rem; }
-  &__service-amount { font-size: .82rem; font-weight: 500; }
+  &__service-name {
+    font-size: .82rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &__service-amount { font-size: .82rem; font-weight: 500; flex-shrink: 0; }
 
   &__bar-track {
     height: 4px;
@@ -299,9 +313,9 @@
     flex-shrink: 0;
   }
 
-  &__payment-label { font-size: .82rem; color: rgba(255,255,255,.7); flex: 1; }
-  &__payment-amount { font-size: .82rem; color: #fff; }
-  &__payment-pct { font-size: .75rem; color: rgba(255,255,255,.3); min-width: 2.5rem; text-align: right; }
+  &__payment-label { font-size: .82rem; color: rgba(255,255,255,.7); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  &__payment-amount { font-size: .82rem; color: #fff; flex-shrink: 0; }
+  &__payment-pct { font-size: .75rem; color: rgba(255,255,255,.3); min-width: 2.5rem; text-align: right; flex-shrink: 0; }
 
   &__visits-card { margin-bottom: 0; }
 
@@ -473,6 +487,10 @@
     border-radius: 6px;
     transition: background .15s;
 
+    @media (max-width: 560px) {
+      grid-template-columns: 1fr auto auto 1rem;
+    }
+
     &:hover { background: rgba(255,255,255,.04); }
     &--open { background: rgba(255,255,255,.04); }
 
@@ -492,6 +510,8 @@
     background: rgba(255,255,255,.06);
     border-radius: 3px;
     overflow: hidden;
+
+    @media (max-width: 560px) { display: none; }
   }
 
   &__daily-bar {
@@ -529,6 +549,10 @@
     margin: .2rem 0 .4rem 10.75rem;
     padding-left: .75rem;
     border-left: 2px solid rgba(201,164,74,.2);
+
+    @media (max-width: 560px) {
+      margin-left: 1rem;
+    }
   }
 
   &__daily-visit {

@@ -908,6 +908,12 @@
     background: #e74c3c;
   }
 
+  &--3days {
+    .cal__header, .cal__body {
+      grid-template-columns: 56px repeat(3, 1fr);
+    }
+  }
+
   @media (max-width: 900px) {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -924,6 +930,12 @@
 
     &__time-label, &__hour-row {
       height: 60px;
+    }
+
+    &--3days {
+      .cal__header, .cal__body {
+        min-width: unset;
+      }
     }
   }
 }

@@ -43,6 +43,9 @@ export class NavbarComponent implements OnInit {
   toggleNotif(e: Event) {
     e.stopPropagation();
     this.notifOpen = !this.notifOpen;
+    if (this.notifOpen && this.notif.unreadCount() > 0) {
+      this.notif.markAllRead().subscribe();
+    }
   }
 
   deleteOne(id: string, e: Event) {

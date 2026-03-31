@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppointmentService, Appointment } from '../../../services/appointment.service';
 
-type ViewMode = 'week' | 'list';
+type ViewMode = '3days' | 'week' | 'list';
 type StatusFilter = 'all' | 'pending' | 'confirmed' | 'cancelled';
 
 @Component({
@@ -23,8 +23,9 @@ export class AdminAppointmentsComponent implements OnInit {
   dateFrom = signal('');
   dateTo = signal('');
 
-  // Week navigation
+  // Week / 3-day navigation
   weekStart = signal(this.getWeekStart(new Date()));
+  threeDaysStart = signal(this.getThreeDaysStart(new Date()));
   showCancelled = signal(false);
 
   // Detail popup (mobile tap)
@@ -88,6 +89,24 @@ export class AdminAppointmentsComponent implements OnInit {
     });
   });
 
+  calDays = computed(() => {
+    if (this.viewMode() === '3days') {
+      const start = this.threeDaysStart();
+      return Array.from({ length: 3 }, (_, i) => {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        return d;
+      });
+    }
+    return this.weekDays();
+  });
+
+  calLabel = computed(() => {
+    const days = this.calDays();
+    const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    return `${fmt(days[0])} — ${fmt(days[days.length - 1])}`;
+  });
+
   weekLabel = computed(() => {
     const days = this.weekDays();
     const fmt = (d: Date) => d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -128,7 +147,7 @@ export class AdminAppointmentsComponent implements OnInit {
 
   constructor(private appointmentService: AppointmentService) {
     effect(() => {
-      if (this.viewMode() === 'week' && !this.loading()) {
+      if ((this.viewMode() === 'week' || this.viewMode() === '3days') && !this.loading()) {
         setTimeout(() => this.scrollToToday(), 0);
       }
     });
@@ -137,10 +156,11 @@ export class AdminAppointmentsComponent implements OnInit {
   private scrollToToday() {
     const el = this.calEl?.nativeElement;
     if (!el || window.innerWidth > 900) return;
-    const todayIndex = this.weekDays().findIndex(d => this.isToday(d));
+    const days = this.calDays();
+    const todayIndex = days.findIndex(d => this.isToday(d));
     if (todayIndex < 0) return;
     const gutterWidth = 56;
-    const colWidth = (el.scrollWidth - gutterWidth) / 7;
+    const colWidth = (el.scrollWidth - gutterWidth) / days.length;
     const targetScroll = gutterWidth + todayIndex * colWidth - (el.clientWidth - colWidth) / 2;
     el.scrollTo({ left: Math.max(0, targetScroll), behavior: 'smooth' });
   }
@@ -173,6 +193,12 @@ export class AdminAppointmentsComponent implements OnInit {
     return d;
   }
 
+  private getThreeDaysStart(date: Date): Date {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
   prevWeek() {
     const s = new Date(this.weekStart());
     s.setDate(s.getDate() - 7);
@@ -185,13 +211,41 @@ export class AdminAppointmentsComponent implements OnInit {
     this.weekStart.set(s);
   }
 
+  prevPeriod() {
+    if (this.viewMode() === '3days') {
+      const s = new Date(this.threeDaysStart());
+      s.setDate(s.getDate() - 3);
+      this.threeDaysStart.set(s);
+    } else {
+      this.prevWeek();
+    }
+  }
+
+  nextPeriod() {
+    if (this.viewMode() === '3days') {
+      const s = new Date(this.threeDaysStart());
+      s.setDate(s.getDate() + 3);
+      this.threeDaysStart.set(s);
+    } else {
+      this.nextWeek();
+    }
+  }
+
   goToToday() {
     this.weekStart.set(this.getWeekStart(new Date()));
+    this.threeDaysStart.set(this.getThreeDaysStart(new Date()));
   }
 
   isCurrentWeek(): boolean {
     const todayStart = this.getWeekStart(new Date()).getTime();
     return this.weekStart().getTime() === todayStart;
+  }
+
+  isCurrentPeriod(): boolean {
+    if (this.viewMode() === '3days') {
+      return this.threeDaysStart().getTime() === this.getThreeDaysStart(new Date()).getTime();
+    }
+    return this.isCurrentWeek();
   }
 
   toDateString(d: Date): string {

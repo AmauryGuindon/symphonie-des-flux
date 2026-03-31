@@ -17,6 +17,10 @@ export class NotificationsService {
     return this.model.find({ userId }).sort({ createdAt: -1 }).limit(30);
   }
 
+  async markAllRead(userId: string): Promise<void> {
+    await this.model.updateMany({ userId, read: false }, { read: true });
+  }
+
   async deleteOne(id: string, userId: string): Promise<void> {
     await this.model.deleteOne({ _id: id, userId });
   }

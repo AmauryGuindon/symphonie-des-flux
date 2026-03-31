@@ -39,6 +39,7 @@
     align-items: flex-start;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
   }
 
   &__header-left {
@@ -57,6 +58,7 @@
     border-radius: 8px;
     padding: .45rem;
     min-width: 260px;
+    flex: 1;
     text-align: center;
     transition: border-color .2s, background-color .2s;
 
@@ -243,6 +245,7 @@
     display: flex;
     gap: .5rem;
     align-items: flex-end;
+    flex-wrap: wrap;
   }
 
   &__toggle {

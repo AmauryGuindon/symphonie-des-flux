@@ -3,6 +3,7 @@
     <h1 class="appt-admin__title">Rendez-vous</h1>
     <div class="appt-admin__header-actions">
       <div class="appt-admin__view-toggle">
+        <button [class.active]="viewMode() === '3days'" (click)="viewMode.set('3days')">3 jours</button>
         <button [class.active]="viewMode() === 'week'" (click)="viewMode.set('week')">Semaine</button>
         <button [class.active]="viewMode() === 'list'" (click)="viewMode.set('list')">Liste</button>
       </div>
@@ -13,20 +14,20 @@
     <div class="appt-admin__loading">Chargement…</div>
   } @else {
 
-    <!-- ── WEEK VIEW ─────────────────────────────────────────────────── -->
-    @if (viewMode() === 'week') {
+    <!-- ── WEEK / 3-DAY VIEW ────────────────────────────────────────── -->
+    @if (viewMode() === 'week' || viewMode() === '3days') {
       <div class="appt-admin__week-nav">
-        <button class="appt-admin__nav-btn" (click)="prevWeek()">‹ Semaine préc.</button>
+        <button class="appt-admin__nav-btn" (click)="prevPeriod()">‹ Préc.</button>
         <div class="appt-admin__week-center">
-          <span class="appt-admin__week-label">{{ weekLabel() }}</span>
-          @if (!isCurrentWeek()) {
+          <span class="appt-admin__week-label">{{ calLabel() }}</span>
+          @if (!isCurrentPeriod()) {
             <button class="appt-admin__today-btn" (click)="goToToday()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><polyline points="15 18 9 12 15 6"/></svg>
-              Revenir à aujourd'hui
+              Aujourd'hui
             </button>
           }
         </div>
-        <button class="appt-admin__nav-btn" (click)="nextWeek()">Semaine suiv. ›</button>
+        <button class="appt-admin__nav-btn" (click)="nextPeriod()">Suiv. ›</button>
       </div>
       <div class="appt-admin__week-toggle-row">
         <button
@@ -39,11 +40,11 @@
         </button>
       </div>
 
-      <div class="cal" #calEl>
+      <div class="cal" [class.cal--3days]="viewMode() === '3days'" #calEl>
         <!-- Header row -->
         <div class="cal__header">
           <div class="cal__time-gutter"></div>
-          @for (day of weekDays(); track day.toISOString()) {
+          @for (day of calDays(); track day.toISOString()) {
             <div class="cal__day-head" [class.cal__day-head--today]="isToday(day)">
               <span class="cal__day-name">{{ dayName(day) }}</span>
               <span class="cal__day-num" [class.cal__day-num--today]="isToday(day)">{{ day.getDate() }}</span>
@@ -61,7 +62,7 @@
           </div>
 
           <!-- Day columns -->
-          @for (day of weekDays(); track day.toISOString()) {
+          @for (day of calDays(); track day.toISOString()) {
             <div class="cal__day-col" [class.cal__day-col--today]="isToday(day)" [class.cal__day-col--closed]="isClosedDay(day)">
               <!-- Hour grid lines -->
               @for (h of HOURS; track h) {
