@@ -282,6 +282,32 @@ export class UsersService {
     });
   }
 
+  async findOrCreateGoogleUser(profile: {
+    googleId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  }): Promise<UserDocument> {
+    let user = await this.userModel.findOne({ googleId: profile.googleId });
+    if (user) return user;
+
+    user = await this.userModel.findOne({ email: profile.email.toLowerCase() });
+    if (user) {
+      user.googleId = profile.googleId;
+      await user.save();
+      return user;
+    }
+
+    const referralCode = uuidv4().split('-')[0].toUpperCase();
+    return this.userModel.create({
+      googleId: profile.googleId,
+      email: profile.email.toLowerCase(),
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      referralCode,
+    });
+  }
+
   async updateProfilePicture(userId: string, url: string | null): Promise<UserDocument> {
     const update = url
       ? { profilePictureUrl: url }

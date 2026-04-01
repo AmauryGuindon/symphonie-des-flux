@@ -22,6 +22,7 @@ import { AdminAccountingComponent } from './components/admin/accounting/accounti
 import { AdminServicesComponent } from './components/admin/services/services.component';
 import { AdminGalleryComponent } from './components/admin/gallery/gallery.component';
 import { AdminNewsletterComponent } from './components/admin/newsletter/newsletter.component';
+import { OAuthCallbackComponent } from './components/auth/oauth-callback/oauth-callback.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { MentionsLegalesComponent } from './components/legal/mentions-legales/mentions-legales.component';
 import { CguComponent } from './components/legal/cgu/cgu.component';
@@ -39,6 +40,7 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
   { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [guestGuard] },
   { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'auth/callback', component: OAuthCallbackComponent },
   { path: 'account', component: AccountComponent, canActivate: [authGuard] },
   {
     path: 'admin',

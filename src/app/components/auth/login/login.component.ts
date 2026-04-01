@@ -23,6 +23,10 @@ export class LoginComponent {
     private route: ActivatedRoute,
   ) {}
 
+  loginWithGoogle() {
+    window.location.href = 'http://localhost:3000/api/auth/google';
+  }
+
   submit() {
     if (!this.email || !this.password) {
       this.error.set('Veuillez remplir tous les champs.');

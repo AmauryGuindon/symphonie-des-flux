@@ -134,6 +134,12 @@ export class AuthService {
     return this.http.get<any>(`${this.API}/appointments/slots?date=${date}`);
   }
 
+  loginWithToken(token: string): Observable<User> {
+    localStorage.setItem(this.TOKEN_KEY, token);
+    this._token.set(token);
+    return this.refreshUser();
+  }
+
   changePassword(currentPassword: string, newPassword: string): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.API}/auth/change-password`, { currentPassword, newPassword });
   }

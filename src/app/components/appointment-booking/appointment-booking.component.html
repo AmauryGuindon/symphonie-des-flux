@@ -150,9 +150,8 @@
                 <circle cx="12" cy="16" r=".5" fill="currentColor" />
               </svg>
               <p>{{ closed() ? 'Fermé ce jour-là.' : 'Aucun créneau disponible.' }}</p>
-              <button class="appt__next-month-btn"
-                (click)="nextMonth(); selectedDate.set(null); selectedTime.set(null)">
-                Voir le mois suivant
+              <button class="appt__next-month-btn" (click)="goToNextAvailableDay()">
+                {{ nextDayIsNewMonth() ? 'Voir le mois suivant' : 'Jour suivant' }}
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
@@ -336,7 +335,7 @@
   <!-- Onglet Mes RDV -->
   @if (myTab() === 'mine' && isAuth()) {
   <div class="appt__mine reveal">
-    @if (myAppointments().length === 0) {
+    @if (upcomingAppointments().length === 0) {
     <div class="appt__empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="36" height="36">
         <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -348,7 +347,7 @@
     </div>
     } @else {
     <div class="appt__mine-list">
-      @for (a of myAppointments(); track a._id) {
+      @for (a of upcomingAppointments(); track a._id) {
       <div class="appt__mine-item">
         <div class="appt__mine-accent"></div>
         <div class="appt__mine-content">

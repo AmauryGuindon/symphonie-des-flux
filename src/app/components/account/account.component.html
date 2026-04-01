@@ -306,7 +306,7 @@
           <p class="account__empty-text">Aucune visite enregistrée.</p>
         } @else {
           <div class="account__visits-list">
-            @for (v of visits(); track v._id) {
+            @for (v of visits() | slice:0:5; track v._id) {
               <div class="account__visit-item">
                 <div class="account__visit-info">
                   <span class="account__visit-service">{{ v.serviceType }}</span>
@@ -337,7 +337,7 @@
           <p class="account__empty-text">Aucune transaction pour le moment.</p>
         } @else {
           <div class="account__pts-history">
-            @for (entry of pointsHistory(); track entry._id) {
+            @for (entry of pointsHistory() | slice:0:5; track entry._id) {
               <div class="account__pts-entry">
                 <div class="account__pts-left">
                   <span class="account__pts-reason" [style.color]="pointsReasonColor(entry.reason)">

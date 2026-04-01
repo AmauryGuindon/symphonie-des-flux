@@ -64,6 +64,25 @@ export class AppointmentBookingComponent implements OnInit {
     this.slots().length > 0 && this.slots().every(s => !s.available),
   );
 
+  nextAvailableDay = computed((): Date | null => {
+    const selectedDs = this.selectedDate();
+    if (!selectedDs) return null;
+    const base = new Date(selectedDs + 'T12:00:00');
+    const todayMidnight = new Date(this.today.getFullYear(), this.today.getMonth(), this.today.getDate());
+    for (let i = 1; i <= 90; i++) {
+      const next = new Date(base.getFullYear(), base.getMonth(), base.getDate() + i);
+      if (next >= todayMidnight && !this.isClosedDay(next)) return next;
+    }
+    return null;
+  });
+
+  nextDayIsNewMonth = computed((): boolean => {
+    const next = this.nextAvailableDay();
+    if (!next) return true;
+    const m = this.currentMonth();
+    return next.getFullYear() !== m.getFullYear() || next.getMonth() !== m.getMonth();
+  });
+
   // Schedule config (dynamic from API)
   private scheduleConfig: BusinessConfig = {
     openDays: [1, 2, 3, 4, 5, 6],
@@ -99,6 +118,17 @@ export class AppointmentBookingComponent implements OnInit {
   // My appointments
   myAppointments = signal<any[]>([]);
   myTab = signal<'book' | 'mine'>('book');
+
+  upcomingAppointments = computed(() => {
+    const now = new Date();
+    const todayStr = this.toDateString(now);
+    const currentTime = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    return this.myAppointments().filter(a => {
+      if (a.date > todayStr) return true;
+      if (a.date === todayStr) return a.time >= currentTime;
+      return false;
+    });
+  });
 
   switchTab(tab: 'book' | 'mine') {
     this.myTab.set(tab);
@@ -173,6 +203,19 @@ export class AppointmentBookingComponent implements OnInit {
     this.currentMonth.set(new Date(m.getFullYear(), m.getMonth() + 1, 1));
     this.selectedDate.set(null);
     this.slots.set([]);
+  }
+
+  goToNextAvailableDay() {
+    const next = this.nextAvailableDay();
+    if (!next) {
+      this.nextMonth();
+      return;
+    }
+    const m = this.currentMonth();
+    if (next.getFullYear() !== m.getFullYear() || next.getMonth() !== m.getMonth()) {
+      this.currentMonth.set(new Date(next.getFullYear(), next.getMonth(), 1));
+    }
+    this.selectDate(next);
   }
 
   isCurrentMonth(): boolean {

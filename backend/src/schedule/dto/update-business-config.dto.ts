@@ -24,6 +24,12 @@ export class UpdateBusinessConfigDto {
   @IsOptional()
   slotDuration?: number;
 
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  @IsOptional()
+  bufferMinutes?: number;
+
   @IsString()
   @Matches(/^(\d{2}:\d{2})?$/)
   @IsOptional()

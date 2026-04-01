@@ -26,12 +26,22 @@ export class RegisterComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
+  registerWithGoogle() {
+    window.location.href = 'http://localhost:3000/api/auth/google';
+  }
+
   submit() {
-    const { firstName, lastName, email, password } = this.form;
-    if (!firstName || !lastName || !email || !password) {
+    const { firstName, lastName, email, password, birthDate } = this.form;
+    if (!firstName || !lastName || !email || !password || !birthDate) {
       this.error.set('Veuillez remplir les champs obligatoires.');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      this.error.set('Veuillez entrer une adresse email valide.');
+      return;
+    }
+
     if (password.length < 8) {
       this.error.set('Le mot de passe doit contenir au moins 8 caractères.');
       return;

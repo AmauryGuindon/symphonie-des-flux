@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 import { RolesGuard } from './guards/roles.guard';
 import { UsersModule } from '../users/users.module';
 
@@ -17,7 +18,7 @@ import { UsersModule } from '../users/users.module';
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN ?? '7d' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, RolesGuard],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, RolesGuard],
   controllers: [AuthController],
   exports: [AuthService, RolesGuard],
 })

@@ -1,4 +1,5 @@
-import { Controller, Post, Body, UseGuards, Request, HttpCode } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Request, HttpCode, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
@@ -6,6 +7,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 class ForgotPasswordDto {
   @IsEmail() email: string;
@@ -60,5 +62,19 @@ export class AuthController {
   async changePassword(@Request() req, @Body() dto: ChangePasswordDto) {
     await this.authService.changePassword(req.user.userId, dto.currentPassword, dto.newPassword);
     return { message: 'Mot de passe modifié avec succès.' };
+  }
+
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  googleAuth() {
+    // Passport redirige vers Google automatiquement
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleCallback(@Request() req, @Res() res: Response) {
+    const { accessToken } = await this.authService.googleLogin(req.user);
+    const frontendUrl = process.env.FRONTEND_URL ?? 'http://localhost:4200';
+    res.redirect(`${frontendUrl}/auth/callback?token=${accessToken}`);
   }
 }
