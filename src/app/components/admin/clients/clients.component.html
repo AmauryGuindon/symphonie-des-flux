@@ -1,13 +1,21 @@
 <div class="clients">
   <div class="clients__header">
     <h1 class="clients__title">Clients</h1>
-    <span class="clients__count">
-      {{ filteredClients().length }}
-      @if (filteredClients().length !== clients().length) {
-        <span class="clients__count-sub"> / {{ clients().length }}</span>
-      }
-      client{{ filteredClients().length > 1 ? 's' : '' }}
-    </span>
+    <div class="clients__header-right">
+      <span class="clients__count">
+        {{ filteredClients().length }}
+        @if (filteredClients().length !== clients().length) {
+          <span class="clients__count-sub"> / {{ clients().length }}</span>
+        }
+        client{{ filteredClients().length > 1 ? 's' : '' }}
+      </span>
+      <button class="clients__export-btn" (click)="exportCsv()" [disabled]="filteredClients().length === 0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Exporter CSV
+      </button>
+    </div>
   </div>
 
   <!-- Barre de recherche -->

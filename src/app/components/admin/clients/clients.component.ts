@@ -98,4 +98,32 @@ export class AdminClientsComponent implements OnInit {
   getTierLabel(tier: string): string {
     return TIER_CONFIG[tier as keyof typeof TIER_CONFIG]?.label ?? tier;
   }
+
+  exportCsv() {
+    const tierLabels: Record<string, string> = { bronze: 'Bronze', silver: 'Argent', gold: 'Or', platinum: 'Platine' };
+    const headers = ['Prénom', 'Nom', 'Email', 'Téléphone', 'Palier', 'Points', 'Visites', 'Dernière visite', 'Inscrit le'];
+    const rows = this.filteredClients().map(c => [
+      c.firstName,
+      c.lastName,
+      c.email,
+      c.phone ?? '',
+      tierLabels[c.loyaltyTier] ?? c.loyaltyTier,
+      c.loyaltyPoints,
+      c.visitCount,
+      c.lastVisitAt ? new Date(c.lastVisitAt).toLocaleDateString('fr-FR') : '',
+      c.createdAt  ? new Date(c.createdAt).toLocaleDateString('fr-FR')  : '',
+    ]);
+
+    const csv = [headers, ...rows]
+      .map(row => row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';'))
+      .join('\n');
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clients-dany1st-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 }
