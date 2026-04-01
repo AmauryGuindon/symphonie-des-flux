@@ -32,6 +32,7 @@ export class AdminGalleryComponent implements OnInit {
   toast = signal<{ message: string; type: 'ok' | 'err' } | null>(null);
   savingOrder = signal(false);
   orderDirty = signal(false);
+  dirtyIds = signal<Set<string>>(new Set());
   draggedIndex = signal<number | null>(null);
   dragOverIndex = signal<number | null>(null);
 
@@ -136,6 +137,14 @@ export class AdminGalleryComponent implements OnInit {
     });
   }
 
+  markDirty(id: string) {
+    this.dirtyIds.update(s => new Set(s).add(id));
+  }
+
+  isDirty(id: string): boolean {
+    return this.dirtyIds().has(id);
+  }
+
   // --- Item save / delete ---
 
   save(item: GalleryItem) {
@@ -150,6 +159,7 @@ export class AdminGalleryComponent implements OnInit {
       .subscribe({
         next: () => {
           this.savingId.set(null);
+          this.dirtyIds.update(s => { const n = new Set(s); n.delete(item._id); return n; });
           this.showToast('Photo sauvegardée', 'ok');
         },
         error: () => {
@@ -185,6 +195,7 @@ export class AdminGalleryComponent implements OnInit {
     this.http.post<GalleryItem>(`${API}/admin/gallery`, formData).subscribe({
       next: item => {
         this.items.update(list => [item, ...list]);
+        this.markDirty(item._id);
         this.uploading.set(false);
         if (input) input.value = '';
       },

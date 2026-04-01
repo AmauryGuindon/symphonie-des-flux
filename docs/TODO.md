@@ -14,7 +14,8 @@
 
 ### Compte
 - [X] Système de notifications in-app (cloche) : palier atteint, points gagnés, RDV confirmé
-- [ ] Photo de profil
+- [X] Suppression des notifications (une par une ou tout supprimer) + marquage lu à l'ouverture
+- [X] Photo de profil (avatar circulaire avec initiales en fallback, upload/suppression)
 - [ ] PWA installable sur téléphone (icône écran d'accueil, sans App Store) — `ng add @angular/pwa`
 
 ---
@@ -24,7 +25,7 @@
 ### Gestion clients
 - [X] Fiche client enrichie : notes internes (ex. "préfère les tempes rasées")
 - [X] Recherche et filtres clients : par palier, dernière visite, points
-- [ ] Export CSV de la base clients
+- [X] Export CSV de la base clients (filtrés, encodage UTF-8 pour Excel)
 
 ### Comptabilité
 - [X] Graphiques CA par prestation (donut chart SVG)
@@ -55,9 +56,14 @@
 |----------|-------|--------|
 | ✅ Fait | Rappels RDV 24h avant | Réduit les no-shows |
 | ✅ Fait | Fiche client avec notes internes | Améliore la qualité de service |
-| ✅ Fait | Notifications in-app | Meilleure expérience client |
+| ✅ Fait | Notifications in-app + suppression + marquage lu | Meilleure expérience client |
 | ✅ Fait | Graphiques CA par prestation + comparatif + annulés | Aide à décider quoi promouvoir |
 | ✅ Fait | Drag & drop galerie + catégories | Confort d'utilisation |
 | ✅ Fait | Recherche & filtres clients | Meilleur suivi par palier |
 | ✅ Fait | Vue agenda semaine | Vision globale des RDV |
+| ✅ Fait | Photo de profil (avatar + upload + suppression) | Expérience personnalisée |
+| ✅ Fait | Export CSV clients | Suivi & marketing |
+| ✅ Fait | Navigation mois ← → en comptabilité | Ergonomie backoffice |
+| 🟡 Basse | Pagination galerie publique | Perf & UX |
 | 🟡 Basse | Récurrence RDV | Fidélisation |
+| 🟡 Basse | PWA installable | Accessibilité mobile |

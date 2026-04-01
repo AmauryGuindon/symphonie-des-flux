@@ -178,6 +178,37 @@
     }
   }
 
+  &__load-more {
+    display: flex;
+    justify-content: center;
+    margin-top: 2.5rem;
+  }
+
+  &__load-more-btn {
+    background: none;
+    border: 1px solid rgba(201, 164, 74, .35);
+    color: rgba(245, 240, 232, .6);
+    font-family: var(--font-body);
+    font-size: .78rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding: .75rem 2.5rem;
+    cursor: pointer;
+    transition: color .25s, border-color .25s, background .25s;
+
+    &:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: rgba(201, 164, 74, .06);
+    }
+  }
+
+  &__load-more-count {
+    opacity: .45;
+    font-size: .7em;
+    letter-spacing: .08em;
+  }
+
   &__footer {
     margin-top: 4rem;
     display: flex;

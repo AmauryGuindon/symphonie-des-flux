@@ -68,12 +68,12 @@
           <div class="agallery__fields">
             <div class="agallery__field">
               <label>Alt</label>
-              <input [(ngModel)]="item.alt" placeholder="Description de l'image" />
+              <input [(ngModel)]="item.alt" placeholder="Description de l'image" (input)="markDirty(item._id)" />
             </div>
             <div class="agallery__field-row">
               <div class="agallery__field">
                 <label>Span</label>
-                <select [(ngModel)]="item.span">
+                <select [(ngModel)]="item.span" (change)="markDirty(item._id)">
                   @for (s of spanOptions; track s) {
                     <option [value]="s">{{ s || 'Normal' }}</option>
                   }
@@ -81,23 +81,25 @@
               </div>
               <div class="agallery__field">
                 <label>Catégorie</label>
-                <select [(ngModel)]="item.category">
+                <select [(ngModel)]="item.category" (change)="markDirty(item._id)">
                   @for (c of categoryOptions; track c.value) {
                     <option [value]="c.value">{{ c.label }}</option>
                   }
                 </select>
               </div>
               <label class="agallery__toggle">
-                <input type="checkbox" [(ngModel)]="item.active" />
+                <input type="checkbox" [(ngModel)]="item.active" (change)="markDirty(item._id)" />
                 Actif
               </label>
             </div>
           </div>
 
           <div class="agallery__actions">
-            <button class="agallery__btn-save" (click)="save(item)" [disabled]="savingId() === item._id">
-              {{ savingId() === item._id ? '...' : 'Sauvegarder' }}
-            </button>
+            @if (isDirty(item._id)) {
+              <button class="agallery__btn-save" (click)="save(item)" [disabled]="savingId() === item._id">
+                {{ savingId() === item._id ? '...' : 'Sauvegarder' }}
+              </button>
+            }
             <button class="agallery__btn-delete" (click)="delete(item)">Supprimer</button>
           </div>
         </div>

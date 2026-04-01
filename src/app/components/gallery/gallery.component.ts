@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 
 const API = 'http://localhost:3000/api';
 const API_ORIGIN = API.replace(/\/api.*$/, '');
+const PAGE_SIZE = 12;
 
 interface GalleryItem {
   _id: string;
@@ -24,6 +25,7 @@ interface GalleryItem {
 export class GalleryComponent implements OnInit {
   private allItems = signal<GalleryItem[]>([]);
   activeCategory = signal('');
+  private visibleCount = signal(PAGE_SIZE);
 
   categories: { value: string; label: string }[] = [
     { value: '', label: 'Tout' },
@@ -38,9 +40,22 @@ export class GalleryComponent implements OnInit {
     return this.allItems().filter(item => item.category === cat);
   });
 
+  visibleItems = computed(() => this.items().slice(0, this.visibleCount()));
+  hasMore = computed(() => this.visibleCount() < this.items().length);
+  remainingCount = computed(() => this.items().length - this.visibleCount());
+
   hasCategories = computed(() =>
     this.allItems().some(item => item.category && item.category !== '')
   );
+
+  setCategory(cat: string) {
+    this.activeCategory.set(cat);
+    this.visibleCount.set(PAGE_SIZE);
+  }
+
+  showMore() {
+    this.visibleCount.update(c => c + PAGE_SIZE);
+  }
 
   private readonly fallbackItems: GalleryItem[] = [
     { _id: '1', url: 'assets/taper1.png', alt: 'Dégradé signature Dany1st', span: 'tall', active: true },

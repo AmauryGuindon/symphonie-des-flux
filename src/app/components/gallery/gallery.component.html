@@ -19,7 +19,7 @@
           <button
             class="gallery__filter-btn"
             [class.gallery__filter-btn--active]="activeCategory() === cat.value"
-            (click)="activeCategory.set(cat.value)"
+            (click)="setCategory(cat.value)"
           >
             {{ cat.label }}
           </button>
@@ -29,7 +29,7 @@
   }
 
   <div class="gallery__grid">
-    @for (item of items(); track item._id) {
+    @for (item of visibleItems(); track item._id) {
       <div
         class="gallery__item"
         [class.gallery__item--tall]="item.span === 'tall'"
@@ -49,6 +49,16 @@
       </div>
     }
   </div>
+
+  @if (hasMore()) {
+  <div class="container">
+    <div class="gallery__load-more">
+      <button class="gallery__load-more-btn" (click)="showMore()">
+        Voir plus <span class="gallery__load-more-count">({{ remainingCount() }} restantes)</span>
+      </button>
+    </div>
+  </div>
+  }
 
   <div class="container">
     <div class="gallery__footer reveal">
