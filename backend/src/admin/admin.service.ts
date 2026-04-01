@@ -336,8 +336,9 @@ export class AdminService implements OnModuleInit {
   async getAccounting(period: string, date: string) {
     const { start, end } = this.parsePeriod(period, date);
 
-    const startStr = start.toISOString().slice(0, 10);
-    const endStr = end.toISOString().slice(0, 10);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const startStr = `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`;
+    const endStr   = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}`;
 
     // visitDate: null matches both missing field and explicit null
     const dateFilter = {
@@ -351,8 +352,8 @@ export class AdminService implements OnModuleInit {
 
     // Période précédente (comparatif)
     const prev = this.parsePrevPeriod(period, date);
-    const prevStartStr = prev.start.toISOString().slice(0, 10);
-    const prevEndStr   = prev.end.toISOString().slice(0, 10);
+    const prevStartStr = `${prev.start.getFullYear()}-${pad(prev.start.getMonth() + 1)}-${pad(prev.start.getDate())}`;
+    const prevEndStr   = `${prev.end.getFullYear()}-${pad(prev.end.getMonth() + 1)}-${pad(prev.end.getDate())}`;
     const prevDateFilter = {
       $or: [
         { visitDate: { $gte: prevStartStr, $lte: prevEndStr } },
