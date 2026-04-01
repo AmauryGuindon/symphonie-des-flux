@@ -56,9 +56,8 @@
     border: 1px dashed rgba(201, 164, 74, .45);
     background: rgba(201, 164, 74, .05);
     border-radius: 8px;
-    padding: .45rem;
-    min-width: 260px;
-    flex: 1;
+    padding: .45rem 1.5rem;
+    width: fit-content;
     text-align: center;
     transition: border-color .2s, background-color .2s;
 
