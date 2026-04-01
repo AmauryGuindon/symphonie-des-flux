@@ -205,6 +205,24 @@ export class AdminAccountingComponent implements OnInit {
     });
   }
 
+
+  prevMonth() {
+    const [y, m] = this.selectedDate().split('-').map(Number);
+    const d = new Date(y, m - 2, 1);
+    this.selectedDate.set(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    this.load();
+  }
+
+  nextMonth() {
+    const [y, m] = this.selectedDate().split('-').map(Number);
+    const d = new Date(y, m, 1);
+    this.selectedDate.set(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    this.load();
+  }
+
+  isCurrentMonth(): boolean {
+    return this.selectedDate() === new Date().toISOString().slice(0, 7);
+  }
   setPeriod(p: 'month' | 'quarter' | 'year') {
     this.period.set(p);
     if (p === 'month') this.selectedDate.set(new Date().toISOString().slice(0, 7));

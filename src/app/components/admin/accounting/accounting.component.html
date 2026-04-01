@@ -21,8 +21,11 @@
     </div>
 
     @if (period() === 'month') {
-    <input type="month" class="acct__date-input" [value]="selectedDate()"
-      (change)="selectedDate.set($any($event.target).value); load()" />
+    <div class="acct__month-nav">
+      <button class="acct__month-arrow" (click)="prevMonth()" aria-label="Mois précédent">&#8592;</button>
+      <span class="acct__month-label">{{ periodLabel() }}</span>
+      <button class="acct__month-arrow" (click)="nextMonth()" [disabled]="isCurrentMonth()" aria-label="Mois suivant">&#8594;</button>
+    </div>
     }
     @if (period() === 'quarter') {
     <select class="acct__date-input" [value]="selectedDate()"
