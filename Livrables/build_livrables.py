@@ -321,7 +321,8 @@ for i, t in enumerate([
     'Pipeline de données', 'Extraction de features', 'Versioning des datasets',
     'Entraînement du modèle', 'Visualisation & supervision', 'Recommandation client par IA',
     'Bonnes pratiques & gouvernance', 'Conclusion & perspectives'], 1):
-    bullet(f'{i}.  {t}')
+    p = doc.add_paragraph(); r = p.add_run(f'{i}. {t}')
+    set_font(r, 11, color=RGBColor(0x22,0x22,0x22)); p.paragraph_format.space_after = Pt(3)
 doc.add_page_break()
 
 # ── 1. INTRODUCTION ─────────────────────────────────────────────
@@ -332,8 +333,8 @@ body("L'objectif central est de mettre en œuvre un cycle de vie complet des don
 h2('1.2 Problématique')
 body("Comment concevoir une infrastructure capable de collecter, structurer, labéliser et versionner des images, tout en garantissant la traçabilité complète du flux de données vers un modèle d'apprentissage automatique ?")
 h2('1.3 Périmètre fonctionnel')
-bullet("Backoffice (admin) : gestion du pipeline, labélisation, création et export de datasets versionnés, supervision via graphiques.")
-bullet("Interface client : recommandation personnalisée de coupe par analyse IA du visage (forme et teinte de peau).")
+body("Le projet se décompose en deux interfaces complémentaires. Le backoffice administrateur prend en charge la gestion du pipeline, la labélisation des images, la création et l'export de datasets versionnés, ainsi que la supervision de l'ensemble via des graphiques de suivi.")
+body("L'interface client, de son côté, propose une recommandation personnalisée de coupe : elle s'appuie sur une analyse du visage par intelligence artificielle, prenant en compte à la fois la forme du visage et la teinte de peau pour suggérer des styles adaptés.")
 doc.add_page_break()
 
 # ── 2. ARCHITECTURE ─────────────────────────────────────────────
@@ -352,11 +353,8 @@ add_table(['Couche','Technologie','Rôle'], [
     ['ML client','MediaPipe (JavaScript)','Détection de forme de visage in-browser'],
 ])
 h2('2.3 Justification des choix techniques')
-bullet('MongoDB : flexibilité de schéma idéale pour des métadonnées hétérogènes, agrégations natives pour les statistiques de labels.')
-bullet('NestJS : architecture modulaire (GalleryModule, DatasetModule, StatsModule), séparation claire des responsabilités.')
-bullet("sharp : extraction de features légère côté serveur, sans dépendance externe, au moment de l'upload.")
-bullet('scikit-learn : implémentation éprouvée du RandomForest multi-label, adaptée à un dataset de taille limitée.')
-bullet('MediaPipe : s\'exécute en WebAssembly dans le navigateur, aucune donnée biométrique transmise à un serveur externe.')
+body("MongoDB a été retenu pour la flexibilité de son schéma, particulièrement adaptée à des métadonnées hétérogènes ; ses agrégations natives facilitent par ailleurs le calcul des statistiques de labels. NestJS apporte une architecture modulaire (GalleryModule, DatasetModule, StatsModule) qui garantit une séparation claire des responsabilités.")
+body("Pour l'extraction de features, sharp offre un traitement léger côté serveur, sans dépendance externe, déclenché au moment de l'upload. Le modèle s'appuie sur scikit-learn, qui fournit une implémentation éprouvée du RandomForest multi-label, bien adaptée à un dataset de taille limitée. Enfin, MediaPipe s'exécute en WebAssembly directement dans le navigateur, ce qui garantit qu'aucune donnée biométrique n'est transmise à un serveur externe.")
 doc.add_page_break()
 
 # ── 3. BDD ──────────────────────────────────────────────────────
@@ -383,9 +381,7 @@ code_block(
     "  _id, version, imageCount, imageIds[], labelsIncluded[], description, createdAt\n"
     "}")
 h2('3.4 Relations')
-bullet("GalleryItem.datasetVersion → DatasetVersion.version (clé logique, document store).")
-bullet("DatasetVersion.imageIds liste les GalleryItem inclus dans le snapshot.")
-bullet("Relation volontairement légère : les snapshots sont immuables.")
+body("La relation entre les deux collections principales reste volontairement légère, conformément à la logique d'un document store. Le champ GalleryItem.datasetVersion pointe vers DatasetVersion.version par une clé logique, tandis que le tableau DatasetVersion.imageIds liste l'ensemble des GalleryItem inclus dans le snapshot. Ce couplage souple se justifie par le caractère immuable des snapshots : une fois figée, une version ne change plus, ce qui rend inutile toute contrainte d'intégrité forte.")
 doc.add_page_break()
 
 # ── 4. PIPELINE ─────────────────────────────────────────────────
@@ -405,9 +401,7 @@ body("Validation finale : l'image est complète et prête à intégrer un datase
 h3('Phase 5 — EXPORTED')
 body("L'image est incluse dans un snapshot versionné ; son champ datasetVersion est renseigné.")
 h2('4.3 Règles de transition')
-bullet("Transitions unidirectionnelles : pas de retour à un statut antérieur.")
-bullet("Seules les images labeled / processed / exported sont éligibles à un dataset.")
-bullet("Le funnel Pipeline visualise les volumes par statut et révèle les goulots d'étranglement.")
+body("Les transitions sont strictement unidirectionnelles : une image ne peut jamais revenir à un statut antérieur, ce qui garantit la cohérence et la traçabilité du flux. Seules les images parvenues aux statuts labeled, processed ou exported sont éligibles à l'intégration dans un dataset. Pour piloter ce processus, le funnel Pipeline visualise les volumes d'images par statut et met immédiatement en évidence les éventuels goulots d'étranglement.")
 doc.add_page_break()
 
 # ── 5. FEATURES ─────────────────────────────────────────────────
@@ -443,10 +437,7 @@ h1('6. Versioning des datasets')
 h2('6.1 Principe')
 body("Le versioning repose sur des snapshots immuables : à un instant T, toutes les images éligibles sont capturées dans une version numérotée qui ne change jamais — garantissant la reproductibilité des entraînements.")
 h2('6.2 Mécanisme de création')
-bullet("L'administrateur clique sur « Créer une version ».")
-bullet("Le backend identifie les images éligibles (labeled, processed, exported).")
-bullet("Un document DatasetVersion est créé (numéro incrémental, imageIds, labelsIncluded, imageCount).")
-bullet("Les images incluses passent à exported et reçoivent le tag de version.")
+body("La création d'une version suit un enchaînement simple depuis l'interface d'administration. L'administrateur déclenche l'opération via le bouton « Créer une version ». Le backend identifie alors automatiquement les images éligibles (statuts labeled, processed ou exported) et génère un document DatasetVersion comportant un numéro incrémental, la liste des imageIds, les labelsIncluded et le imageCount correspondant. Pour finir, les images ainsi capturées passent au statut exported et reçoivent le tag de la version créée, scellant définitivement leur appartenance au snapshot.")
 h2('6.3 Structure du JSON exporté')
 code_block(
     '{\n'
@@ -489,8 +480,7 @@ h2('8.2 Distribution des labels')
 body("La distribution des labels permet d'identifier les classes sous-représentées — indicateur clé de la qualité du dataset. Exemple sur le dataset v1 :")
 figure(P_LABEL, 13, 'Figure 5 — Distribution réelle des labels du dataset v1')
 h2('8.3 Croissance & statistiques de versions')
-bullet("Graphique de croissance : nombre d'images ajoutées par semaine (8 semaines).")
-bullet("Chaque version affiche : nombre d'images, labels inclus, date, export JSON direct.")
+body("Un graphique de croissance retrace le nombre d'images ajoutées semaine après semaine, sur une fenêtre de huit semaines, donnant une vision claire de la dynamique d'alimentation du dataset. En complément, chaque version est présentée avec ses indicateurs clés — nombre d'images, labels inclus et date de création — et propose un export JSON direct, facilitant la réutilisation immédiate du snapshot.")
 doc.add_page_break()
 
 # ── 9. RECOMMANDATION ───────────────────────────────────────────
@@ -525,15 +515,11 @@ doc.add_page_break()
 # ── 10. GOUVERNANCE ─────────────────────────────────────────────
 h1('10. Bonnes pratiques & gouvernance')
 h2('10.1 Séparation fichiers / métadonnées')
-bullet("Fichiers images → disque (/uploads/gallery/)")
-bullet("Métadonnées → MongoDB (statut, labels, features, références)")
-body("Cette séparation permet de migrer vers S3 ou un CDN sans toucher à la base de données.")
+body("L'architecture distingue nettement le stockage des fichiers de celui des métadonnées : les images sont déposées sur le disque (/uploads/gallery/), tandis que MongoDB conserve l'ensemble des métadonnées associées — statut, labels, features et références. Cette séparation offre une grande souplesse d'évolution : il devient possible de migrer le stockage vers un service S3 ou un CDN sans avoir à modifier la base de données ni la logique métier.")
 h2('10.2 Versioning immuable')
 body("Les snapshots sont immuables. Relancer train.py sur le même JSON produit exactement le même modèle — reproductibilité et auditabilité garanties.")
 h2('10.3 Sécurité & protection des données')
-bullet("Authentification JWT, rôles client / admin, OAuth2 Google.")
-bullet("Guards NestJS sur toutes les routes sensibles.")
-bullet("MediaPipe in-browser : aucune donnée biométrique transmise (RGPD by design).")
+body("La sécurité repose sur une authentification par JWT, complétée par une connexion OAuth2 Google, avec une distinction des rôles entre client et administrateur. Toutes les routes sensibles sont protégées par des Guards NestJS, qui contrôlent systématiquement les droits d'accès. Sur le plan de la protection des données personnelles, l'analyse du visage par MediaPipe s'exécute intégralement dans le navigateur : aucune donnée biométrique n'est transmise à un serveur, ce qui inscrit la solution dans une logique de respect du RGPD dès la conception (privacy by design).")
 doc.add_page_break()
 
 # ── 11. CONCLUSION ──────────────────────────────────────────────
@@ -552,11 +538,8 @@ add_table(['Exigence','Statut'], [
     ['Recommandation client IA (bonus)','Réalisé'],
 ])
 h2('11.2 Perspectives d\'évolution')
-bullet("Dataset plus volumineux (objectif : 100+ images par label).")
-bullet("Stockage cloud (AWS S3, Cloudinary).")
-bullet("API de prédiction temps réel exposant model.pkl.")
-bullet("Réentraînement automatique déclenché par un nouveau dataset.")
-bullet("CNN / Vision Transformer pour remplacer le RandomForest.")
+body("Plusieurs axes d'évolution se dégagent naturellement de ce travail. Le premier consisterait à constituer un dataset nettement plus volumineux, avec un objectif d'au moins une centaine d'images par label, afin d'améliorer significativement les performances du modèle. En parallèle, le passage à un stockage cloud (AWS S3 ou Cloudinary) renforcerait la scalabilité de la plateforme.")
+body("Sur le plan applicatif, l'exposition de model.pkl via une API de prédiction en temps réel permettrait d'intégrer directement les recommandations dans le parcours client, tandis qu'un réentraînement automatique déclenché à chaque nouveau dataset rendrait le système véritablement continu. Enfin, à plus long terme, le remplacement du RandomForest par une architecture de type CNN ou Vision Transformer ouvrirait la voie à une analyse fine du contenu visuel des images plutôt que de leurs seules caractéristiques globales.")
 
 OUT_DOCX = os.path.join(BASE, 'Rapport_DataCut.docx')
 doc.save(OUT_DOCX)
@@ -608,6 +591,9 @@ def bullets(s,items,l,t,w,size=15,spacing=0.5,color=WHITE2):
 def pic(s,path,l,t,w):
     s.shapes.add_picture(path,PIn(l),PIn(t),width=PIn(w))
 
+def notes(s,txt):
+    s.notes_slide.notes_text_frame.text = txt.strip()
+
 # 1 — TITRE
 s = slide()
 rect(s,0,2.85,13.33,0.06,GOLD2)
@@ -616,6 +602,9 @@ text(s,'CUT',6.6,1.0,3.2,1.4,size=72,bold=True,color=GOLD2)
 text(s,'Symphonie des données en flux continu',0,3.15,13.33,0.7,size=20,italic=True,color=GREY2,align=PP_ALIGN.CENTER)
 text(s,'Rapport technique — Master 1 IA — École 89',0,3.95,13.33,0.5,size=14,color=GREY2,align=PP_ALIGN.CENTER)
 text(s,'Amaury Guindon  ·  Intervenant : Najib AL AWAR  ·  2025–2026',0,4.55,13.33,0.5,size=12,color=PColor(0x77,0x77,0x77),align=PP_ALIGN.CENTER)
+notes(s, """
+[~30 s] Bonjour à toutes et à tous. Je m'appelle Amaury Guindon et je vais vous présenter mon projet fil rouge de Master 1 Intelligence Artificielle : DataCut, « Symphonie des données en flux continu ». L'idée de ce projet est de construire une plateforme qui gère le cycle de vie complet des données, depuis l'ingestion d'images jusqu'à l'entraînement d'un modèle d'IA. Je vais vous présenter l'architecture, le pipeline de données, la partie machine learning, puis une démonstration de recommandation client. Comptez une quinzaine de minutes, et je garderai du temps pour vos questions à la fin.
+""")
 
 # 2 — CONTEXTE
 s = slide(); titlebar(s,'Contexte & Problématique')
@@ -627,11 +616,20 @@ text(s,'Problématique',7.0,1.45,5.8,0.4,size=16,bold=True,color=GOLD2)
 text(s,"Comment collecter, labéliser et versionner des images tout en garantissant la traçabilité complète vers un modèle d'IA ?",7.0,1.95,5.8,1.5,size=14)
 rect(s,0.5,5.5,12.3,0.06,GOLD2)
 text(s,'Ingestion → Labélisation → Versioning → Entraînement → Recommandation',0.5,5.7,12.3,0.6,size=15,bold=True,color=GOLD2,align=PP_ALIGN.CENTER)
+notes(s, """
+[~1 min 30] Le contexte du projet est celui d'un barbershop haut de gamme, fictif, qui souhaite exploiter ses photos de réalisations. Concrètement, il dispose de nombreuses images de coupes qu'il faut labéliser : on parle de styles comme le fade, l'afro, la tresse, le dégradé, ou encore la barbe. La problématique centrale est la suivante : comment collecter, labéliser et versionner toutes ces images, tout en garantissant une traçabilité complète des données jusqu'au modèle d'intelligence artificielle ?
+C'est tout l'enjeu d'un pipeline de données bien structuré. On ne peut pas simplement jeter des images dans un dossier et lancer un entraînement : il faut savoir d'où vient chaque donnée, à quel stade elle se trouve, et avec quelle version du dataset le modèle a été entraîné. Tout au long de cette présentation, je vais suivre cette chaîne logique que vous voyez en bas de l'écran : ingestion, puis labélisation, puis versioning, puis entraînement, et enfin la recommandation côté client. Chaque étape de cette symphonie a son rôle, et c'est leur enchaînement maîtrisé qui fait la valeur du projet.
+""")
 
 # 3 — ARCHITECTURE (image)
 s = slide(); titlebar(s,'Architecture de la plateforme')
 pic(s,P_ARCH,3.5,1.45,6.3)
 text(s,'Séparation fichiers / métadonnées · ML offline + ML in-browser',0.5,6.7,12.3,0.5,size=13,color=GOLD2,align=PP_ALIGN.CENTER)
+notes(s, """
+[~1 min 30] Voici la vue d'ensemble de l'architecture. Elle est organisée en couches bien distinctes. Tout en haut, le frontend en Angular 17, qui propose deux interfaces : une interface d'administration pour gérer les données, et une interface client pour la recommandation. Le frontend dialogue avec le backend NestJS via une API REST, sur le port 3001, avec des Guards JWT pour la sécurité et Multer pour la réception des fichiers.
+Un point important de conception : le stockage est hybride. Les fichiers images, qui sont lourds, sont écrits directement sur le disque, dans le dossier uploads. En revanche, toutes les métadonnées — le statut, les labels, les caractéristiques — sont stockées dans MongoDB. Cette séparation est volontaire et je reviendrai dessus, car elle nous permettra plus tard de migrer vers le cloud sans rien casser.
+Enfin, tout en bas, la partie Python avec scikit-learn : c'est le script train.py qui consomme le dataset exporté et produit le modèle, le fichier model.pkl. À noter qu'il y a deux usages de l'IA dans ce projet : un machine learning « offline » côté serveur pour l'entraînement, et un machine learning « in-browser », dans le navigateur, pour la recommandation client avec MediaPipe.
+""")
 
 # 4 — STACK
 s = slide(); titlebar(s,'Stack technique')
@@ -647,11 +645,19 @@ for i,(k,v) in enumerate([
     y=1.45+i*0.74; rect(s,0.4,y,12.5,0.66,PColor(0x14,0x14,0x14) if i%2==0 else PColor(0x1E,0x1E,0x1E))
     text(s,k,0.6,y+0.1,3.6,0.5,size=14,bold=True,color=GOLD2)
     text(s,v,4.3,y+0.1,8.4,0.5,size=14)
+notes(s, """
+[~1 min] Rapidement sur la stack technique et surtout sur les raisons de ces choix. Angular 17 en mode standalone avec les signals pour une interface réactive et moderne. NestJS côté backend, pour son architecture modulaire qui sépare proprement les responsabilités. MongoDB pour la base de données : sa flexibilité de schéma est idéale pour des métadonnées hétérogènes, et ses agrégations natives sont parfaites pour calculer les statistiques de labels.
+Pour l'extraction de caractéristiques, j'utilise sharp, une bibliothèque Node.js très légère. Côté machine learning, scikit-learn avec un RandomForest, qui est une valeur sûre pour un dataset de taille limitée. MediaPipe pour la détection de visage dans le navigateur. Et enfin, l'authentification combine du JWT classique avec une connexion Google via OAuth2. Chaque brique a été choisie pour une raison précise, pas par effet de mode.
+""")
 
 # 5 — BDD (image)
 s = slide(); titlebar(s,'Schéma de base de données')
 pic(s,P_DB,1.4,1.45,10.5)
 text(s,'GalleryItem.datasetVersion → DatasetVersion.version',0.5,6.9,12.3,0.4,size=12,italic=True,color=GOLD2,align=PP_ALIGN.CENTER)
+notes(s, """
+[~1 min 30] Passons au schéma de la base de données. Il y a trois collections principales. La première, GalleryItem, représente chaque image : on y trouve son nom de fichier, son URL sur le disque, son statut dans le pipeline, ses labels, et surtout ses features, c'est-à-dire les caractéristiques numériques extraites automatiquement. La deuxième collection, DatasetVersion, représente un snapshot versionné : elle contient un numéro de version, le nombre d'images, la liste des identifiants d'images incluses et les labels concernés. Enfin, la collection User gère les comptes, avec le rôle client ou admin et la connexion Google.
+La relation clé est celle que vous voyez au centre : le champ datasetVersion d'une image pointe vers la version d'un dataset. C'est une relation volontairement légère, typique d'une base documentaire. Pourquoi légère ? Parce que les snapshots sont immuables : une fois qu'une version est créée, elle ne change plus jamais. Il n'y a donc pas besoin de contraintes d'intégrité fortes comme dans une base relationnelle classique. Et je rappelle le principe hybride : les fichiers sont sur le disque, les métadonnées dans Mongo.
+""")
 
 # 6 — PIPELINE (image)
 s = slide(); titlebar(s,'Pipeline de données — 5 statuts')
@@ -661,6 +667,11 @@ bullets(s,['RAW — NestJS + Multer reçoit le fichier, sharp extrait les featur
            'LABELED — 1 à N labels parmi 12 disponibles',
            'PROCESSED — validation finale avant export',
            'EXPORTED — image intégrée dans un snapshot versionné'],0.6,4.1,12.2,size=13,spacing=0.5)
+notes(s, """
+[~1 min 30] Le cœur du projet, c'est ce pipeline de données en cinq statuts. Une image traverse ces étapes dans un seul sens, du début à la fin. Première étape, RAW : l'image vient d'être uploadée. NestJS et Multer la sauvegardent, et sharp en extrait automatiquement les caractéristiques. À ce stade, rien d'humain n'est intervenu sur le contenu. Deuxième étape, VALIDATED : un administrateur vérifie visuellement la qualité — le cadrage, la netteté, la pertinence de l'image.
+Troisième étape, LABELED : c'est l'étape de labélisation manuelle, où l'admin assigne de un à plusieurs labels parmi les douze disponibles. Quatrième étape, PROCESSED : validation finale, l'image est jugée complète et prête. Et enfin EXPORTED : l'image est intégrée dans un snapshot versionné.
+Le point essentiel ici, c'est que les transitions sont unidirectionnelles : on ne revient jamais en arrière. Cela garantit la traçabilité. Et seules les images suffisamment avancées dans le pipeline sont éligibles à un dataset. Un funnel visuel permet à l'administrateur de voir, en un coup d'œil, combien d'images sont à chaque étape et où se trouvent les goulots d'étranglement.
+""")
 
 # 7 — FEATURES
 s = slide(); titlebar(s,'Extraction automatique de features (sharp)')
@@ -674,6 +685,10 @@ for i,(k,desc,ex) in enumerate([
     text(s,desc,3.3,y+0.1,6.0,0.5,size=14)
     text(s,ex,9.5,y+0.1,2.5,0.5,size=14,color=GREY2,align=PP_ALIGN.RIGHT)
 text(s,'→ Vecteur 7D stocké en MongoDB · réutilisé directement par train.py',0.5,6.6,12.0,0.5,size=13,bold=True,color=GOLD2,align=PP_ALIGN.CENTER)
+notes(s, """
+[~1 min] Revenons sur l'extraction de features, car c'est ce qui alimente le modèle. À chaque upload, de manière totalement automatique et transparente pour l'administrateur, sharp calcule un vecteur de sept caractéristiques numériques. Vous les voyez à l'écran : la largeur et la hauteur en pixels, la taille du fichier, le ratio largeur sur hauteur, et les trois composantes rouge, vert, bleu de la couleur dominante de l'image.
+Ce vecteur de dimension sept est immédiatement stocké dans MongoDB, aux côtés de l'image. L'avantage est double : d'une part, le calcul est fait une seule fois, à l'upload ; d'autre part, ce vecteur est directement réutilisable par le script Python d'entraînement, sans aucun retraitement. La donnée est prête à servir au modèle dès qu'elle entre dans le système.
+""")
 
 # 8 — VERSIONING
 s = slide(); titlebar(s,'Versioning des datasets')
@@ -688,6 +703,10 @@ bullets(s,['Versions numérotées (v1, v2…) et horodatées',
            'Historique complet des versions dans l\'interface'],0.5,3.3,12.0,size=14,spacing=0.55)
 rect(s,0.5,6.1,12.3,0.06,GOLD2)
 text(s,'Contrainte du projet respectée : versioning immuable ✓',0.5,6.3,12.3,0.5,size=14,bold=True,color=GOLD2,align=PP_ALIGN.CENTER)
+notes(s, """
+[~1 min 30] Le versioning des datasets est une exigence forte du projet, et c'est un concept clé en machine learning. Le principe : un snapshot immuable. À un instant donné, l'administrateur clique sur « Créer une version ». Le backend identifie automatiquement toutes les images éligibles, c'est-à-dire celles qui sont labélisées, traitées ou déjà exportées. Il crée alors un document DatasetVersion qui fige la liste exacte des images et des labels. Enfin, ces images reçoivent le tag de la version.
+Pourquoi est-ce si important ? Parce que cela garantit la reproductibilité. Si je relance l'entraînement sur la version 1 dans six mois, j'obtiendrai exactement le même modèle, car les données n'auront pas bougé d'un pixel. C'est fondamental pour pouvoir auditer un modèle, comparer deux versions, ou comprendre une régression de performance. Les versions sont numérotées, horodatées, et conservées dans l'historique. Cette contrainte du sujet — le versioning immuable — est donc pleinement respectée.
+""")
 
 # 9 — ML (image)
 s = slide(); titlebar(s,'Entraînement ML — train.py')
@@ -698,6 +717,10 @@ text(s,'Paramètres',6.0,3.6,6.8,0.4,size=16,bold=True,color=GOLD2)
 bullets(s,['n_estimators = 100','test_size = 0.2 (80/20)','random_state = 42'],6.0,4.1,6.8,size=13,spacing=0.45)
 rect(s,6.0,5.7,6.8,0.6,PColor(0x14,0x14,0x14))
 text(s,'py train.py dataset-v1.json',6.2,5.8,6.4,0.45,size=13,color=PColor(0x90,0xEE,0x90))
+notes(s, """
+[~1 min 30] Venons-en à l'entraînement du modèle, dans le script train.py. La chaîne, que vous voyez à gauche, est la suivante : on charge le dataset JSON, on reconstruit le vecteur de features pour chaque image, on transforme les labels avec un MultiLabelBinarizer, on découpe en jeu d'entraînement et jeu de test selon un ratio 80/20, on entraîne le modèle, on évalue, et on sauvegarde dans model.pkl.
+Le choix d'algorithme est important. C'est un problème multi-label : une même image peut porter plusieurs étiquettes en même temps, par exemple fade, plus barbe, plus adulte. J'utilise donc une stratégie OneVsRest par-dessus un RandomForest : concrètement, on entraîne un classifieur indépendant par label, ce qui permet de prédire plusieurs labels simultanément. Côté paramètres, cent arbres dans la forêt, un split 80/20, et un random_state fixé à 42 pour garantir la reproductibilité. Le lancement est très simple : une seule commande, py train.py, suivie du fichier dataset, et le modèle est produit.
+""")
 
 # 10 — RESULTATS (chart image)
 s = slide(); titlebar(s,'Résultats & qualité du dataset')
@@ -708,6 +731,10 @@ text(s,'Contexte',7.4,3.5,5.5,0.4,size=15,bold=True,color=GOLD2)
 bullets(s,['Dataset prototype : 9 images','Performances limitées par la taille','Architecture scalable sans toucher au code'],7.4,3.95,5.5,size=13,spacing=0.5)
 rect(s,7.4,6.0,5.5,0.06,GOLD2)
 text(s,'Plus de données → meilleur modèle',7.4,6.15,5.5,0.5,size=14,bold=True,color=GOLD2)
+notes(s, """
+[~1 min] Parlons des résultats et, en toute honnêteté, des limites. Le graphique à gauche montre la distribution réelle des labels sur le dataset version 1. On voit immédiatement un déséquilibre : certains labels comme « après » ou « adulte » sont très présents, tandis que d'autres comme « enfant » ou « rasage » n'apparaissent qu'une fois. C'est un indicateur clé de la qualité d'un dataset.
+Le modèle génère des métriques classiques : l'accuracy, ainsi que la precision, le recall et le F1-score par label. Mais il faut être lucide : ce dataset est un prototype de neuf images seulement. Les performances chiffrées sont donc forcément limitées, ce n'est pas le but à ce stade. Le point fort, c'est que l'architecture est entièrement scalable : pour améliorer le modèle, il suffit d'ajouter des données et de créer une nouvelle version, sans modifier une seule ligne de code. Plus de données, c'est mécaniquement un meilleur modèle.
+""")
 
 # 11 — RECOMMANDATION (image)
 s = slide(); titlebar(s,'Recommandation client — « Ma Coupe Idéale »')
@@ -716,6 +743,10 @@ text(s,'Forme du visage',0.6,4.3,6.0,0.4,size=14,bold=True,color=GOLD2)
 bullets(s,['Ovale → polyvalent','Ronde → fade, taper','Carrée → burst-fade, dégradé','Cœur → dégradé, taper','Oblongue → volume côtés'],0.6,4.75,5.9,size=12,spacing=0.36)
 text(s,'Teinte de peau',7.0,4.3,5.8,0.4,size=14,bold=True,color=GOLD2)
 bullets(s,['Clair → styles lisses (fade, taper)','Médium → tous les styles','Foncé → afro, tresse, burst-fade'],7.0,4.75,5.8,size=12,spacing=0.42)
+notes(s, """
+[~1 min 30] Voici maintenant la partie côté client, la page « Ma Coupe Idéale ». C'est une fonctionnalité bonus, mais qui illustre bien un second usage de l'IA. Le client prend une photo, ou en charge une. MediaPipe, qui tourne entièrement dans le navigateur, détecte 468 points de repère sur le visage. À partir de ces points, on calcule la forme du visage et la teinte de peau, puis on propose des styles adaptés et on filtre la galerie en conséquence.
+Concrètement, pour la forme : un visage ovale est polyvalent, un visage rond ira bien avec un fade ou un taper, un visage carré avec un burst-fade, et ainsi de suite. Pour la teinte de peau, qui donne une indication sur la texture de cheveux, on adapte aussi les suggestions. Le point que je veux vraiment souligner ici, c'est que tout ce traitement se fait localement, dans le navigateur, en WebAssembly. Aucune image, aucune donnée biométrique du visage n'est envoyée à un serveur. C'est une démarche de respect de la vie privée dès la conception, ce qu'on appelle le privacy by design, et c'est essentiel quand on manipule des données aussi sensibles qu'un visage.
+""")
 
 # 12 — GOUVERNANCE
 s = slide(); titlebar(s,'Bonnes pratiques & gouvernance')
@@ -727,6 +758,10 @@ for i,(t,d) in enumerate([
     y=1.45+i*1.4; rect(s,0.4,y,12.5,1.2,PColor(0x12,0x12,0x12))
     text(s,t,0.7,y+0.12,12.0,0.45,size=15,bold=True,color=GOLD2)
     text(s,d,0.7,y+0.6,12.0,0.5,size=12,color=GREY2)
+notes(s, """
+[~1 min] Avant de conclure, un mot sur les bonnes pratiques et la gouvernance des données, car c'est ce qui distingue un projet jouet d'un projet sérieux. Premièrement, la séparation fichiers et métadonnées, dont j'ai parlé : elle rend possible une migration vers le cloud, S3 ou un CDN, sans toucher à la base. Deuxièmement, le versioning immuable, qui assure reproductibilité et auditabilité.
+Troisièmement, la sécurité : authentification par JWT, connexion Google en OAuth2, gestion des rôles client et admin, et des Guards NestJS sur toutes les routes sensibles. Et quatrièmement, la protection des données personnelles avec MediaPipe en local, dans une logique RGPD. Ces quatre piliers garantissent que la plateforme est non seulement fonctionnelle, mais aussi maintenable, sûre et conforme.
+""")
 
 # 13 — CONCLUSION
 s = slide(); titlebar(s,'Conclusion & Perspectives')
@@ -739,6 +774,10 @@ bullets(s,['100+ images par label','Stockage cloud (S3, Cloudinary)','API REST e
            'Réentraînement automatique','CNN / Vision Transformer'],7.0,1.95,5.8,size=13,spacing=0.52,color=WHITE2)
 rect(s,0.5,6.2,12.3,0.06,GOLD2)
 text(s,'Architecture scalable : plus de données → meilleur modèle, sans modifier le code',0.5,6.4,12.3,0.6,size=14,bold=True,color=GOLD2,align=PP_ALIGN.CENTER)
+notes(s, """
+[~1 min] Pour conclure. Ce projet met en œuvre un cycle de vie complet de la donnée : un pipeline structuré en cinq statuts, une extraction de features automatique, un versioning immuable des datasets, un entraînement ML produisant un modèle réutilisable, une couche de visualisation et de supervision, et même une recommandation client par IA en bonus. Toutes les exigences du sujet sont couvertes.
+Les perspectives sont claires : constituer un dataset bien plus volumineux, viser une centaine d'images par label, passer à un stockage cloud, exposer le modèle via une API de prédiction en temps réel, automatiser le réentraînement, et à terme remplacer le RandomForest par un réseau de neurones convolutif. Le message que je veux laisser, c'est que l'architecture est scalable par conception : plus on apporte de données, meilleur sera le modèle, et cela sans avoir à modifier le code. Je vous remercie de votre attention, et je suis à votre disposition pour vos questions.
+""")
 
 OUT_PPTX = os.path.join(BASE, 'Presentation_DataCut.pptx')
 prs.save(OUT_PPTX)
