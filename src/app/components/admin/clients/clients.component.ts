@@ -122,7 +122,7 @@ export class AdminClientsComponent implements OnInit {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `clients-dany1st-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `clients-datacut-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

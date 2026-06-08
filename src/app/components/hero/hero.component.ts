@@ -31,7 +31,7 @@ export class HeroComponent implements AfterViewInit, OnDestroy {
   @ViewChild('particleCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('heroSection') heroRef!: ElementRef;
 
-  titleChars = 'DANY1ST'.split('');
+  titleChars = 'DATACUT'.split('');
   private animFrameId: number | null = null;
   private particles: Particle[] = [];
   private ctx!: CanvasRenderingContext2D;

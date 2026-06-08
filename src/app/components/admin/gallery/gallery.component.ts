@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
-const API = 'http://localhost:3000/api';
+const API = 'http://localhost:3001/api';
 
 interface GalleryItem {
   _id: string;

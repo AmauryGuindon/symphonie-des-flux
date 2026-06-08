@@ -12,7 +12,7 @@ export interface AppNotification {
   createdAt: string;
 }
 
-const API = 'http://localhost:3000/api/notifications';
+const API = 'http://localhost:3001/api/notifications';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {

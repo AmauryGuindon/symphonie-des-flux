@@ -1,0 +1,132 @@
+@if (toast()) {
+  <div class="pipe__toast" [class.pipe__toast--err]="toast()!.type === 'err'">
+    {{ toast()!.message }}
+  </div>
+}
+
+<div class="pipe">
+  <div class="pipe__header">
+    <h2 class="pipe__title">Pipeline de données</h2>
+  </div>
+
+  <!-- Funnel stats -->
+  @if (stats(); as s) {
+    <div class="pipe__funnel">
+      @for (step of statusOrder; track step) {
+        <div
+          class="pipe__funnel-step"
+          [class.pipe__funnel-step--active]="filterStatus() === step"
+          (click)="filterStatus.set(filterStatus() === step ? 'all' : step)"
+        >
+          <span class="pipe__funnel-count">{{ getCount(s.byStatus, step) }}</span>
+          <span class="pipe__funnel-label">{{ statusLabels[step] }}</span>
+          <div class="pipe__funnel-bar">
+            <div
+              class="pipe__funnel-fill"
+              [style.width.%]="getBarWidth(s.byStatus, step, s.total)"
+            ></div>
+          </div>
+        </div>
+        @if (step !== 'exported') {
+          <div class="pipe__funnel-arrow">→</div>
+        }
+      }
+    </div>
+    <div class="pipe__meta">
+      <span>{{ s.total }} image{{ s.total > 1 ? 's' : '' }} au total</span>
+      <span>·</span>
+      <span>{{ s.versionsCount }} version{{ s.versionsCount > 1 ? 's' : '' }} de dataset</span>
+    </div>
+  }
+
+  <!-- Filtres -->
+  <div class="pipe__filters">
+    <button
+      class="pipe__filter-btn"
+      [class.pipe__filter-btn--active]="filterStatus() === 'all'"
+      (click)="filterStatus.set('all')"
+    >Toutes</button>
+    @for (step of statusOrder; track step) {
+      <button
+        class="pipe__filter-btn"
+        [class.pipe__filter-btn--active]="filterStatus() === step"
+        (click)="filterStatus.set(step)"
+      >{{ statusLabels[step] }}</button>
+    }
+  </div>
+
+  <!-- Table -->
+  @if (loading()) {
+    <p class="pipe__loading">Chargement…</p>
+  } @else if (filteredItems().length === 0) {
+    <p class="pipe__empty">Aucune image dans cette catégorie.</p>
+  } @else {
+    <div class="pipe__table-wrap">
+      <table class="pipe__table">
+        <thead>
+          <tr>
+            <th>Aperçu</th>
+            <th>Fichier</th>
+            <th>Features</th>
+            <th>Statut</th>
+            <th>Labels</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of filteredItems(); track item._id) {
+            <tr>
+              <td>
+                <img [src]="item.url" [alt]="item.alt ?? ''" class="pipe__thumb" />
+              </td>
+              <td>
+                <span class="pipe__filename">{{ item.alt || '—' }}</span>
+                <span class="pipe__category">{{ item.category || 'non catégorisé' }}</span>
+              </td>
+              <td>
+                @if (item.features) {
+                  <div class="pipe__features">
+                    <span>{{ item.features.width }}×{{ item.features.height }}</span>
+                    <span>{{ item.features.sizeKb }} Ko</span>
+                    <span
+                      class="pipe__color-dot"
+                      [style.background]="item.features.dominantColor"
+                      [title]="item.features.dominantColor"
+                    ></span>
+                  </div>
+                } @else {
+                  <span class="pipe__na">—</span>
+                }
+              </td>
+              <td>
+                <span class="pipe__status pipe__status--{{ item.status }}">
+                  {{ statusLabels[item.status] }}
+                </span>
+              </td>
+              <td>
+                <div class="pipe__labels">
+                  @for (label of availableLabels; track label) {
+                    <button
+                      class="pipe__label-chip"
+                      [class.pipe__label-chip--active]="item.labels.includes(label)"
+                      (click)="toggleLabel(item, label)"
+                    >{{ label }}</button>
+                  }
+                </div>
+              </td>
+              <td>
+                @if (!isLastStatus(item.status)) {
+                  <button class="pipe__advance-btn" (click)="advance(item)">
+                    → {{ nextStatusLabel(item.status) }}
+                  </button>
+                } @else {
+                  <span class="pipe__done">✓ Exporté</span>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

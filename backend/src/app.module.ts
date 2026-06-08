@@ -10,11 +10,13 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { RemindersModule } from './reminders/reminders.module';
 import { GalleryModule } from './gallery/gallery.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { DatasetModule } from './dataset/dataset.module';
+import { StatsModule } from './stats/stats.module';
 
 @Module({
   imports: [
     MongooseModule.forRoot(
-      process.env.MONGODB_URI ?? 'mongodb://localhost:27017/dany1st',
+      process.env.MONGODB_URI ?? 'mongodb://localhost:27017/datacut',
     ),
     ThrottlerModule.forRoot([{
       name: 'global',
@@ -30,6 +32,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     RemindersModule,
     GalleryModule,
     NotificationsModule,
+    DatasetModule,
+    StatsModule,
   ],
 })
 export class AppModule {}

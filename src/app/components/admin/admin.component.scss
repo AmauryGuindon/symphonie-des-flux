@@ -139,6 +139,12 @@
     }
   }
 
+  &__separator {
+    height: 1px;
+    background: rgba(201,164,74,.1);
+    margin: .5rem .875rem;
+  }
+
   &__footer {
     padding: 1.25rem 1.5rem;
     border-top: 1px solid rgba(201,164,74,.1);

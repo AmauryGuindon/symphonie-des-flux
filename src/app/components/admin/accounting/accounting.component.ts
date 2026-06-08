@@ -350,7 +350,7 @@ export class AdminAccountingComponent implements OnInit {
     // En-tête
     doc.setFontSize(18);
     doc.setTextColor(201, 164, 74);
-    doc.text('Dany1st Barber', 14, 20);
+    doc.text('DataCut', 14, 20);
     doc.setFontSize(11);
     doc.setTextColor(100);
     doc.text(`Rapport comptable — ${period}`, 14, 28);

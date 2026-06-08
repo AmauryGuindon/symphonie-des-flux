@@ -1,0 +1,148 @@
+@use '../admin-shared' as *;
+
+.ds {
+  @include page-padding;
+
+  &__header  { margin-bottom: 2rem; }
+  &__title   { @include page-title; }
+  &__loading, &__empty { @include loading; }
+
+  &__toast {
+    position: fixed;
+    bottom: 2rem; left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    background: #1e3a2e; border: 1px solid #4caf82; color: #4caf82;
+    font-size: .82rem; padding: .75rem 2rem; border-radius: 6px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.5); white-space: nowrap;
+    &--err { background: #3a1e1e; border-color: #e74c3c; color: #e74c3c; }
+  }
+
+  // ── Création ──────────────────────────────────────────────────────────────
+
+  &__create-card { @include card; margin-bottom: 2rem; }
+
+  &__create-title {
+    font-size: 1rem; font-weight: 600; color: #fff; margin: 0 0 .4rem;
+  }
+
+  &__create-hint {
+    font-size: .8rem; color: rgba(255,255,255,.4); margin: 0 0 1rem;
+    strong { color: rgba(255,255,255,.6); }
+  }
+
+  &__create-row {
+    display: flex; gap: .75rem;
+    @media (max-width: 600px) { flex-direction: column; }
+  }
+
+  &__create-input {
+    flex: 1;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 6px; padding: .55rem 1rem;
+    color: #fff; font-size: .85rem; outline: none;
+    &::placeholder { color: rgba(255,255,255,.25); }
+    &:focus { border-color: rgba(201,164,74,.4); }
+  }
+
+  &__create-btn { @include btn-primary; }
+
+  // ── Graphes ────────────────────────────────────────────────────────────────
+
+  &__charts {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem;
+    @media (max-width: 900px) { grid-template-columns: 1fr; }
+  }
+
+  &__chart-card { @include card; }
+
+  &__chart-title {
+    font-size: .85rem; font-weight: 600; color: rgba(255,255,255,.7); margin: 0 0 1.25rem;
+  }
+
+  // Bar chart croissance
+
+  &__bar-chart {
+    display: flex; align-items: flex-end; gap: .5rem; height: 100px;
+  }
+
+  &__bar-group {
+    flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%;
+  }
+
+  &__bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+
+  &__bar {
+    width: 100%;
+    background: linear-gradient(to top, #C9A44A, rgba(201,164,74,.3));
+    border-radius: 3px 3px 0 0; min-height: 2px; transition: height .3s ease;
+  }
+
+  &__bar-label {
+    font-size: .62rem; color: rgba(255,255,255,.25); margin-top: .3rem; white-space: nowrap;
+  }
+
+  // Distribution labels
+
+  &__label-bars { display: flex; flex-direction: column; gap: .6rem; }
+
+  &__label-row { display: flex; align-items: center; gap: .75rem; }
+
+  &__label-name {
+    font-size: .75rem; color: rgba(255,255,255,.6); width: 90px; flex-shrink: 0;
+  }
+
+  &__label-bar-wrap {
+    flex: 1; height: 6px; background: rgba(255,255,255,.06);
+    border-radius: 3px; overflow: hidden;
+  }
+
+  &__label-bar-fill {
+    height: 100%; background: #C9A44A; border-radius: 3px; transition: width .4s ease;
+  }
+
+  &__label-count {
+    font-size: .72rem; color: rgba(255,255,255,.35); width: 24px; text-align: right;
+  }
+
+  // ── Versions ──────────────────────────────────────────────────────────────
+
+  &__versions-title {
+    font-size: 1rem; font-weight: 600; color: rgba(255,255,255,.7); margin: 0 0 1rem;
+  }
+
+  &__version-list {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;
+  }
+
+  &__version-card {
+    @include card; display: flex; flex-direction: column; gap: .75rem;
+  }
+
+  &__version-head {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  &__version-tag { font-size: 1.1rem; font-weight: 700; color: #C9A44A; letter-spacing: .05em; }
+
+  &__version-date { font-size: .72rem; color: rgba(255,255,255,.3); }
+
+  &__version-body { display: flex; flex-direction: column; gap: .4rem; }
+
+  &__version-stat { font-size: .82rem; color: rgba(255,255,255,.6); }
+
+  &__version-desc { font-size: .78rem; color: rgba(255,255,255,.4); font-style: italic; }
+
+  &__version-labels { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .2rem; }
+
+  &__version-label {
+    padding: .15rem .5rem; border-radius: 10px;
+    background: rgba(201,164,74,.12); border: 1px solid rgba(201,164,74,.25);
+    color: rgba(201,164,74,.8); font-size: .68rem;
+  }
+
+  &__version-no-label { font-size: .72rem; color: rgba(255,255,255,.2); }
+
+  &__export-btn { @include btn-primary; font-size: .78rem; align-self: flex-start; }
+}

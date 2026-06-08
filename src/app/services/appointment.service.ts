@@ -32,7 +32,7 @@ export interface Appointment {
   createdAt: string;
 }
 
-const API = 'http://localhost:3000/api';
+const API = 'http://localhost:3001/api';
 
 @Injectable({ providedIn: 'root' })
 export class AppointmentService {

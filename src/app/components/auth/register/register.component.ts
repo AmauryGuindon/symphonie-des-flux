@@ -27,7 +27,7 @@ export class RegisterComponent {
   constructor(private auth: AuthService, private router: Router) {}
 
   registerWithGoogle() {
-    window.location.href = 'http://localhost:3000/api/auth/google';
+    window.location.href = 'http://localhost:3001/api/auth/google';
   }
 
   submit() {

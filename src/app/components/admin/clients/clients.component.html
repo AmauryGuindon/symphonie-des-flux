@@ -31,6 +31,9 @@
       (keyup.enter)="onSearch()"
       (input)="onSearch()"
     />
+    @if (search) {
+      <button class="clients__search-clear" (click)="search = ''; onSearch()" title="Effacer">✕</button>
+    }
   </div>
 
   <!-- Filtres & tri -->

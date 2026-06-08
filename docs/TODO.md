@@ -9,7 +9,7 @@
 
 ### Réservation
 - [X] Rappel SMS/email 24h avant le RDV *(envoi automatique à 9h, anti-doublon `reminderSent`)*
-- [ ] Liste d'attente si tous les créneaux d'une journée sont pris
+- [ ] Liste d'attente si tous les créneaux d'une journée sont pris (à faire)
 - [ ] Récurrence : "reprendre le même RDV chaque mois"
 
 ### Compte

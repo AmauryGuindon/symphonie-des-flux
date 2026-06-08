@@ -2,13 +2,13 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
-const MONGODB_URI = process.env.MONGODB_URI ?? 'mongodb://localhost:27017/dany1st';
+const MONGODB_URI = process.env.MONGODB_URI ?? 'mongodb://localhost:27017/datacut';
 
 // ── Modifie ces valeurs avant de lancer le script ──────────────────────────
-const ADMIN_FIRST_NAME = 'Dany';
-const ADMIN_LAST_NAME  = 'Admin';
-const ADMIN_EMAIL      = 'dany@dany1st.com';
-const ADMIN_PASSWORD   = 'DanyAdmin2024!';
+const ADMIN_FIRST_NAME = 'Admin';
+const ADMIN_LAST_NAME  = 'DataCut';
+const ADMIN_EMAIL      = 'admin@datacut.fr';
+const ADMIN_PASSWORD   = 'Admin2024!';
 // ───────────────────────────────────────────────────────────────────────────
 
 const UserSchema = new mongoose.Schema({

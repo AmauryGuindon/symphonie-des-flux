@@ -2,7 +2,7 @@ import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
-const API = 'http://localhost:3000/api';
+const API = 'http://localhost:3001/api';
 const API_ORIGIN = API.replace(/\/api.*$/, '');
 const PAGE_SIZE = 12;
 
@@ -58,7 +58,7 @@ export class GalleryComponent implements OnInit {
   }
 
   private readonly fallbackItems: GalleryItem[] = [
-    { _id: '1', url: 'assets/taper1.png', alt: 'Dégradé signature Dany1st', span: 'tall', active: true },
+    { _id: '1', url: 'assets/taper1.png', alt: 'Dégradé signature', span: 'tall', active: true },
     { _id: '2', url: 'assets/burstfade1.png', alt: 'Burst fade', span: '', active: true },
     { _id: '3', url: 'assets/burstfade2.png', alt: 'Burst fade 2', span: '', active: true },
     { _id: '4', url: 'assets/taper2.png', alt: 'Taper fade', span: 'wide', active: true },

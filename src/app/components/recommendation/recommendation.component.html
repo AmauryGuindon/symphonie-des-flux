@@ -1,0 +1,198 @@
+<section class="reco">
+
+  <!-- En-tête -->
+  <div class="reco__hero">
+    <h1 class="reco__title">Trouve ta coupe idéale</h1>
+    <p class="reco__subtitle">
+      Prends une photo ou importe une image — notre IA analyse la forme de ton visage
+      et te recommande les coupes qui te correspondent.
+    </p>
+  </div>
+
+  <!-- Canvas caché pour la capture -->
+  <canvas #snapCanvas style="display:none"></canvas>
+
+  <!-- Étape 1 : Choix du mode -->
+  @if (step() === 'upload') {
+    <div class="reco__upload-wrap">
+
+      <div class="reco__modes">
+        <!-- Caméra -->
+        <button class="reco__mode-btn reco__mode-btn--primary" (click)="openCamera()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M23 7l-7 5 7 5V7z"/>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+          </svg>
+          Utiliser la caméra
+        </button>
+
+        <!-- Upload fichier -->
+        <label class="reco__mode-btn" for="photoInput">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Importer une photo
+          <input
+            id="photoInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            class="reco__file-input"
+            (change)="onFileSelected($event)"
+          />
+        </label>
+      </div>
+
+      @if (error()) {
+        <p class="reco__error">{{ error() }}</p>
+      }
+
+      <div class="reco__tips">
+        <h3 class="reco__tips-title">Conseils pour une bonne photo</h3>
+        <ul class="reco__tips-list">
+          <li>Visage de face, regarder droit devant</li>
+          <li>Bonne lumière, pas de contre-jour</li>
+          <li>Pas de lunettes ni chapeau</li>
+          <li>Cheveux dégagés du visage si possible</li>
+        </ul>
+      </div>
+
+    </div>
+  }
+
+  <!-- Étape 2 : Vue caméra (analyse temps réel) -->
+  @if (step() === 'camera') {
+    <div class="reco__camera-wrap">
+      <div class="reco__video-frame">
+        <video #videoEl autoplay playsinline muted class="reco__video"></video>
+        <div class="reco__video-overlay">
+          <div class="reco__face-guide"></div>
+        </div>
+
+        <!-- Badge forme détectée en live -->
+        @if (liveShape()) {
+          <div class="reco__live-badge">
+            <span class="reco__live-dot"></span>
+            Visage <strong>{{ liveShape() }}</strong>
+          </div>
+        }
+      </div>
+
+      <!-- Barre de stabilité -->
+      <div class="reco__stability-wrap">
+        <span class="reco__stability-label">Stabilité</span>
+        <div class="reco__stability-bar">
+          <div
+            class="reco__stability-fill"
+            [style.width.%]="liveStability()"
+            [class.reco__stability-fill--ready]="liveStability() >= 75"
+          ></div>
+        </div>
+        <span class="reco__stability-pct">{{ liveStability() }}%</span>
+      </div>
+
+      <div class="reco__camera-actions">
+        <!-- Confirmer manuellement si l'utilisateur ne veut pas attendre -->
+        <button
+          class="reco__confirm-btn"
+          [disabled]="!liveShape()"
+          (click)="confirmNow()"
+        >
+          Confirmer maintenant
+        </button>
+        <button class="reco__cancel-btn" (click)="cancelCamera()">Annuler</button>
+      </div>
+
+      <p class="reco__camera-hint">
+        @if (!liveShape()) {
+          Centre ton visage dans le cadre…
+        } @else if (liveStability() < 75) {
+          Maintiens ta position, analyse en cours…
+        } @else {
+          Verrouillage automatique dans un instant !
+        }
+      </p>
+    </div>
+  }
+
+  <!-- Étape 3 : Analyse en cours -->
+  @if (step() === 'analyzing') {
+    <div class="reco__analyzing">
+      <div class="reco__spinner"></div>
+      <p class="reco__analyzing-text">Analyse de ton visage en cours…</p>
+      <p class="reco__analyzing-sub">Détection des points du visage avec MediaPipe</p>
+    </div>
+  }
+
+  <!-- Étape 4 : Résultat -->
+  @if (step() === 'result' && shapeInfo()) {
+    <div class="reco__result">
+
+      <div class="reco__photo-wrap">
+        <img [src]="photoUrl()" alt="Ta photo" class="reco__photo" />
+        <div class="reco__shape-badge">
+          Visage <strong>{{ shapeInfo()!.label }}</strong>
+        </div>
+      </div>
+
+      <div class="reco__info">
+        <h2 class="reco__info-title">Forme de visage : {{ shapeInfo()!.label }}</h2>
+        <p class="reco__info-desc">{{ shapeInfo()!.description }}</p>
+        <p class="reco__info-tips">{{ shapeInfo()!.tips }}</p>
+
+        @if (skinTone()) {
+          <div class="reco__skin-row">
+            <span class="reco__skin-dot reco__skin-dot--{{ skinTone() }}"></span>
+            <div>
+              <span class="reco__skin-label">Teinte de peau : <strong>{{ skinTone() }}</strong></span>
+              <p class="reco__skin-desc">{{ skinDesc() }}</p>
+            </div>
+          </div>
+        }
+
+        <div class="reco__info-labels">
+          <span class="reco__info-label-title">Styles recommandés :</span>
+          <div class="reco__chips">
+            @for (label of finalLabels(); track label) {
+              <span class="reco__chip">{{ label }}</span>
+            }
+          </div>
+        </div>
+
+        <button class="reco__retry" (click)="reset()">
+          Essayer avec une autre photo
+        </button>
+      </div>
+
+    </div>
+
+    <div class="reco__gallery">
+      <h2 class="reco__gallery-title">
+        Inspirations pour toi
+        <span class="reco__gallery-count">{{ matchingPhotos().length }} photo(s)</span>
+      </h2>
+
+      @if (matchingPhotos().length === 0) {
+        <p class="reco__gallery-empty">
+          Aucune photo dans la galerie pour ces styles pour l'instant.<br>
+          Reviens après le prochain rendez-vous !
+        </p>
+      } @else {
+        <div class="reco__grid">
+          @for (photo of matchingPhotos(); track photo._id) {
+            <div class="reco__grid-item">
+              <img [src]="photo.url" [alt]="photo.alt || 'Coupe'" />
+              <div class="reco__grid-labels">
+                @for (l of photo.labels; track l) {
+                  <span class="reco__grid-chip">{{ l }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+</section>

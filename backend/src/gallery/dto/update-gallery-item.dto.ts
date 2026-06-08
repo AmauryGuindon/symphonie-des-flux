@@ -1,5 +1,5 @@
 import { Type, Transform } from 'class-transformer';
-import { IsOptional, IsString, IsBoolean, IsNumber, IsIn } from 'class-validator';
+import { IsOptional, IsString, IsBoolean, IsNumber, IsIn, IsArray } from 'class-validator';
 
 export class UpdateGalleryItemDto {
   @IsOptional()
@@ -28,4 +28,13 @@ export class UpdateGalleryItemDto {
   @Type(() => Number)
   @IsNumber()
   order?: number;
+
+  @IsOptional()
+  @IsIn(['raw', 'validated', 'labeled', 'processed', 'exported'])
+  status?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  labels?: string[];
 }

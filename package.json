@@ -1,5 +1,5 @@
 {
-  "name": "dany1st-barber",
+  "name": "datacut-frontend",
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
@@ -17,6 +17,7 @@
     "@angular/platform-browser": "^17.3.0",
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
+    "@mediapipe/tasks-vision": "^0.10.34",
     "chart.js": "^4.5.1",
     "gsap": "^3.12.5",
     "jspdf": "^4.2.1",

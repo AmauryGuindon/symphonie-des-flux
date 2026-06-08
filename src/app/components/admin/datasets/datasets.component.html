@@ -1,0 +1,123 @@
+@if (toast()) {
+  <div class="ds__toast" [class.ds__toast--err]="toast()!.type === 'err'">
+    {{ toast()!.message }}
+  </div>
+}
+
+<div class="ds">
+  <div class="ds__header">
+    <h2 class="ds__title">Datasets & Versions</h2>
+  </div>
+
+  <!-- Créer une version -->
+  <div class="ds__create-card">
+    <h3 class="ds__create-title">Créer une nouvelle version</h3>
+    <p class="ds__create-hint">
+      Capture un snapshot de toutes les images au statut
+      <strong>labelisé</strong>, <strong>traité</strong> ou <strong>exporté</strong>.
+    </p>
+    <div class="ds__create-row">
+      <input
+        class="ds__create-input"
+        type="text"
+        placeholder="Description (optionnel)"
+        [value]="description()"
+        (input)="description.set($any($event.target).value)"
+      />
+      <button class="ds__create-btn" [disabled]="creating()" (click)="createVersion()">
+        {{ creating() ? 'Création…' : '+ Créer version' }}
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <p class="ds__loading">Chargement…</p>
+  } @else {
+
+    <!-- Graphes -->
+    <div class="ds__charts">
+
+      <!-- Croissance -->
+      <div class="ds__chart-card">
+        <h4 class="ds__chart-title">Croissance du dataset (8 semaines)</h4>
+        <div class="ds__bar-chart">
+          @for (point of growth(); track point.week) {
+            <div class="ds__bar-group">
+              <div class="ds__bar-wrap">
+                <div
+                  class="ds__bar"
+                  [style.height.%]="barHeight(point.count, maxGrowth)"
+                  [title]="point.count + ' image(s)'"
+                ></div>
+              </div>
+              <span class="ds__bar-label">{{ point.week | date:'dd/MM' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Distribution des labels -->
+      <div class="ds__chart-card">
+        <h4 class="ds__chart-title">Distribution des labels</h4>
+        @if (labels().length === 0) {
+          <p class="ds__empty">Aucun label attribué pour l'instant.</p>
+        } @else {
+          <div class="ds__label-bars">
+            @for (stat of labels(); track stat.label) {
+              <div class="ds__label-row">
+                <span class="ds__label-name">{{ stat.label }}</span>
+                <div class="ds__label-bar-wrap">
+                  <div
+                    class="ds__label-bar-fill"
+                    [style.width.%]="barHeight(stat.count, maxLabelCount)"
+                  ></div>
+                </div>
+                <span class="ds__label-count">{{ stat.count }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Liste des versions -->
+    <div class="ds__versions">
+      <h3 class="ds__versions-title">Historique des versions</h3>
+      @if (versions().length === 0) {
+        <p class="ds__empty">Aucune version créée. Utilisez le formulaire ci-dessus.</p>
+      } @else {
+        <div class="ds__version-list">
+          @for (v of versions(); track v._id) {
+            <div class="ds__version-card">
+              <div class="ds__version-head">
+                <span class="ds__version-tag">{{ v.version }}</span>
+                <span class="ds__version-date">{{ v.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="ds__version-body">
+                <span class="ds__version-stat">
+                  {{ v.imageCount }} image{{ v.imageCount > 1 ? 's' : '' }}
+                </span>
+                @if (v.description) {
+                  <span class="ds__version-desc">{{ v.description }}</span>
+                }
+                <div class="ds__version-labels">
+                  @for (label of v.labelsIncluded; track label) {
+                    <span class="ds__version-label">{{ label }}</span>
+                  }
+                  @if (v.labelsIncluded.length === 0) {
+                    <span class="ds__version-no-label">Aucun label</span>
+                  }
+                </div>
+              </div>
+              <button class="ds__export-btn" (click)="exportVersion(v)">
+                ↓ Exporter JSON
+              </button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  }
+</div>

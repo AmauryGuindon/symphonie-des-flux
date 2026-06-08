@@ -1,13 +1,14 @@
 <nav class="navbar" [class.scrolled]="scrolled" [class.menu-open]="menuOpen">
   <div class="navbar__inner">
     <a class="navbar__logo" routerLink="/">
-      <img src="assets/logo/logo_dany1st.webp" alt="Dany1st Barber" class="navbar__logo-img" />
+      <span style="font-weight:800;font-size:1.2rem;letter-spacing:2px">DATA<span style="color:var(--gold,#c9a84c)">CUT</span></span>
     </a>
 
     <ul class="navbar__links">
       <li><a routerLink="/services" routerLinkActive="active">Services</a></li>
       <li><a routerLink="/gallery" routerLinkActive="active">Galerie</a></li>
       <li><a routerLink="/about" routerLinkActive="active">À Propos</a></li>
+      <li><a routerLink="/recommendation" routerLinkActive="active">Ma Coupe</a></li>
       <li>
         <a routerLink="/appointment" routerLinkActive="active" class="navbar__cta">
           Réserver
@@ -82,6 +83,7 @@
       <li><a routerLink="/services" routerLinkActive="active" (click)="closeMenu()">Services</a></li>
       <li><a routerLink="/gallery" routerLinkActive="active" (click)="closeMenu()">Galerie</a></li>
       <li><a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">À Propos</a></li>
+      <li><a routerLink="/recommendation" routerLinkActive="active" (click)="closeMenu()">Ma Coupe</a></li>
       <li>
         <a routerLink="/appointment" routerLinkActive="active" (click)="closeMenu()">
           Réserver

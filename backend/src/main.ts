@@ -53,7 +53,7 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
-  console.log(`Backend Dany1st démarré sur http://localhost:${port}/api`);
+  console.log(`Backend DataCut démarré sur http://localhost:${port}/api`);
   console.log(`Origines autorisées : ${ALLOWED_ORIGINS.join(', ')}`);
 }
 bootstrap();

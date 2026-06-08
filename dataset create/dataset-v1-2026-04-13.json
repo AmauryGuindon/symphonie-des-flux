@@ -1,0 +1,192 @@
+{
+  "version": "v1",
+  "createdAt": "2026-04-13T10:20:16.432Z",
+  "imageCount": 9,
+  "labelsIncluded": [
+    "burst-fade",
+    "adulte",
+    "après",
+    "taper",
+    "barbe",
+    "afro",
+    "dégradé",
+    "rasage",
+    "enfant",
+    "tresse"
+  ],
+  "description": "Version test école V1",
+  "images": [
+    {
+      "id": "69dcc14426a6927f935bd9d2",
+      "url": "/uploads/gallery/1776075076734-577447480.png",
+      "labels": [
+        "burst-fade",
+        "adulte",
+        "après"
+      ],
+      "category": "degrade",
+      "features": {
+        "width": 705,
+        "height": 921,
+        "sizeKb": 677,
+        "format": "png",
+        "dominantColor": "#686878"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc14826a6927f935bd9d5",
+      "url": "/uploads/gallery/1776075080759-168451781.png",
+      "labels": [
+        "burst-fade",
+        "adulte",
+        "après"
+      ],
+      "category": "degrade",
+      "features": {
+        "width": 634,
+        "height": 912,
+        "sizeKb": 598,
+        "format": "png",
+        "dominantColor": "#686868"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc14b26a6927f935bd9d8",
+      "url": "/uploads/gallery/1776075083888-917998472.png",
+      "labels": [
+        "taper",
+        "adulte",
+        "après"
+      ],
+      "category": "degrade",
+      "features": {
+        "width": 646,
+        "height": 917,
+        "sizeKb": 664,
+        "format": "png",
+        "dominantColor": "#888888"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc14f26a6927f935bd9db",
+      "url": "/uploads/gallery/1776075087335-836050282.png",
+      "labels": [
+        "taper",
+        "adulte",
+        "après"
+      ],
+      "category": "degrade",
+      "features": {
+        "width": 637,
+        "height": 917,
+        "sizeKb": 634,
+        "format": "png",
+        "dominantColor": "#9898a8"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc27026a6927f935bdac6",
+      "url": "/uploads/gallery/1776075376743-477789554.jpg",
+      "labels": [
+        "burst-fade",
+        "barbe",
+        "adulte",
+        "après",
+        "afro"
+      ],
+      "category": "",
+      "features": {
+        "width": 219,
+        "height": 230,
+        "sizeKb": 6,
+        "format": "jpeg",
+        "dominantColor": "#282828"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc27426a6927f935bdac9",
+      "url": "/uploads/gallery/1776075380584-287735212.jpg",
+      "labels": [
+        "barbe",
+        "dégradé",
+        "adulte",
+        "après",
+        "afro"
+      ],
+      "category": "",
+      "features": {
+        "width": 225,
+        "height": 225,
+        "sizeKb": 6,
+        "format": "jpeg",
+        "dominantColor": "#78b8e8"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc27826a6927f935bdacc",
+      "url": "/uploads/gallery/1776075384399-863872759.jpg",
+      "labels": [
+        "après",
+        "dégradé",
+        "afro",
+        "adulte",
+        "rasage"
+      ],
+      "category": "degrade",
+      "features": {
+        "width": 201,
+        "height": 251,
+        "sizeKb": 6,
+        "format": "jpeg",
+        "dominantColor": "#c8d8d8"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc27b26a6927f935bdacf",
+      "url": "/uploads/gallery/1776075387718-339513988.jpg",
+      "labels": [
+        "taper",
+        "afro",
+        "après",
+        "enfant"
+      ],
+      "category": "coupe",
+      "features": {
+        "width": 201,
+        "height": 251,
+        "sizeKb": 6,
+        "format": "jpeg",
+        "dominantColor": "#586878"
+      },
+      "status": "exported"
+    },
+    {
+      "id": "69dcc27e26a6927f935bdad2",
+      "url": "/uploads/gallery/1776075390920-481893175.jpg",
+      "labels": [
+        "tresse",
+        "taper",
+        "afro",
+        "barbe",
+        "adulte",
+        "après"
+      ],
+      "category": "coupe",
+      "features": {
+        "width": 245,
+        "height": 206,
+        "sizeKb": 5,
+        "format": "jpeg",
+        "dominantColor": "#989898"
+      },
+      "status": "exported"
+    }
+  ]
+}

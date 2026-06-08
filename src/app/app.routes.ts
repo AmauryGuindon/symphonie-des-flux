@@ -22,7 +22,10 @@ import { AdminAccountingComponent } from './components/admin/accounting/accounti
 import { AdminServicesComponent } from './components/admin/services/services.component';
 import { AdminGalleryComponent } from './components/admin/gallery/gallery.component';
 import { AdminNewsletterComponent } from './components/admin/newsletter/newsletter.component';
+import { AdminPipelineComponent } from './components/admin/pipeline/pipeline.component';
+import { AdminDatasetsComponent } from './components/admin/datasets/datasets.component';
 import { OAuthCallbackComponent } from './components/auth/oauth-callback/oauth-callback.component';
+import { RecommendationComponent } from './components/recommendation/recommendation.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { MentionsLegalesComponent } from './components/legal/mentions-legales/mentions-legales.component';
 import { CguComponent } from './components/legal/cgu/cgu.component';
@@ -35,6 +38,7 @@ export const routes: Routes = [
   { path: 'gallery', component: GalleryComponent },
   { path: 'about', component: AboutComponent },
   { path: 'booking', component: BookingComponent },
+  { path: 'recommendation', component: RecommendationComponent },
   { path: 'appointment', component: AppointmentBookingComponent },
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
@@ -59,6 +63,8 @@ export const routes: Routes = [
       { path: 'prestations', component: AdminServicesComponent },
       { path: 'gallery', component: AdminGalleryComponent },
       { path: 'newsletter', component: AdminNewsletterComponent },
+      { path: 'pipeline', component: AdminPipelineComponent },
+      { path: 'datasets', component: AdminDatasetsComponent },
     ],
   },
   { path: 'mentions-legales', component: MentionsLegalesComponent },

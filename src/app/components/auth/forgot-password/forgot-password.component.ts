@@ -23,7 +23,7 @@ export class ForgotPasswordComponent {
     if (!this.email) { this.error.set('Veuillez saisir votre email.'); return; }
     this.loading.set(true);
     this.error.set('');
-    this.http.post('http://localhost:3000/api/auth/forgot-password', { email: this.email }).subscribe({
+    this.http.post('http://localhost:3001/api/auth/forgot-password', { email: this.email }).subscribe({
       next: () => { this.sent.set(true); this.loading.set(false); },
       error: () => { this.error.set('Une erreur est survenue. Réessayez.'); this.loading.set(false); },
     });

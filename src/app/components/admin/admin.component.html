@@ -5,7 +5,7 @@
     <button class="admin-topbar__burger" (click)="sidebarOpen.set(!sidebarOpen())" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
-    <span class="admin-topbar__title">DANY<span>1ST</span></span>
+    <span class="admin-topbar__title">DATA<span>CUT</span></span>
   </div>
 
   <!-- Overlay -->
@@ -14,7 +14,7 @@
   <!-- Sidebar -->
   <aside class="admin-sidebar">
     <div class="admin-sidebar__brand">
-      <span class="admin-sidebar__brand-name">DANY<span>1ST</span></span>
+      <span class="admin-sidebar__brand-name">DATA<span>CUT</span></span>
       <span class="admin-sidebar__brand-label">Backoffice</span>
     </div>
 
@@ -93,6 +93,23 @@
           <polyline points="22,6 12,13 2,6"/>
         </svg>
         Newsletter
+      </a>
+
+      <div class="admin-sidebar__separator"></div>
+
+      <a routerLink="/admin/pipeline" routerLinkActive="active" class="admin-sidebar__link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Pipeline
+      </a>
+      <a routerLink="/admin/datasets" routerLinkActive="active" class="admin-sidebar__link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <ellipse cx="12" cy="5" rx="9" ry="3"/>
+          <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+          <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+        </svg>
+        Datasets
       </a>
     </nav>
 

@@ -42,6 +42,13 @@ export class GalleryController {
     return this.galleryService.findAll();
   }
 
+  @Get('admin/gallery/pipeline-stats')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  pipelineStats() {
+    return this.galleryService.pipelineStats();
+  }
+
   @Post('admin/gallery')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
@@ -67,7 +74,16 @@ export class GalleryController {
   ) {
     if (!file) throw new BadRequestException('Fichier requis');
     const url = `/uploads/gallery/${file.filename}`;
-    return this.galleryService.create(file.filename, url, body.alt, body.span, body.category);
+    return this.galleryService.create(
+      file.filename,
+      url,
+      file.path,
+      file.size,
+      file.mimetype,
+      body.alt,
+      body.span,
+      body.category,
+    );
   }
 
   @Patch('admin/gallery/reorder')
